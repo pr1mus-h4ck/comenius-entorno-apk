@@ -1,14 +1,21 @@
-import { post } from "../api/api";
-import { API } from "../api/endpoints";
-
 export async function login(correo, contrasena) {
 
-  return await post(API.LOGIN, {
+  return {
+
+    ok: true,
+
+    usuarioID: 1,
+
+    sessionID: "123456",
+
+    nombre: "Mariana",
+
+    rol: "alumno",
 
     correo,
 
-    contrasena,
+    verificacion: false,
 
-  });
+  };
 
 }
