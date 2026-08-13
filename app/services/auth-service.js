@@ -267,3 +267,197 @@ export function confirmarOtp(usuarioID, sessionID, otp) {
 
     });
 }
+
+// ===============================
+// OBTENER LISTA DE COMISIONES
+// ===============================
+
+export function actualizarListaComision(usuarioID, sessionID, rol) {
+
+  // URL del Back-End
+  const URL = "http://localhost:3000/actualizarListaComision";
+
+  // Enviar datos de sesión al Back-End
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      id: usuarioID,
+      session: sessionID,
+      rol: rol,
+    }),
+
+  })
+
+    // Convertir respuesta a JSON
+    .then((recibir) => recibir.json())
+
+    // Adaptar respuesta del Back-End
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta lista de comisiones:",
+        recibido
+      );
+
+      return {
+        ok: !!recibido.comision,
+
+        comisiones: recibido.comision,
+
+        mensaje: recibido.mensaje,
+      };
+
+    })
+
+    // Error de conexión
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener comisiones:",
+        error
+      );
+
+      return {
+        ok: false,
+
+        comisiones: [],
+
+        mensaje: "No se pudieron obtener las comisiones.",
+      };
+
+    });
+
+}
+
+// ===============================
+// INGRESAR A COMISION
+// ===============================
+
+export function ingresarComision(comision, comisionID) {
+
+  const URL = "http://localhost:3000/ingresarComision";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      comision: comision,
+      comisionID: comisionID,
+    }),
+
+  })
+
+    .then((recibir) => {
+
+      console.log(
+        "✅ Respuesta ingresar comisión:",
+        recibir.status
+      );
+
+      return recibir.ok;
+
+    })
+
+    .then((ok) => {
+
+      return {
+        ok: ok,
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al ingresar a la comisión:",
+        error
+      );
+
+      return {
+        ok: false,
+      };
+
+    });
+
+}
+
+// ===============================
+// OBTENER PORTADA
+// ===============================
+
+export function obtenerPortada(usuarioID, sessionID, comisionID) {
+
+  // URL del Back-End
+  const URL = "http://localhost:3000/actualizarPortada";
+
+  // Enviar datos al Back-End
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      id: usuarioID,
+      session: sessionID,
+      comisionID: comisionID,
+    }),
+
+  })
+
+    // Convertir respuesta a JSON
+    .then((recibir) => recibir.json())
+
+    // Adaptar respuesta del Back-End
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta portada:",
+        recibido
+      );
+
+      return {
+        ok: !!recibido.portada,
+
+        portada: recibido.portada,
+
+        mensaje: recibido.mensaje,
+      };
+
+    })
+
+    // Error de conexión
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener portada:",
+        error
+      );
+
+      return {
+        ok: false,
+
+        portada: [],
+
+        mensaje: "No se pudo obtener la portada.",
+      };
+
+    });
+
+}
