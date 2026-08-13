@@ -3,54 +3,46 @@ import { useState } from "react";
 import {
   StyleSheet,
   Text,
-  View
+  View,
+  Pressable,
+  Alert,
 } from "react-native";
 
-import Button from "../../components/Button";
-
-import Input from "../../components/Input";
-
-import Card from "../../components/Card";
+import * as Clipboard from "expo-clipboard";
 
 import AuthLayout from "../../components/AuthLayout";
-
 import AuthSide from "../../components/AuthSide";
+import Button from "../../components/Button";
+import Input from "../../components/Input";
 
 import { COLORS } from "../../constants/colors";
-
 import { SPACING } from "../../constants/spacing";
-
 import { TYPOGRAPHY } from "../../constants/typography";
-
-import { RADIUS } from "../../constants/radius";
 
 import { useSession } from "../../context/SessionContext";
 
 import { iniciarSesion } from "../../services/session";
-
 import { login } from "../../services/auth-service";
-
 import { irOtp } from "../../services/navigation-service";
 
 export default function LoginScreen() {
 
-  // ==========================
-  // Hooks
-  // ==========================
-
   const { setSession } = useSession();
 
-  // ==========================
-  // Estados
-  // ==========================
+  // ==========================================
+  // ESTADOS
+  // ==========================================
 
   const [correo, setCorreo] = useState("");
 
   const [contrasena, setContrasena] = useState("");
 
-  // ==========================
-  // Login
-  // ==========================
+  const [mostrarCredenciales, setMostrarCredenciales] = useState(false);
+
+
+  // ==========================================
+  // LOGIN
+  // ==========================================
 
   async function iniciarSesionClick() {
 
@@ -61,130 +53,374 @@ export default function LoginScreen() {
 
     if (respuesta.ok) {
 
+      Alert.alert(
+        "Atención",
+        respuesta.mensaje
+      );
+
+      //Guardamos la sesión 
       iniciarSesion(
         respuesta,
         setSession
       );
 
-      // Por ahora siempre pasa a OTP
       irOtp();
 
     }
 
   }
 
-  // ==========================
-  // Render
-  // ==========================
 
-return (
+  // ==========================================
+  // COPIAR CREDENCIAL
+  // ==========================================
 
-  <AuthLayout
+  async function copiarTexto(texto) {
 
-    left={
+    await Clipboard.setStringAsync(texto);
 
-      <AuthSide
+  }
 
-        title="Credenciales de ingreso"
 
-        subtitle="¿Olvidaste tus credenciales?"
+  // ==========================================
+  // PANTALLA DE CREDENCIALES
+  // ==========================================
 
-        buttonText="Visualizar"
+  if (mostrarCredenciales) {
 
-        onPress={() => {}}
+    return (
 
-      />
+      <AuthLayout
 
-    }
+        left={
 
-  >
+          <AuthSide
 
-    <Text style={styles.bienvenido}>
-      ¡Bienvenido!
-    </Text>
+            title="¿Estás listo para ingresar a CVS?"
 
-    <Text style={styles.titulo}>
-      Iniciar sesión
-    </Text>
+            subtitle="No olvides copiar las credenciales."
 
-    <Text style={styles.subtitulo}>
-      Usando tu cuenta de estudiante.
-    </Text>
+            buttonText="Ingresar"
 
-    <Input
-      placeholder="Correo electrónico"
-      value={correo}
-      onChangeText={setCorreo}
-    />
+            onPress={() =>
+              setMostrarCredenciales(false)
+            }
 
-    <Input
-      placeholder="Contraseña"
-      secureTextEntry
-      value={contrasena}
-      onChangeText={setContrasena}
-    />
+          />
 
-    <Button
-      title="Iniciar sesión"
-      onPress={iniciarSesionClick}
-    />
+        }
 
-  </AuthLayout>
+      >
 
-);
+        <View style={styles.credencialesContainer}>
+
+          {/* ==================================
+              CORREO ALUMNO
+          ================================== */}
+
+          <Text style={styles.credencialTitulo}>
+            Correo de Alumno
+          </Text>
+
+          <Text style={styles.credencialDato}>
+            h1yhzo1z5w@ibolinva.com
+          </Text>
+
+          <Pressable
+            style={styles.botonCredencial}
+
+            onPress={() =>
+              copiarTexto(
+                "h1yhzo1z5w@ibolinva.com"
+              )
+            }
+          >
+
+            <Text style={styles.textoBotonCredencial}>
+              Copiar Correo
+            </Text>
+
+          </Pressable>
+
+
+          {/* ==================================
+              CORREO INSTRUCTOR
+          ================================== */}
+
+          <Text style={styles.credencialTitulo}>
+            Correo de Instructor
+          </Text>
+
+          <Text style={styles.credencialDato}>
+            ev1v4y5v7x@wvatxiy.com
+          </Text>
+
+          <Pressable
+            style={styles.botonCredencial}
+
+            onPress={() =>
+              copiarTexto(
+                "ev1v4y5v7x@wvatxiy.com"
+              )
+            }
+          >
+
+            <Text style={styles.textoBotonCredencial}>
+              Copiar Correo
+            </Text>
+
+          </Pressable>
+
+
+          {/* ==================================
+              CONTRASEÑA
+          ================================== */}
+
+          <Text style={styles.credencialTitulo}>
+            Contraseña Genérica
+          </Text>
+
+          <Text style={styles.credencialDato}>
+            54321
+          </Text>
+
+          <Pressable
+            style={styles.botonCredencial}
+
+            onPress={() =>
+              copiarTexto("54321")
+            }
+          >
+
+            <Text style={styles.textoBotonCredencial}>
+              Copiar Contraseña
+            </Text>
+
+          </Pressable>
+
+        </View>
+
+      </AuthLayout>
+
+    );
+
+  }
+
+
+  // ==========================================
+  // LOGIN
+  // ==========================================
+
+  return (
+
+    <AuthLayout
+
+      left={
+
+        <AuthSide
+
+          title="Credenciales de Ingreso"
+
+          subtitle="¿Olvidaste tus credenciales?"
+
+          buttonText="Visualizar"
+
+          onPress={() =>
+            setMostrarCredenciales(true)
+          }
+
+        />
+
+      }
+
+    >
+
+      <View style={styles.container}>
+
+        {/* ==================================
+            TITULO
+        ================================== */}
+
+        <Text style={styles.bienvenido}>
+          ¡Bienvenido!
+        </Text>
+
+        <Text style={styles.titulo}>
+          Inicia sesión
+        </Text>
+
+        <Text style={styles.subtitulo}>
+          Usando tu cuenta de estudiante.
+        </Text>
+
+
+        {/* ==================================
+            FORMULARIO
+        ================================== */}
+
+        <View style={styles.form}>
+
+          <Text style={styles.label}>
+            Correo Electrónico
+          </Text>
+
+          <Input
+            placeholder="Ingresa tu correo electrónico"
+
+            value={correo}
+
+            onChangeText={setCorreo}
+
+            keyboardType="email-address"
+          />
+
+
+          <Text style={styles.label}>
+            Contraseña
+          </Text>
+
+          <Input
+            placeholder="Ingresa tu contraseña"
+
+            secureTextEntry
+
+            value={contrasena}
+
+            onChangeText={setContrasena}
+          />
+
+
+          <Button
+            title="Iniciar"
+
+            onPress={iniciarSesionClick}
+          />
+
+        </View>
+
+      </View>
+
+    </AuthLayout>
+
+  );
 }
+
+
+// ==========================================
+// ESTILOS
+// ==========================================
 
 const styles = StyleSheet.create({
 
+  // ========================================
+  // LOGIN
+  // ========================================
+
   container: {
 
-  flex: 1,
+    width: "100%",
 
-  justifyContent: "center",
+    maxWidth: 400,
 
-  alignItems: "center",
+    alignSelf: "center",
 
-  padding: SPACING.xxl,
+    alignItems: "center",
 
-  backgroundColor: COLORS.background,
+  },
 
-},
-
-  card: {
-
-  backgroundColor: COLORS.card,
-
-  borderRadius: RADIUS.md,
-
-  padding: SPACING.xl,
-
-  marginBottom: SPACING.lg,
-
-  borderWidth: 1,
-
-  borderColor: COLORS.border,
-
-  width: "100%",
-
-  alignSelf: "center",
-
-},
 
   bienvenido: {
 
     fontSize: TYPOGRAPHY.body,
 
-    color: COLORS.textSecondary,
+    color: COLORS.text,
+
+    textAlign: "center",
+
+    marginBottom: 2,
+
+  },
+
+
+  titulo: {
+
+    fontSize: TYPOGRAPHY.h2,
+
+    fontWeight: "bold",
+
+    color: COLORS.primary,
+
+    textAlign: "center",
 
     marginBottom: SPACING.xs,
 
   },
 
-  titulo: {
 
-    fontSize: TYPOGRAPHY.title,
+  subtitulo: {
+
+    fontSize: TYPOGRAPHY.small,
+
+    color: COLORS.text,
+
+    textAlign: "center",
+
+    marginBottom: SPACING.xxl,
+
+  },
+
+
+  form: {
+
+    width: "100%",
+
+  },
+
+
+  label: {
+
+    fontSize: TYPOGRAPHY.small,
+
+    color: COLORS.text,
+
+    marginBottom: SPACING.xs,
+
+  },
+
+
+  // ========================================
+  // CREDENCIALES
+  // ========================================
+
+  credencialesContainer: {
+
+    width: "100%",
+
+    maxWidth: 450,
+
+    alignSelf: "center",
+
+    justifyContent: "center",
+
+  },
+
+
+  credencialTitulo: {
+
+    fontSize: TYPOGRAPHY.h3,
 
     fontWeight: "bold",
+
+    color: COLORS.primary,
+
+    marginBottom: SPACING.xs,
+
+  },
+
+
+  credencialDato: {
+
+    fontSize: TYPOGRAPHY.body,
 
     color: COLORS.text,
 
@@ -192,13 +428,33 @@ const styles = StyleSheet.create({
 
   },
 
-  subtitulo: {
 
-    fontSize: TYPOGRAPHY.body,
+  botonCredencial: {
 
-    color: COLORS.textSecondary,
+    width: "100%",
 
-    marginBottom: SPACING.xxl,
+    backgroundColor: COLORS.primary,
+
+    borderRadius: 8,
+
+    alignItems: "center",
+
+    justifyContent: "center",
+
+    paddingVertical: 12,
+
+    marginBottom: SPACING.sm,
+
+  },
+
+
+  textoBotonCredencial: {
+
+    color: COLORS.white,
+
+    fontSize: TYPOGRAPHY.small,
+
+    fontWeight: "bold",
 
   },
 

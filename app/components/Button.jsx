@@ -1,7 +1,7 @@
 import {
   Pressable,
-  Text,
   StyleSheet,
+  Text,
 } from "react-native";
 
 import { COLORS } from "../constants/colors";
@@ -10,101 +10,51 @@ import { SPACING } from "../constants/spacing";
 import { TYPOGRAPHY } from "../constants/typography";
 
 export default function Button({
-
   title,
-
   onPress,
-
-  disabled = false,
-
   style,
-
-  textStyle,
-
 }) {
 
   return (
-
     <Pressable
-
-      disabled={disabled}
-
-      onPress={onPress}
-
-      style={({ pressed }) => [
-
+      style={[
         styles.button,
-
-        pressed && styles.buttonPressed,
-
-        disabled && styles.buttonDisabled,
-
         style,
-
       ]}
-
+      onPress={onPress}
     >
 
-      <Text
-
-        style={[
-
-          styles.text,
-
-          textStyle,
-
-        ]}
-
-      >
-
+      <Text style={styles.text}>
         {title}
-
       </Text>
 
     </Pressable>
-
   );
-
 }
 
 const styles = StyleSheet.create({
 
   button: {
+    width: "100%",
+
+    minHeight: 42,
 
     backgroundColor: COLORS.primary,
-
-    paddingVertical: SPACING.lg,
-
-    paddingHorizontal: SPACING.xl,
 
     borderRadius: RADIUS.md,
 
     alignItems: "center",
-
     justifyContent: "center",
 
-  },
-
-  buttonPressed: {
-
-    backgroundColor: COLORS.primaryDark,
-
-  },
-
-  buttonDisabled: {
-
-    opacity: 0.5,
-
+    paddingVertical: SPACING.sm,
   },
 
   text: {
-
     color: COLORS.white,
 
-    fontSize: TYPOGRAPHY.button,
+    fontSize: TYPOGRAPHY.small,
 
     fontWeight: "bold",
-
   },
 
 });

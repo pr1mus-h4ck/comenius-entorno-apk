@@ -1,4 +1,7 @@
-import { StyleSheet, TextInput } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+} from "react-native";
 
 import { COLORS } from "../constants/colors";
 import { RADIUS } from "../constants/radius";
@@ -6,23 +9,14 @@ import { SPACING } from "../constants/spacing";
 import { TYPOGRAPHY } from "../constants/typography";
 
 export default function Input({
-
   value,
-
   onChangeText,
-
   placeholder,
-
   secureTextEntry = false,
-
   keyboardType = "default",
-
   autoCapitalize = "none",
-
   style,
-
   ...props
-
 }) {
 
   return (
@@ -43,23 +37,24 @@ export default function Input({
 
       autoCapitalize={autoCapitalize}
 
-      style={[styles.input, style]}
+      style={[
+        styles.input,
+        style,
+      ]}
 
       {...props}
 
     />
 
   );
-
 }
 
 const styles = StyleSheet.create({
 
   input: {
-
     width: "100%",
 
-    backgroundColor: COLORS.white,
+    minHeight: 44,
 
     borderWidth: 1,
 
@@ -67,16 +62,17 @@ const styles = StyleSheet.create({
 
     borderRadius: RADIUS.md,
 
-    paddingVertical: SPACING.md,
+    backgroundColor: COLORS.surface,
 
     paddingHorizontal: SPACING.md,
 
-    marginBottom: SPACING.md,
+    paddingVertical: SPACING.sm,
+
+    fontSize: TYPOGRAPHY.small,
 
     color: COLORS.text,
 
-    fontSize: TYPOGRAPHY.body,
-
+    marginBottom: SPACING.lg,
   },
 
 });
