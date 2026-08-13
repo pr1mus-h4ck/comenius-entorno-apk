@@ -17,9 +17,6 @@ export function login(correo, contrasena) {
     .then((recibir) => recibir.json())
     .then((recibido) => {
       // Aquí adaptamos lo que devuelve tu API al formato que espera tu pantalla
-      console.log(
-        recibido.usuarioID + " " + recibido.sessionID + " " + recibido.correo,
-      );
       return {
         ok: true,
         usuarioID: recibido.usuarioID,
