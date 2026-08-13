@@ -1,20 +1,7 @@
-import { useEffect, useState } from "react";
-
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  Alert,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { irMateria } from "../../../services/navigation-service";
 import { useSessionService } from "../../../services/session-service";
-import {actualizarListaComision, ingresarComision as ingresarComisionApi} from "../../../services/auth-service";
-
-import {
-  actualizarListaComision,
-} from "../../../services/auth-service";
 
 import Header from "../../../components/Header";
 
@@ -25,100 +12,39 @@ import { TYPOGRAPHY } from "../../../constants/typography";
 
 export default function ListaComision() {
 
-  const [comisiones, setComisiones] = useState([]);
+const comisiones = [
 
-  const {
-    session,
-    actualizarCampo,
-  } = useSessionService();
+  {
+    id: 1,
+    nombre: "Sistemas Operativos",
+    comision: "A",
+    profesor: "Mariana López",
+  },
 
+  {
+    id: 2,
+    nombre: "Programación II",
+    comision: "B",
+    profesor: "Juan Pérez",
+  },
 
-  // ==========================================
-  // OBTENER COMISIONES
-  // ==========================================
+];    
 
-  useEffect(() => {
+  const { actualizarCampo } = useSessionService();
 
-    cargarComisiones();
+  function ingresarComision(comision) {
 
-  }, []);
+    actualizarCampo("comision", comision);
 
+    actualizarCampo("comisionID", comision.id);
 
-  async function cargarComisiones() {
+    actualizarCampo("item", "Materia");
 
-    const respuesta = await actualizarListaComision(
+    actualizarCampo("enlace", "Portada");
 
-      session.usuarioID,
-
-      session.sessionID,
-
-      session.rol
-
-    );
-
-
-    if (!respuesta.ok) {
-
-      Alert.alert(
-        "Error",
-        respuesta.mensaje
-      );
-
-      return;
-    }
-
-
-    setComisiones(
-      respuesta.comisiones
-    );
+    irMateria();
 
   }
-
-
-  // ==========================================
-  // INGRESAR A COMISION
-  // ==========================================
-
-  async function ingresarComision(comision) {
-
-  const respuesta = await ingresarComisionApi(
-    comision,
-    comision.id
-  );
-
-  if (!respuesta.ok) {
-
-    Alert.alert(
-      "Error",
-      "No se pudo ingresar a la comisión."
-    );
-
-    return;
-  }
-
-  actualizarCampo(
-    "comision",
-    comision
-  );
-
-  actualizarCampo(
-    "comisionID",
-    comision.id
-  );
-
-  actualizarCampo(
-    "item",
-    "Materia"
-  );
-
-  actualizarCampo(
-    "enlace",
-    "Portada"
-  );
-
-  irMateria();
-}
-
 
   return (
 
@@ -132,51 +58,34 @@ export default function ListaComision() {
 
       />
 
-
       {comisiones.map((comision) => (
 
         <Pressable
-
-          key={comision.id}
-
-          style={styles.card}
-
-          onPress={() =>
-            ingresarComision(comision)
-          }
-
+            key={comision.id}
+            style={styles.card}
+            onPress={() => ingresarComision(comision)}
         >
 
-          <Text style={styles.nombre}>
-
+            <Text style={styles.nombre}>
             {comision.nombre}
+            </Text>
 
-          </Text>
+            <Text style={styles.detalle}>
+              Comisión {comision.comision}
+            </Text>
 
-
-          <Text style={styles.detalle}>
-
-            Comisión {comision.comision}
-
-          </Text>
-
-
-          <Text style={styles.detalle}>
-
-            Profesor: {comision.profesor}
-
-          </Text>
+            <Text style={styles.detalle}>
+              Profesor: {comision.profesor}
+            </Text>
 
         </Pressable>
 
-      ))}
-
+        ))}
     </View>
 
   );
 
 }
-
 
 const styles = StyleSheet.create({
 
@@ -189,7 +98,6 @@ const styles = StyleSheet.create({
     padding: SPACING.xl,
 
   },
-
 
   card: {
 
@@ -207,7 +115,6 @@ const styles = StyleSheet.create({
 
   },
 
-
   nombre: {
 
     fontSize: TYPOGRAPHY.h3,
@@ -219,7 +126,6 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
 
   },
-
 
   detalle: {
 
