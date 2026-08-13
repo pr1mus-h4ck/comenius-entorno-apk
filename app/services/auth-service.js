@@ -1,12 +1,10 @@
 // ✅ Fetch usando .then() — sin async/await
 export function login(correo, contrasena) {
-
   if (!correo.trim() || !contrasena.trim()) {
     return Promise.resolve({
       ok: false,
-      mensaje: "Por favor, completa todos los campos"
+      mensaje: "Por favor, completa todos los campos",
     });
-
   }
   // Reemplaza esta URL por la de tu API real
   const URL = "http://localhost:3000/login";
@@ -48,7 +46,6 @@ export function login(correo, contrasena) {
 // ===============================
 
 export function enviarOtp(usuarioID, sessionID) {
-
   // URL del Back-End
   const URL = "http://localhost:3000/enviar-otp";
 
@@ -85,8 +82,8 @@ export function enviarOtp(usuarioID, sessionID) {
       return {
         ok: false,
         mensaje: "No se pudo enviar el código de verificación",
-      }
-    })
+      };
+    });
 }
 
 // ===============================
@@ -94,7 +91,6 @@ export function enviarOtp(usuarioID, sessionID) {
 // ===============================
 
 export function confirmarOtp(usuarioID, sessionID, otp) {
-
   if (!otp || !otp.length !== 6) {
     return Promise.resolve({
       ok: false,
@@ -134,136 +130,11 @@ export function confirmarOtp(usuarioID, sessionID, otp) {
     })
 
     .catch((error) => {
-
       console.log("❌ Error confirmar OTP:", error);
 
       return {
         ok: false,
         mensaje: "No se pudo verificar el código.",
       };
-
-    });
-}
-
-// ===============================
-// ENVIAR OTP
-// ===============================
-
-export function enviarOtp(usuarioID, sessionID) {
-
-  // URL del Back-End
-  const URL = "http://localhost:3000/enviar-otp";
-
-  // Enviar datos de sesión al Back-End
-  return fetch(URL, {
-    method: "POST",
-
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-
-    body: JSON.stringify({
-      id: usuarioID,
-      session: sessionID,
-    }),
-  })
-
-    // Convertir respuesta a JSON
-    .then((recibir) => recibir.json())
-
-    // Adaptar respuesta del Back-End
-    .then((recibido) => {
-
-      console.log("✅ Respuesta enviar OTP:", recibido);
-
-      return {
-        ok: recibido.correoEnviado === "success",
-        correoEnviado: recibido.correoEnviado,
-        otp: recibido.otp,
-        mensaje: recibido.tipo,
-      };
-
-    })
-
-    // Error de conexión
-    .catch((error) => {
-
-      console.log("❌ Error enviar OTP:", error);
-
-      return {
-        ok: false,
-        mensaje: "No se pudo enviar el código.",
-      };
-
-    });
-}
-
-
-// ===============================
-// CONFIRMAR OTP
-// ===============================
-
-export function confirmarOtp(usuarioID, sessionID, otp) {
-
-  // Validar código antes de hacer el fetch
-  if (!otp || otp.length !== 6) {
-
-    return Promise.resolve({
-      ok: false,
-      mensaje: "Debe completar el código de 6 dígitos.",
-    });
-
-  }
-
-  // URL del Back-End
-  const URL = "http://localhost:3000/confirmar-otp";
-
-  // Enviar código al Back-End
-  return fetch(URL, {
-    method: "POST",
-
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-
-    body: JSON.stringify({
-      id: usuarioID,
-      session: sessionID,
-      otp: otp,
-    }),
-  })
-
-    // Convertir respuesta a JSON
-    .then((recibir) => recibir.json())
-
-    // Adaptar respuesta del Back-End
-    .then((recibido) => {
-
-      console.log("✅ Respuesta confirmar OTP:", recibido);
-
-      return {
-        ok: !!recibido.verificacion,
-        verificacion: recibido.verificacion,
-        rol: recibido.rol,
-        nombre: recibido.nombre,
-        instructorID: recibido.instructorId,
-        intentos: recibido.intentos,
-        mensaje: recibido.tipo,
-      };
-
-    })
-
-    // Error de conexión
-    .catch((error) => {
-
-      console.log("❌ Error confirmar OTP:", error);
-
-      return {
-        ok: false,
-        mensaje: "No se pudo verificar el código.",
-      };
-
     });
 }
