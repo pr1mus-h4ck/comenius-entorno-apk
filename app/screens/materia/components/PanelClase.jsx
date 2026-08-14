@@ -5,8 +5,8 @@ import {
   StyleSheet
 } from "react-native";
 
+import { obtenerPublicaciones } from "../../../services/auth-service";
 import { useSessionService } from "../../../services/session-service";
-import { obtenerPublicaciones } from "../../../services/materia-service";
 
 import { COLORS } from "../../../constants/colors";
 
@@ -27,9 +27,30 @@ export default function PanelClase() {
 
 async function cargarPublicaciones() {
 
-  const datos = await obtenerPublicaciones();
+  const respuesta = await obtenerPublicaciones(
 
-  setPublicaciones(datos);
+    session.usuarioID,
+
+    session.sessionID,
+
+    session.comisionID
+
+  );
+
+  if (!respuesta.ok) {
+
+    console.log(
+      "❌",
+      respuesta.mensaje
+    );
+
+    return;
+
+  }
+
+  setPublicaciones(
+    respuesta.publicaciones
+  );
 
 }
 

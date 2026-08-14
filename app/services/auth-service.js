@@ -138,3 +138,484 @@ export function confirmarOtp(usuarioID, sessionID, otp) {
       };
     });
 }
+// ===============================
+// OBTENER LISTA DE COMISIONES
+// ===============================
+
+export function actualizarListaComision(
+  usuarioID,
+  sessionID,
+  rol
+) {
+
+  const URL =
+    "http://localhost:3000/actualizarListaComision";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      rol: rol,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta lista de comisiones:",
+        recibido
+      );
+
+      return {
+
+        ok: !!recibido.comision,
+
+        comisiones:
+          recibido.comision,
+
+        mensaje:
+          recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener comisiones:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        comisiones: [],
+
+        mensaje:
+          "No se pudieron obtener las comisiones.",
+
+      };
+
+    });
+
+}
+
+
+// ===============================
+// INGRESAR A COMISION
+// ===============================
+
+export function ingresarComision(
+  comision,
+  comisionID
+) {
+
+  const URL =
+    "http://localhost:3000/ingresarComision";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      comision: comision,
+
+      comisionID: comisionID,
+
+    }),
+
+  })
+
+    .then((recibir) => {
+
+      console.log(
+        "✅ Respuesta ingresar comisión:",
+        recibir.status
+      );
+
+      return recibir.ok;
+
+    })
+
+    .then((ok) => {
+
+      return {
+        ok: ok,
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al ingresar a la comisión:",
+        error
+      );
+
+      return {
+        ok: false,
+      };
+
+    });
+
+}
+
+
+// ===============================
+// OBTENER PORTADA
+// ===============================
+
+export function obtenerPortada(
+  usuarioID,
+  sessionID,
+  comisionID
+) {
+
+  const URL =
+    "http://localhost:3000/actualizarPortada";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      comisionID: comisionID,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta portada:",
+        recibido
+      );
+
+      return {
+
+        ok: !!recibido.portada,
+
+        portada:
+          recibido.portada,
+
+        mensaje:
+          recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener portada:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        portada: [],
+
+        mensaje:
+          "No se pudo obtener la portada.",
+
+      };
+
+    });
+
+}
+
+// ===============================
+// OBTENER PUBLICACIONES
+// ===============================
+
+export function obtenerPublicaciones(
+  usuarioID,
+  sessionID,
+  comisionID
+) {
+
+  const URL =
+    "http://localhost:3000/actualizarPublicacion";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      comisionID: comisionID,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta publicaciones:",
+        recibido
+      );
+
+      return {
+
+        ok: !!recibido.panelClase,
+
+        publicaciones:
+          recibido.panelClase || [],
+
+        mensaje:
+          recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener publicaciones:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        publicaciones: [],
+
+        mensaje:
+          "No se pudieron obtener las publicaciones.",
+
+      };
+
+    });
+
+}
+
+
+// ===============================
+// CREAR PUBLICACIÓN
+// ===============================
+
+export function crearPublicacion(
+  usuarioID,
+  sessionID,
+  titulo,
+  contenido,
+  comisionID,
+  instructorID
+) {
+
+  if (!contenido.trim()) {
+
+    return Promise.resolve({
+
+      ok: false,
+
+      mensaje:
+        "El contenido de la publicación es obligatorio.",
+
+    });
+
+  }
+
+  const URL =
+    "http://localhost:3000/crearPublicacion";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      titulo: titulo,
+
+      publicacion: contenido,
+
+      comisionID: comisionID,
+
+      instructorId: instructorID,
+
+      fechaHora: Date.now(),
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta crear publicación:",
+        recibido
+      );
+
+      return {
+
+        ok: recibido.ok === true,
+
+        mensaje:
+          recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al crear publicación:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        mensaje:
+          "No se pudo crear la publicación.",
+
+      };
+
+    });
+
+}
+
+// ===============================
+// OBTENER LISTA DE TRABAJOS
+// ===============================
+
+export function obtenerTrabajos(
+  usuarioID,
+  sessionID,
+  comisionID
+) {
+
+  // URL del Back-End
+  const URL = "http://localhost:3000/actualizarTrabajos";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      comisionID: comisionID,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta lista de trabajos:",
+        recibido
+      );
+
+      return {
+
+        ok: !!recibido.trabajos,
+
+        trabajos:
+          recibido.trabajos || [],
+
+        mensaje:
+          recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener trabajos:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        trabajos: [],
+
+        mensaje:
+          "No se pudieron obtener los trabajos.",
+
+      };
+
+    });
+
+}

@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 
-import { obtenerPortada } from "../../../services/materia-service";
+import { obtenerPortada } from "../../../services/auth-service";
 
 import {
-  View,
-  Text,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import Card from "../../../components/Card";
+
+import { useSessionService } from "../../../services/session-service";
 
 import { COLORS } from "../../../constants/colors";
 import { SPACING } from "../../../constants/spacing";
@@ -18,19 +20,41 @@ export default function Portada() {
 
   const [portada, setPortada] = useState([]);
 
+  const { session } = useSessionService();
+
+
+  // ==========================================
+  // CARGAR PORTADA
+  // ==========================================
+
   useEffect(() => {
 
     cargarPortada();
 
   }, []);
 
+
   async function cargarPortada() {
 
-  const datos = await obtenerPortada();
+    const respuesta = await obtenerPortada(
 
-  setPortada(datos);
+      session.usuarioID,
 
-}
+      session.sessionID,
+
+      session.comisionID
+
+    );
+
+
+    if (respuesta.ok) {
+
+      setPortada(respuesta.portada);
+
+    }
+
+  }
+
 
   return (
 
@@ -51,6 +75,7 @@ export default function Portada() {
             {item.Objetivo}
           </Text>
 
+
           <Text style={styles.titulo}>
             Evaluación de la cursada
           </Text>
@@ -68,6 +93,7 @@ export default function Portada() {
   );
 
 }
+
 
 const styles = StyleSheet.create({
 

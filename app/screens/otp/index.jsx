@@ -103,6 +103,7 @@ export default function OtpScreen() {
       verificacion: respuesta.verificacion,
       rol: respuesta.rol,
       nombre: respuesta.nombre,
+      instructorID: respuesta.instructorID,
     });
 
     irInicio();

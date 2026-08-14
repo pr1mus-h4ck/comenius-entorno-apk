@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { ScrollView } from "react-native";
 
-import { obtenerTrabajos } from "../../services/materia-service";
+import { obtenerTrabajos } from "../../services/auth-service";
 import { useSessionService } from "../../services/session-service";
 
 import FormularioTrabajo from "./components/FormularioTrabajo";
@@ -22,9 +22,29 @@ export default function ListaTrabajo() {
 
 async function cargarTrabajos() {
 
-  const datos = await obtenerTrabajos();
+  const respuesta = await obtenerTrabajos(
 
-  setTrabajos(datos);
+    session.usuarioID,
+
+    session.sessionID,
+
+    session.comisionID
+
+  );
+
+  if (!respuesta.ok) {
+
+    console.log(
+      "❌",
+      respuesta.mensaje
+    );
+
+    return;
+  }
+
+  setTrabajos(
+    respuesta.trabajos
+  );
 
 }
 

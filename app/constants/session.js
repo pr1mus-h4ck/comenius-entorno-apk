@@ -17,6 +17,7 @@ export const SESSION_INICIAL = {
   // Materia
   comision: null,
   comisionID: null,
+  instructorID: null,
   enlace: null,
 
   // Trabajo
