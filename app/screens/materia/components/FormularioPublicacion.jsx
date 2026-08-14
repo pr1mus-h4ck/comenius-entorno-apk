@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import {
-  Alert,
   StyleSheet,
 } from "react-native";
 
@@ -9,23 +8,16 @@ import Card from "../../../components/Card";
 import Button from "../../../components/Button";
 import Input from "../../../components/Input";
 
+import { crearPublicacion } from "../../../services/auth-service";
 import { useSessionService } from "../../../services/session-service";
 
-import {
-  crearPublicacion,
-} from "../../../services/auth-service";
-
-import { SPACING } from "../../../constants/spacing";
-
 export default function FormularioPublicacion() {
+
+  const { session } = useSessionService();
 
   const [titulo, setTitulo] = useState("");
 
   const [contenido, setContenido] = useState("");
-
-  const {
-    session,
-  } = useSessionService();
 
 
   // ==========================================
@@ -53,18 +45,19 @@ export default function FormularioPublicacion() {
 
     if (!respuesta.ok) {
 
-      Alert.alert(
-        "Error",
+      console.log(
+        "❌ Error:",
         respuesta.mensaje
       );
 
       return;
+
     }
 
 
-    Alert.alert(
-      "Éxito",
-      "La publicación fue creada correctamente."
+    console.log(
+      "✅ Publicación creada:",
+      respuesta.mensaje
     );
 
 

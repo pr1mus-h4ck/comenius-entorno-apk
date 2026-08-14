@@ -1,15 +1,16 @@
 import {
-  View,
-  Text,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import ComentarioCard from "./ComentarioCard";
+import FormularioComentario from "./FormularioComentario";
 
 import Card from "../../../components/Card";
 
+
 import { COLORS } from "../../../constants/colors";
-import { RADIUS } from "../../../constants/radius";
 import { SPACING } from "../../../constants/spacing";
 import { TYPOGRAPHY } from "../../../constants/typography";
 
@@ -51,12 +52,16 @@ export default function PublicacionCard({
 
       {publicacion.comentarios?.map((comentario) => (
 
-  <ComentarioCard
-    key={comentario.id}
-    comentario={comentario}
-  />
+        <ComentarioCard
+          key={comentario.id}
+          comentario={comentario}
+        />
 
-))}
+      ))}
+
+      <FormularioComentario
+        publicacionId={publicacion.id}
+      />
 
     </Card>
 

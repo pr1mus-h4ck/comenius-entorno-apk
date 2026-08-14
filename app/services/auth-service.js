@@ -91,7 +91,7 @@ export function enviarOtp(usuarioID, sessionID) {
 // ===============================
 
 export function confirmarOtp(usuarioID, sessionID, otp) {
-  if (!otp || !otp.length !== 6) {
+  if (!otp || otp.length !== 6)  {
     return Promise.resolve({
       ok: false,
       mensaje: "Debe completar el código de 6 dígitos.",
@@ -367,6 +367,10 @@ export function obtenerPortada(
 // OBTENER PUBLICACIONES
 // ===============================
 
+// ===============================
+// OBTENER PUBLICACIONES
+// ===============================
+
 export function obtenerPublicaciones(
   usuarioID,
   sessionID,
@@ -375,6 +379,7 @@ export function obtenerPublicaciones(
 
   const URL =
     "http://localhost:3000/actualizarPublicacion";
+
 
   return fetch(URL, {
 
@@ -399,6 +404,11 @@ export function obtenerPublicaciones(
 
     .then((recibir) => recibir.json())
 
+
+    // ==========================================
+    // ADAPTAR RESPUESTA DEL BACK-END
+    // ==========================================
+
     .then((recibido) => {
 
       console.log(
@@ -406,19 +416,62 @@ export function obtenerPublicaciones(
         recibido
       );
 
+
+      const publicaciones =
+        (recibido.panelClase || []).map(
+          (publicacion) => ({
+
+            id: publicacion.id,
+
+            Titulo: publicacion.Titulo,
+
+            Contenido: publicacion.Contenido,
+
+            FechaHora: publicacion.FechaHora,
+
+            NombreCompleto:
+              publicacion.NombreCompleto,
+
+
+            comentarios:
+              (publicacion.comentarios || []).map(
+                (comentario) => ({
+
+                  id:
+                    comentario.ComentarioID,
+
+                  Contenido:
+                    comentario.ComentarioContenido,
+
+                  FechaHora:
+                    comentario.FechaHoraComentario,
+
+                  NombreCompleto:
+                    comentario.NombreCompletoComenterio,
+
+                })
+              ),
+
+          })
+        );
+
+
       return {
 
         ok: !!recibido.panelClase,
 
-        publicaciones:
-          recibido.panelClase || [],
+        publicaciones: publicaciones,
 
-        mensaje:
-          recibido.mensaje,
+        mensaje: recibido.mensaje,
 
       };
 
     })
+
+
+    // ==========================================
+    // ERROR DE CONEXIÓN
+    // ==========================================
 
     .catch((error) => {
 
@@ -534,6 +587,113 @@ export function crearPublicacion(
 
         mensaje:
           "No se pudo crear la publicación.",
+
+      };
+
+    });
+
+}
+
+// ===============================
+// CREAR COMENTARIO
+// ===============================
+
+export function crearComentario(
+  usuarioID,
+  sessionID,
+  publicacionId,
+  comentario
+) {
+
+  // Validar comentario antes de hacer el fetch
+  if (!comentario.trim()) {
+
+    return Promise.resolve({
+
+      ok: false,
+
+      mensaje:
+        "El comentario no puede estar vacío.",
+
+    });
+
+  }
+
+
+  // URL del Back-End
+  const URL =
+    "http://localhost:3000/crearComentario";
+
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+
+      Accept: "application/json",
+
+      "Content-Type": "application/json",
+
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      publicacionId: publicacionId,
+
+      comentario: comentario,
+
+      fechaHora: Date.now(),
+
+    }),
+
+  })
+
+
+    // Convertir respuesta a JSON
+    .then((recibir) => recibir.json())
+
+
+    // Adaptar respuesta del Back-End
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta crear comentario:",
+        recibido
+      );
+
+
+      return {
+
+        ok: recibido.ok === true,
+
+        mensaje:
+          recibido.mensaje,
+
+      };
+
+    })
+
+
+    // Error de conexión
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al crear comentario:",
+        error
+      );
+
+
+      return {
+
+        ok: false,
+
+        mensaje:
+          "No se pudo crear el comentario.",
 
       };
 

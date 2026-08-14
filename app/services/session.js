@@ -13,6 +13,7 @@ export function iniciarSesion(datos, setSession) {
     rol: datos.rol,
     correo: datos.correo,
     verificacion: datos.verificacion,
+    instructorID: datos.instructorID,
   }));
 }
 
@@ -31,5 +32,6 @@ export function cerrarSesion(setSession) {
     enlace: null,
     trabajo: null,
     listaAlumno: null,
+    instructorID: null,
   });
 }

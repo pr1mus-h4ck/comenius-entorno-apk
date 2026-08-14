@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 
-import { obtenerPortada } from "../../../services/auth-service";
-
 import {
-  StyleSheet,
-  Text,
   View,
+  Text,
+  StyleSheet,
 } from "react-native";
 
-import Card from "../../../components/Card";
-
+import { obtenerPortada } from "../../../services/auth-service";
 import { useSessionService } from "../../../services/session-service";
+
+import Card from "../../../components/Card";
 
 import { COLORS } from "../../../constants/colors";
 import { SPACING } from "../../../constants/spacing";
@@ -24,7 +23,7 @@ export default function Portada() {
 
 
   // ==========================================
-  // CARGAR PORTADA
+  // OBTENER PORTADA
   // ==========================================
 
   useEffect(() => {
@@ -47,11 +46,21 @@ export default function Portada() {
     );
 
 
-    if (respuesta.ok) {
+    if (!respuesta.ok) {
 
-      setPortada(respuesta.portada);
+      console.log(
+        "❌ Error:",
+        respuesta.mensaje
+      );
+
+      return;
 
     }
+
+
+    setPortada(
+      respuesta.portada
+    );
 
   }
 
@@ -74,7 +83,6 @@ export default function Portada() {
           <Text style={styles.texto}>
             {item.Objetivo}
           </Text>
-
 
           <Text style={styles.titulo}>
             Evaluación de la cursada

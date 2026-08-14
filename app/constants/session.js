@@ -5,6 +5,7 @@ export const SESSION_INICIAL = {
   sessionID: null,
   nombre: "",
   rol: null,
+  instructorID: null,
 
   // Seguridad
   otp: null,
@@ -17,7 +18,6 @@ export const SESSION_INICIAL = {
   // Materia
   comision: null,
   comisionID: null,
-  instructorID: null,
   enlace: null,
 
   // Trabajo

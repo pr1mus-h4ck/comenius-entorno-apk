@@ -12,10 +12,6 @@ import { irMateria } from "../../../services/navigation-service";
 import { useSessionService } from "../../../services/session-service";
 import {actualizarListaComision, ingresarComision as ingresarComisionApi} from "../../../services/auth-service";
 
-import {
-  actualizarListaComision,
-} from "../../../services/auth-service";
-
 import Header from "../../../components/Header";
 
 import { COLORS } from "../../../constants/colors";

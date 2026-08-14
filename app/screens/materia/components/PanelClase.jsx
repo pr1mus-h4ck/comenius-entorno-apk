@@ -40,7 +40,7 @@ async function cargarPublicaciones() {
   if (!respuesta.ok) {
 
     console.log(
-      "❌",
+      "❌ Error:",
       respuesta.mensaje
     );
 
