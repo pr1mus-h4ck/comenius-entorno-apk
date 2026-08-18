@@ -90,54 +90,142 @@ export function enviarOtp(usuarioID, sessionID) {
 // CONFIRMAR OTP
 // ===============================
 
-export function confirmarOtp(usuarioID, sessionID, otp) {
-  if (!otp || otp.length !== 6)  {
+export function confirmarOtp(
+  usuarioID,
+  sessionID,
+  otp
+) {
+
+  // ==========================================
+  // VALIDAR OTP ANTES DEL FETCH
+  // ==========================================
+
+  if (!otp || otp.length !== 6) {
+
     return Promise.resolve({
+
       ok: false,
-      mensaje: "Debe completar el código de 6 dígitos.",
+
+      mensaje:
+        "Debe completar el código de 6 dígitos.",
+
     });
+
   }
 
-  const URL = "http://localhost:3000/confirmar-otp";
+
+  // ==========================================
+  // URL DEL BACK-END
+  // ==========================================
+
+  const URL =
+    "http://localhost:3000/confirmar-otp";
+
+
+  // ==========================================
+  // FETCH
+  // ==========================================
 
   return fetch(URL, {
+
     method: "POST",
+
     headers: {
+
       Accept: "application/json",
+
       "Content-Type": "application/json",
+
     },
 
     body: JSON.stringify({
+
       id: usuarioID,
+
       session: sessionID,
+
       otp: otp,
+
     }),
+
   })
+
+
+    // ========================================
+    // CONVERTIR RESPUESTA A JSON
+    // ========================================
+
     .then((recibir) => recibir.json())
 
+
+    // ========================================
+    // RESPUESTA DEL BACK-END
+    // ========================================
+
     .then((recibido) => {
-      console.log("✅ Respuesta confirmar OTP:", recibido);
+
+      console.log(
+        "✅ Respuesta confirmar OTP:",
+        recibido
+      );
+
 
       return {
+
         ok: !!recibido.verificacion,
-        verificacion: recibido.verificacion,
-        rol: recibido.rol,
-        nombre: recibido.nombre,
-        instructorID: recibido.instructorId,
-        intentos: recibido.intentos,
-        mensaje: recibido.tipo,
+
+        verificacion:
+          recibido.verificacion,
+
+        rol:
+          recibido.rol,
+
+        nombre:
+          recibido.nombre,
+
+        instructorID:
+          recibido.instructorId,
+
+        intentos:
+          recibido.intentos,
+
+        mensaje:
+          recibido.tipo,
+
+        conexionError: false,
+
       };
+
     })
 
+
+    // ========================================
+    // ERROR DE CONEXIÓN
+    // ========================================
+
     .catch((error) => {
-      console.log("❌ Error confirmar OTP:", error);
+
+      console.log(
+        "❌ Error confirmar OTP:",
+        error
+      );
+
 
       return {
+
         ok: false,
-        mensaje: "No se pudo verificar el código.",
+
+        conexionError: true,
+
+        mensaje:
+          "No se pudo conectar con el servidor.",
+
       };
+
     });
+
 }
+
 // ===============================
 // OBTENER LISTA DE COMISIONES
 // ===============================

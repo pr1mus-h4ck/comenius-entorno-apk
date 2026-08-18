@@ -1,18 +1,28 @@
 import { useRef, useState } from "react";
-import { Alert } from "react-native";
 
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
-  View
+  View,
 } from "react-native";
 
 import AuthLayout from "../../components/AuthLayout";
 import AuthSide from "../../components/AuthSide";
 
-import { irLogin } from "../../services/navigation-service";
+import {
+  irLogin,
+  irInicio,
+} from "../../services/navigation-service";
+
+import { useSessionService } from "../../services/session-service";
+
+import {
+  enviarOtp,
+  confirmarOtp,
+} from "../../services/auth-service";
 
 import { COLORS } from "../../constants/colors";
 import { RADIUS } from "../../constants/radius";
@@ -20,19 +30,17 @@ import { SPACING } from "../../constants/spacing";
 import { TYPOGRAPHY } from "../../constants/typography";
 
 
-import { useSessionService } from "../../services/session-service";
-
-import {
-  enviarOtp
-} from "../../services/auth-service";
-
-
-
 export default function OtpScreen() {
 
-  const { session, actualizarSesion, } = useSessionService();
+  const {
+    session,
+    actualizarSesion,
+    limpiarSesion,
+  } = useSessionService();
+
 
   const [codigoEnviado, setCodigoEnviado] = useState(false);
+
 
   const [codigo, setCodigo] = useState([
     "",
@@ -43,14 +51,24 @@ export default function OtpScreen() {
     "",
   ]);
 
+
   const inputs = useRef([]);
+
+
+  // ==========================================
+  // ENVIAR OTP
+  // ==========================================
 
   async function enviarCodigo() {
 
     const respuesta = await enviarOtp(
+
       session.usuarioID,
+
       session.sessionID
+
     );
+
 
     if (!respuesta.ok) {
 
@@ -60,10 +78,18 @@ export default function OtpScreen() {
       );
 
       return;
+
     }
 
+
     setCodigoEnviado(true);
+
   }
+
+
+  // ==========================================
+  // CAMBIAR DIGITO
+  // ==========================================
 
   function cambiarCodigo(valor, indice) {
 
@@ -73,21 +99,86 @@ export default function OtpScreen() {
 
     setCodigo(nuevoCodigo);
 
+
     if (valor && indice < 5) {
+
       inputs.current[indice + 1]?.focus();
+
     }
 
   }
+
+
+  // ==========================================
+  // CONFIRMAR OTP
+  // ==========================================
 
   async function confirmarCodigo() {
 
     const codigoCompleto = codigo.join("");
 
+
+    // ========================================
+    // VALIDACIÓN ANTES DEL FETCH
+    // ========================================
+
+    if (!codigoCompleto) {
+
+      Alert.alert(
+        "Error",
+        "Debe ingresar el código de verificación."
+      );
+
+      return;
+
+    }
+
+
+    if (codigoCompleto.length !== 6) {
+
+      Alert.alert(
+        "Error",
+        "Debe completar el código de 6 dígitos."
+      );
+
+      return;
+
+    }
+
+
+    // ========================================
+    // FETCH
+    // ========================================
+
     const respuesta = await confirmarOtp(
+
       session.usuarioID,
+
       session.sessionID,
+
       codigoCompleto
+
     );
+
+
+    // ========================================
+    // ERROR DE CONEXIÓN
+    // ========================================
+
+    if (respuesta.conexionError) {
+
+      limpiarSesion();
+
+      irLogin();
+
+      return;
+
+    }
+
+
+    // ========================================
+    // OTP INCORRECTO
+    // ========================================
 
     if (!respuesta.ok) {
 
@@ -97,17 +188,35 @@ export default function OtpScreen() {
       );
 
       return;
+
     }
 
+
+    // ========================================
+    // LOGIN COMPLETADO
+    // ========================================
+
     actualizarSesion({
-      verificacion: respuesta.verificacion,
-      rol: respuesta.rol,
-      nombre: respuesta.nombre,
-      instructorID: respuesta.instructorID,
+
+      verificacion:
+        respuesta.verificacion,
+
+      rol:
+        respuesta.rol,
+
+      nombre:
+        respuesta.nombre,
+
+      instructorID:
+        respuesta.instructorID,
+
     });
 
+
     irInicio();
+
   }
+
 
   return (
 
@@ -123,7 +232,13 @@ export default function OtpScreen() {
 
           buttonText="Cancelar"
 
-          onPress={irLogin}
+          onPress={() => {
+
+            limpiarSesion();
+
+            irLogin();
+
+          }}
 
         />
 
@@ -139,21 +254,28 @@ export default function OtpScreen() {
             Paso 1/2
           </Text>
 
+
           <Text style={styles.titulo}>
             OTP Verificación
           </Text>
+
 
           <Text style={styles.descripcion}>
             Te enviaremos un código al siguiente correo.
           </Text>
 
+
           <Text style={styles.correo}>
-            usuario@correo.com
+            {session.correo}
           </Text>
 
+
           <Pressable
+
             style={styles.boton}
+
             onPress={enviarCodigo}
+
           >
 
             <Text style={styles.textoBoton}>
@@ -172,13 +294,16 @@ export default function OtpScreen() {
             Paso 2/2
           </Text>
 
+
           <Text style={styles.titulo}>
             Confirmar código
           </Text>
 
+
           <Text style={styles.descripcion}>
             Ingresá el código recibido.
           </Text>
+
 
           <View style={styles.codigoContainer}>
 
@@ -189,7 +314,9 @@ export default function OtpScreen() {
                 key={indice}
 
                 ref={(input) => {
+
                   inputs.current[indice] = input;
+
                 }}
 
                 style={styles.codigoInput}
@@ -211,6 +338,7 @@ export default function OtpScreen() {
             ))}
 
           </View>
+
 
           <Pressable
 
@@ -236,6 +364,7 @@ export default function OtpScreen() {
 
 }
 
+
 const styles = StyleSheet.create({
 
   paso: {
@@ -249,6 +378,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
 
   },
+
 
   titulo: {
 
@@ -264,6 +394,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   descripcion: {
 
     fontSize: TYPOGRAPHY.body,
@@ -275,6 +406,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
 
   },
+
 
   correo: {
 
@@ -300,6 +432,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   boton: {
 
     backgroundColor: COLORS.primary,
@@ -312,6 +445,7 @@ const styles = StyleSheet.create({
 
   },
 
+
   textoBoton: {
 
     color: COLORS.white,
@@ -322,15 +456,21 @@ const styles = StyleSheet.create({
 
   },
 
+
   codigoContainer: {
 
     flexDirection: "row",
 
-    justifyContent: "space-between",
+    justifyContent: "center",
+
+    alignItems: "center",
+
+    gap: SPACING.sm,
 
     marginBottom: SPACING.xl,
 
   },
+
 
   codigoInput: {
 
@@ -349,6 +489,12 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.h2,
 
     color: COLORS.text,
+
+    textAlign: "center",
+
+    textAlignVertical: "center",
+
+    padding: 0,
 
   },
 

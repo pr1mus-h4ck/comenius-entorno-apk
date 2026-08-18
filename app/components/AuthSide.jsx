@@ -3,7 +3,6 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  useWindowDimensions,
 } from "react-native";
 
 import { Image } from "expo-image";
@@ -20,94 +19,94 @@ export default function AuthSide({
   onPress,
 }) {
 
-  const { width } = useWindowDimensions();
-
-  const esMovil = width < 700;
-
   return (
-    <View
-      style={[
-        styles.container,
-        esMovil && styles.containerMovil,
-      ]}
-    >
+
+    <View style={styles.container}>
 
       <Image
+
         source={require("../../assets/pre-logo.svg")}
-        style={[
-          styles.logo,
-          esMovil && styles.logoMovil,
-        ]}
+
+        style={styles.logo}
+
         contentFit="contain"
+
       />
 
-      <Text
-        style={[
-          styles.title,
-          esMovil && styles.titleMovil,
-        ]}
-      >
-        {title}
-      </Text>
 
-      <Text
-        style={[
-          styles.subtitle,
-          esMovil && styles.subtitleMovil,
-        ]}
-      >
-        {subtitle}
-      </Text>
+      {title ? (
 
-      <Pressable
-        style={[
-          styles.button,
-          esMovil && styles.buttonMovil,
-        ]}
-        onPress={onPress}
-      >
-        <Text style={styles.buttonText}>
-          {buttonText}
+        <Text style={styles.title}>
+
+          {title}
+
         </Text>
-      </Pressable>
+
+      ) : null}
+
+
+      {subtitle ? (
+
+        <Text style={styles.subtitle}>
+
+          {subtitle}
+
+        </Text>
+
+      ) : null}
+
+
+      {buttonText ? (
+
+        <Pressable
+
+          style={styles.button}
+
+          onPress={onPress}
+
+        >
+
+          <Text style={styles.buttonText}>
+
+            {buttonText}
+
+          </Text>
+
+        </Pressable>
+
+      ) : null}
 
     </View>
+
   );
 }
+
 
 const styles = StyleSheet.create({
 
   container: {
-    flex: 1,
 
     justifyContent: "center",
+
     alignItems: "center",
 
     width: "100%",
-  },
 
-  containerMovil: {
-    flex: 0,
-
-    justifyContent: "center",
   },
 
   logo: {
-    width: 100,
-    height: 100,
 
-    marginBottom: SPACING.md,
-  },
-
-  logoMovil: {
     width: 90,
+
     height: 90,
 
     marginBottom: SPACING.sm,
+
   },
 
   title: {
-    fontSize: TYPOGRAPHY.h2,
+
+    fontSize: 22,
 
     fontWeight: "bold",
 
@@ -115,58 +114,48 @@ const styles = StyleSheet.create({
 
     textAlign: "center",
 
-    marginBottom: SPACING.xs,
-  },
-
-  titleMovil: {
-    fontSize: 22,
-
     marginBottom: 2,
+
   },
 
   subtitle: {
-    fontSize: TYPOGRAPHY.body,
+
+    fontSize: 16,
 
     color: COLORS.white,
 
     textAlign: "center",
 
-    marginBottom: SPACING.xxl,
-  },
-
-  subtitleMovil: {
-    fontSize: 16,
-
     marginBottom: SPACING.md,
+
   },
 
   button: {
+
     borderWidth: 1,
 
     borderColor: COLORS.white,
 
     borderRadius: RADIUS.md,
 
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.xxl,
-
-    alignItems: "center",
-  },
-
-  buttonMovil: {
     paddingVertical: 10,
 
     paddingHorizontal: 35,
 
     minWidth: 150,
+
+    alignItems: "center",
+
   },
 
   buttonText: {
+
     color: COLORS.white,
 
     fontWeight: "bold",
 
     fontSize: TYPOGRAPHY.body,
+
   },
 
 });
