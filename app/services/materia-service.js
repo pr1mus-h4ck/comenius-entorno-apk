@@ -1,72 +1,8 @@
-// ===============================
-// PORTADA
-// ===============================
-
-export async function obtenerPortada() {
-
-  return [
-
-    {
-      Objetivo:
-        "Comprender los conceptos fundamentales de los Sistemas Operativos.",
-
-      EvaluacionCursada:
-        "Parcial, trabajos prácticos y examen final.",
-    },
-
-  ];
-
-}
 
 // ===============================
 // PANEL DE CLASE
 // ===============================
 
-export async function obtenerPublicaciones() {
-
-  return [
-
-    {
-      id: 1,
-
-      NombreCompleto: "Mariana López",
-
-      FechaHora: "15/07/2026 18:30",
-
-      Titulo: "Bienvenidos",
-
-      Contenido:
-        "Recuerden leer el reglamento antes de la próxima clase.",
-
-      comentarios: [
-
-        {
-          id: 1,
-
-          NombreCompleto: "Juan Pérez",
-
-          FechaHora: "15/07/2026 19:10",
-
-          Contenido: "Muchas gracias profesora.",
-        },
-
-        {
-          id: 2,
-
-          NombreCompleto: "Ana Gómez",
-
-          FechaHora: "15/07/2026 20:02",
-
-          Contenido: "Ya descargué el material.",
-        },
-
-      ],
-
-    },
-
-  ];
-
-}
 
 // ===============================
 // LISTA DE TRABAJOS

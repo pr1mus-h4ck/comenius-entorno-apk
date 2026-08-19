@@ -7,8 +7,10 @@ import {
 } from "react-native";
 
 import FileIcon from "../../../components/FileIcon";
-import { obtenerTrabajo } from "../../../services/materia-service";
 import Card from "../../../components/Card";
+
+import { obtenerTrabajoInstructor } from "../../../services/auth-service";
+import { useSessionService } from "../../../services/session-service";
 
 import { COLORS } from "../../../constants/colors";
 import { SPACING } from "../../../constants/spacing";
@@ -18,19 +20,53 @@ export default function TrabajoInstructor() {
 
   const [trabajo, setTrabajo] = useState(null);
 
+  const { session } = useSessionService();
+
+
+  // ==========================================
+  // OBTENER TRABAJO
+  // ==========================================
+
   useEffect(() => {
 
     cargarTrabajo();
 
   }, []);
 
+
   async function cargarTrabajo() {
 
-  const datos = await obtenerTrabajo();
+    const respuesta = await obtenerTrabajoInstructor(
 
-  setTrabajo(datos);
+      session.usuarioID,
 
-}
+      session.sessionID,
+
+      session.comisionID,
+
+      session.trabajo?.id
+
+    );
+
+
+    if (!respuesta.ok) {
+
+      console.log(
+        "❌ Error:",
+        respuesta.mensaje
+      );
+
+      return;
+
+    }
+
+
+    setTrabajo(
+      respuesta.trabajo
+    );
+
+  }
+
 
   if (!trabajo) {
 
@@ -38,47 +74,66 @@ export default function TrabajoInstructor() {
 
   }
 
+
   return (
 
     <Card style={styles.card}>
 
       <Text style={styles.titulo}>
+
         {trabajo.Titulo}
+
       </Text>
+
 
       <Text style={styles.contenido}>
+
         {trabajo.Contenido}
+
       </Text>
+
 
       <Text style={styles.subtitulo}>
+
         Archivos
+
       </Text>
 
-      {trabajo.Archivos.map((archivo) => (
 
-      <View
-        key={archivo.id}
-        style={styles.archivo}
-      >
+      {trabajo.Archivos?.map((archivo) => (
 
-        <FileIcon
-          fileName={archivo.Nombre}
-          size={28}
-        />
+        <View
 
-        <Text style={styles.nombreArchivo}>
-          {archivo.Nombre}
-        </Text>
+          key={archivo.id}
 
-      </View>
+          style={styles.archivo}
 
-))}
+        >
+
+          <FileIcon
+
+            fileName={archivo.Nombre}
+
+            size={28}
+
+          />
+
+          <Text style={styles.nombreArchivo}>
+
+            {archivo.Nombre}
+
+          </Text>
+
+        </View>
+
+      ))}
 
     </Card>
 
   );
 
 }
+
 
 const styles = StyleSheet.create({
 

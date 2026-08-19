@@ -25,13 +25,9 @@ export default function AuthLayout({
         </View>
 
         <ScrollView
-
           style={styles.right}
-
           contentContainerStyle={styles.rightContent}
-
           showsVerticalScrollIndicator={false}
-
         >
 
           {children}
@@ -43,8 +39,8 @@ export default function AuthLayout({
     </View>
 
   );
-}
 
+}
 
 const styles = StyleSheet.create({
 
@@ -54,21 +50,15 @@ const styles = StyleSheet.create({
 
     backgroundColor: COLORS.background,
 
-    alignItems: "center",
-
   },
 
   card: {
 
-    width: "100%",
-
-    maxWidth: 500,
-
     flex: 1,
 
-    backgroundColor: COLORS.white,
+    width: "100%",
 
-    borderRadius: RADIUS.xl,
+    backgroundColor: COLORS.white,
 
     overflow: "hidden",
 
@@ -77,8 +67,6 @@ const styles = StyleSheet.create({
   left: {
 
     width: "100%",
-
-    minHeight: 250,
 
     backgroundColor: COLORS.primary,
 
@@ -110,11 +98,11 @@ const styles = StyleSheet.create({
 
     flexGrow: 1,
 
+    justifyContent: "flex-start",
+
     paddingHorizontal: 22,
 
     paddingVertical: 50,
-
-    justifyContent: "flex-start",
 
   },
 

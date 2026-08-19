@@ -455,10 +455,6 @@ export function obtenerPortada(
 // OBTENER PUBLICACIONES
 // ===============================
 
-// ===============================
-// OBTENER PUBLICACIONES
-// ===============================
-
 export function obtenerPublicaciones(
   usuarioID,
   sessionID,
@@ -861,6 +857,170 @@ export function obtenerTrabajos(
 
         mensaje:
           "No se pudieron obtener los trabajos.",
+
+      };
+
+    });
+
+}
+
+// ===============================
+// OBTENER TRABAJO - INSTRUCTOR
+// ===============================
+
+export function obtenerTrabajoInstructor(
+  usuarioID,
+  sessionID,
+  comisionID,
+  trabajoID
+) {
+
+  const URL =
+    "http://localhost:3000/actualizarTrabajoInstructor";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      comisionID: comisionID,
+
+      trabajo: trabajoID,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta trabajo instructor:",
+        recibido
+      );
+
+      return {
+
+        ok: !!recibido.id,
+
+        trabajo: recibido,
+
+        mensaje: recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener trabajo:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        trabajo: null,
+
+        mensaje:
+          "No se pudo obtener el trabajo.",
+
+      };
+
+    });
+
+}
+
+
+// ===============================
+// OBTENER TRABAJO - ALUMNO
+// ===============================
+
+export function obtenerTrabajoAlumno(
+  usuarioID,
+  sessionID,
+  comisionID,
+  trabajoID,
+  listaAlumno
+) {
+
+  const URL =
+    "http://localhost:3000/actualizarTrabajoAlumno";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      comisionID: comisionID,
+
+      trabajo: trabajoID,
+
+      listaAlumno: listaAlumno,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta trabajo alumno:",
+        recibido
+      );
+
+      return {
+
+        ok: true,
+
+        trabajo: recibido,
+
+        mensaje: recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener trabajo alumno:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        trabajo: null,
+
+        mensaje:
+          "No se pudo obtener el trabajo.",
 
       };
 
