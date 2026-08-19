@@ -10,7 +10,11 @@ import {
 
 import { irMateria } from "../../../services/navigation-service";
 import { useSessionService } from "../../../services/session-service";
-import {actualizarListaComision, ingresarComision as ingresarComisionApi} from "../../../services/auth-service";
+
+import {
+  actualizarListaComision,
+  ingresarComision as ingresarComisionApi,
+} from "../../../services/auth-service";
 
 import Header from "../../../components/Header";
 
@@ -30,7 +34,7 @@ export default function ListaComision() {
 
 
   // ==========================================
-  // OBTENER COMISIONES
+  // OBTENER COMISIONES DEL BACK
   // ==========================================
 
   useEffect(() => {
@@ -61,11 +65,12 @@ export default function ListaComision() {
       );
 
       return;
+
     }
 
 
     setComisiones(
-      respuesta.comisiones
+      respuesta.comisiones || []
     );
 
   }
@@ -77,43 +82,51 @@ export default function ListaComision() {
 
   async function ingresarComision(comision) {
 
-  const respuesta = await ingresarComisionApi(
-    comision,
-    comision.id
-  );
+    const respuesta = await ingresarComisionApi(
 
-  if (!respuesta.ok) {
+      comision,
 
-    Alert.alert(
-      "Error",
-      "No se pudo ingresar a la comisión."
+      comision.id
+
     );
 
-    return;
+
+    if (!respuesta.ok) {
+
+      Alert.alert(
+        "Error",
+        "No se pudo ingresar a la comisión."
+      );
+
+      return;
+
+    }
+
+
+    actualizarCampo(
+      "comision",
+      comision
+    );
+
+    actualizarCampo(
+      "comisionID",
+      comision.id
+    );
+
+    actualizarCampo(
+      "item",
+      "Materia"
+    );
+
+    actualizarCampo(
+      "enlace",
+      "Portada"
+    );
+
+
+    irMateria();
+
   }
-
-  actualizarCampo(
-    "comision",
-    comision
-  );
-
-  actualizarCampo(
-    "comisionID",
-    comision.id
-  );
-
-  actualizarCampo(
-    "item",
-    "Materia"
-  );
-
-  actualizarCampo(
-    "enlace",
-    "Portada"
-  );
-
-  irMateria();
-}
 
 
   return (
@@ -121,11 +134,8 @@ export default function ListaComision() {
     <View style={styles.container}>
 
       <Header
-
         title="Mis Comisiones"
-
         subtitle="Seleccioná una comisión para ingresar."
-
       />
 
 
