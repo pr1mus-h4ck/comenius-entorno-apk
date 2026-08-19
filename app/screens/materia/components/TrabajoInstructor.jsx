@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
 import {
+  Linking,
   StyleSheet,
-  Text,
-  View,
+  Text
 } from "react-native";
 
-import FileIcon from "../../../components/FileIcon";
 import Card from "../../../components/Card";
+import FileIcon from "../../../components/FileIcon";
 
 import { obtenerTrabajoInstructor } from "../../../services/auth-service";
 import { useSessionService } from "../../../services/session-service";
@@ -102,29 +102,22 @@ export default function TrabajoInstructor() {
 
       {trabajo.Archivos?.map((archivo) => (
 
-        <View
+       <Pressable
+  key={archivo.id}
+  style={styles.archivo}
+  onPress={() => abrirArchivo(archivo.URL)}
+>
 
-          key={archivo.id}
+  <FileIcon
+    fileName={archivo.Nombre}
+    size={28}
+  />
 
-          style={styles.archivo}
+  <Text style={styles.nombreArchivo}>
+    {archivo.Nombre}
+  </Text>
 
-        >
-
-          <FileIcon
-
-            fileName={archivo.Nombre}
-
-            size={28}
-
-          />
-
-          <Text style={styles.nombreArchivo}>
-
-            {archivo.Nombre}
-
-          </Text>
-
-        </View>
+</Pressable>
 
       ))}
 
@@ -134,6 +127,22 @@ export default function TrabajoInstructor() {
 
 }
 
+async function abrirArchivo(url) {
+
+  if (!url) {
+    console.log("❌ El archivo no tiene URL.");
+    return;
+  }
+
+  const puedeAbrir = await Linking.canOpenURL(url);
+
+  if (!puedeAbrir) {
+    console.log("❌ No se puede abrir el archivo:", url);
+    return;
+  }
+
+  await Linking.openURL(url);
+}
 
 const styles = StyleSheet.create({
 

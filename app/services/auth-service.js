@@ -271,10 +271,10 @@ export function actualizarListaComision(
 
       return {
 
-        ok: !!recibido.comision,
+        ok: Array.isArray(recibido.comision),
 
         comisiones:
-          recibido.comision,
+          recibido.comision || [],
 
         mensaje:
           recibido.mensaje,
@@ -1021,6 +1021,92 @@ export function obtenerTrabajoAlumno(
 
         mensaje:
           "No se pudo obtener el trabajo.",
+
+      };
+
+    });
+
+}
+
+// ===============================
+// OBTENER CHAT DEL TRABAJO
+// ===============================
+
+export function obtenerChat(
+  usuarioID,
+  sessionID,
+  trabajoID,
+  comisionID,
+  listaAlumno,
+  rol
+) {
+
+  const URL =
+    "http://localhost:3000/actualizarChatTrabajo";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      session: sessionID,
+
+      id: usuarioID,
+
+      trabajo: trabajoID,
+
+      comision: comisionID,
+
+      listaAlumno: listaAlumno,
+
+      rol: rol,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta chat:",
+        recibido
+      );
+
+      return {
+
+        ok: Array.isArray(recibido.chat),
+
+        mensajes: recibido.chat || [],
+
+        mensaje: recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al obtener chat:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        mensajes: [],
+
+        mensaje:
+          "No se pudo obtener el chat.",
 
       };
 

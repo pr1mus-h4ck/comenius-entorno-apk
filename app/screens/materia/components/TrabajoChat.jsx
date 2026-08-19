@@ -6,25 +6,80 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { obtenerChat } from "../../../services/materia-service";
+import {
+  obtenerChat,
+} from "../../../services/auth-service";
+
+import {
+  useSessionService,
+} from "../../../services/session-service";
+
 
 export default function TrabajoChat() {
 
   const [mensajes, setMensajes] = useState([]);
 
+  const { session } = useSessionService();
+
+
+  // ==========================================
+  // OBTENER CHAT
+  // ==========================================
+
   useEffect(() => {
+
+    if (!session?.trabajo?.id) {
+      return;
+    }
 
     cargarMensajes();
 
-  }, []);
+  }, [
+
+    session?.trabajo?.id,
+
+    session?.listaAlumno,
+
+  ]);
+
 
   async function cargarMensajes() {
 
-  const datos = await obtenerChat();
+    const respuesta = await obtenerChat(
 
-  setMensajes(datos);
+      session.usuarioID,
 
-}
+      session.sessionID,
+
+      session.trabajo.id,
+
+      session.comisionID,
+
+      session.listaAlumno,
+
+      session.rol
+
+    );
+
+
+    if (!respuesta.ok) {
+
+      console.log(
+        "❌ Error:",
+        respuesta.mensaje
+      );
+
+      return;
+
+    }
+
+
+    setMensajes(
+      respuesta.mensajes
+    );
+
+  }
+
 
   return (
 
@@ -34,19 +89,32 @@ export default function TrabajoChat() {
         Chat
       </Text>
 
-      {mensajes.map((mensaje) => (
+
+      {mensajes.map((mensaje, index) => (
 
         <View
-          key={mensaje.id}
+          key={mensaje.id ?? index}
           style={styles.mensaje}
         >
 
           <Text style={styles.autor}>
-            {mensaje.autor}
+
+            {mensaje.EmisorNombreCompleto}
+
           </Text>
 
+
           <Text>
-            {mensaje.mensaje}
+
+            {mensaje.Contenido}
+
+          </Text>
+
+
+          <Text style={styles.fecha}>
+
+            {mensaje.FechaHora}
+
           </Text>
 
         </View>
@@ -58,6 +126,7 @@ export default function TrabajoChat() {
   );
 
 }
+
 
 const styles = StyleSheet.create({
 
@@ -100,6 +169,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
 
     marginBottom: 4,
+
+  },
+
+  fecha: {
+
+    fontSize: 12,
+
+    color: "#888",
+
+    marginTop: 5,
 
   },
 

@@ -6,35 +6,95 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { obtenerEntrega } from "../../../services/materia-service";
+import {
+  obtenerTrabajoAlumno,
+} from "../../../services/auth-service";
+
+import {
+  useSessionService,
+} from "../../../services/session-service";
+
 import FileIcon from "../../../components/FileIcon";
 import Card from "../../../components/Card";
 
-import { COLORS } from "../../../constants/colors";
-import { SPACING } from "../../../constants/spacing";
-import { TYPOGRAPHY } from "../../../constants/typography";
+import {
+  COLORS
+} from "../../../constants/colors";
+
+import {
+  SPACING
+} from "../../../constants/spacing";
+
+import {
+  TYPOGRAPHY
+} from "../../../constants/typography";
+
 
 export default function TrabajoAlumno() {
 
   const [entrega, setEntrega] = useState(null);
 
+  const { session } = useSessionService();
+
+
+  // ==========================================
+  // OBTENER ENTREGA
+  // ==========================================
+
   useEffect(() => {
+
+    if (!session?.trabajo?.id) {
+      return;
+    }
 
     cargarEntrega();
 
-  }, []);
+  }, [
+    session?.trabajo?.id,
+    session?.listaAlumno
+  ]);
+
 
   async function cargarEntrega() {
 
-  const datos = await obtenerEntrega();
+    const respuesta = await obtenerTrabajoAlumno(
 
-  setEntrega(datos);
+      session.usuarioID,
 
-}
+      session.sessionID,
+
+      session.comisionID,
+
+      session.trabajo.id,
+
+      session.listaAlumno
+
+    );
+
+
+    if (!respuesta.ok) {
+
+      console.log(
+        "❌ Error:",
+        respuesta.mensaje
+      );
+
+      return;
+
+    }
+
+
+    setEntrega(
+      respuesta.trabajo
+    );
+
+  }
+
 
   if (!entrega) {
 
     return (
+
       <Card style={styles.card}>
 
         <Text style={styles.sinEntrega}>
@@ -49,6 +109,7 @@ export default function TrabajoAlumno() {
 
   }
 
+
   return (
 
     <Card style={styles.card}>
@@ -59,31 +120,41 @@ export default function TrabajoAlumno() {
 
       </Text>
 
-      {entrega.Archivos.map((archivo) => (
 
-      <View
-        key={archivo.id}
-        style={styles.archivo}
-      >
+      {entrega.Archivos?.map((archivo) => (
 
-        <FileIcon
-          fileName={archivo.Nombre}
-          size={28}
-        />
+        <View
 
-        <Text style={styles.nombreArchivo}>
-          {archivo.Nombre}
-        </Text>
+          key={archivo.id}
 
-      </View>
+          style={styles.archivo}
 
-    ))}
+        >
+
+          <FileIcon
+
+            fileName={archivo.Nombre}
+
+            size={28}
+
+          />
+
+          <Text style={styles.nombreArchivo}>
+
+            {archivo.Nombre}
+
+          </Text>
+
+        </View>
+
+      ))}
 
     </Card>
 
   );
 
 }
+
 
 const styles = StyleSheet.create({
 

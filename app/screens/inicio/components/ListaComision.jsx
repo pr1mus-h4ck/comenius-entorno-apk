@@ -34,7 +34,7 @@ export default function ListaComision() {
 
 
   // ==========================================
-  // OBTENER COMISIONES DEL BACK
+  // OBTENER COMISIONES
   // ==========================================
 
   useEffect(() => {
@@ -65,12 +65,17 @@ export default function ListaComision() {
       );
 
       return;
-
     }
 
 
+    console.log(
+      "✅ Comisiones recibidas:",
+      respuesta.comisiones
+    );
+
+
     setComisiones(
-      respuesta.comisiones || []
+      respuesta.comisiones
     );
 
   }
@@ -86,7 +91,7 @@ export default function ListaComision() {
 
       comision,
 
-      comision.id
+      comision.Comision_ID
 
     );
 
@@ -99,7 +104,6 @@ export default function ListaComision() {
       );
 
       return;
-
     }
 
 
@@ -110,7 +114,7 @@ export default function ListaComision() {
 
     actualizarCampo(
       "comisionID",
-      comision.id
+      comision.Comision_ID
     );
 
     actualizarCampo(
@@ -123,7 +127,6 @@ export default function ListaComision() {
       "Portada"
     );
 
-
     irMateria();
 
   }
@@ -134,8 +137,11 @@ export default function ListaComision() {
     <View style={styles.container}>
 
       <Header
+
         title="Mis Comisiones"
+
         subtitle="Seleccioná una comisión para ingresar."
+
       />
 
 
@@ -143,7 +149,7 @@ export default function ListaComision() {
 
         <Pressable
 
-          key={comision.id}
+          key={comision.Comision_ID}
 
           style={styles.card}
 
@@ -155,21 +161,21 @@ export default function ListaComision() {
 
           <Text style={styles.nombre}>
 
-            {comision.nombre}
+            {comision.Materia}
 
           </Text>
 
 
           <Text style={styles.detalle}>
 
-            Comisión {comision.comision}
+            Comisión {comision.Comision}
 
           </Text>
 
 
           <Text style={styles.detalle}>
 
-            Profesor: {comision.profesor}
+            Profesor: {comision.Instructores}
 
           </Text>
 
