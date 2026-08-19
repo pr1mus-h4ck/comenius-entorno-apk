@@ -1,27 +1,24 @@
+import { Image } from "expo-image";
+
 export default function Icon({
-
   icon,
-
   active = false,
-
   size = 24,
-
 }) {
 
-  const Svg = active
+  const source = active
     ? icon.white ?? icon
     : icon.black ?? icon;
 
   return (
-
-    <Svg
-
-      width={size}
-
-      height={size}
-
+    <Image
+      source={source}
+      style={{
+        width: size,
+        height: size,
+      }}
+      contentFit="contain"
     />
-
   );
 
 }
