@@ -15,23 +15,44 @@ import { ICONS } from "../constants/icons";
 import { useSessionService } from "../services/session-service";
 import { irLogin } from "../services/navigation-service";
 
+import {
+  cerrarSesion as cerrarSesionApi,
+} from "../services/auth-service";
+
 
 export default function TabsLayout() {
 
-  const { limpiarSesion } = useSessionService();
+  const {
+    session,
+    limpiarSesion,
+  } = useSessionService();
 
 
-  // ==========================================
-  // CERRAR SESIÓN
-  // ==========================================
+  async function cerrarSesion() {
 
-  function cerrarSesion() {
+    try {
 
-    // Elimina todos los datos de la sesión
-    limpiarSesion();
+      await cerrarSesionApi(
+        session.usuarioID,
+        session.sessionID
+      );
 
-    // Vuelve al Login
-    irLogin();
+    } catch (error) {
+
+      console.log(
+        "Error cerrando sesión en backend:",
+        error
+      );
+
+    } finally {
+
+      // Siempre limpiar sesión local
+      limpiarSesion();
+
+      // Volver al login
+      irLogin();
+
+    }
 
   }
 
@@ -64,10 +85,6 @@ export default function TabsLayout() {
 
     >
 
-      {/* ======================================
-          INICIO
-      ====================================== */}
-
       <Tabs.Screen
 
         name="inicio"
@@ -95,10 +112,6 @@ export default function TabsLayout() {
       />
 
 
-      {/* ======================================
-          LOGO CENTRAL
-      ====================================== */}
-
       <Tabs.Screen
 
         name="logo"
@@ -125,7 +138,7 @@ export default function TabsLayout() {
 
               <Image
 
-                source={require("../../assets/pre-logo.svg")}
+                source={ICONS.logo}
 
                 style={{
 
@@ -147,10 +160,6 @@ export default function TabsLayout() {
 
       />
 
-
-      {/* ======================================
-          CERRAR SESIÓN
-      ====================================== */}
 
       <Tabs.Screen
 
@@ -178,19 +187,21 @@ export default function TabsLayout() {
 
             >
 
-              <Text
+              <Image
+
+                source={ICONS.logout}
 
                 style={{
 
-                  fontSize: 22,
+                  width: 24,
+
+                  height: 24,
 
                 }}
 
-              >
+                contentFit="contain"
 
-                🚪
-
-              </Text>
+              />
 
               <Text
 
@@ -218,12 +229,6 @@ export default function TabsLayout() {
 
       />
 
-
-      {/* ======================================
-          MATERIA
-          No aparece en el menú.
-          Se accede mediante irMateria().
-      ====================================== */}
 
       <Tabs.Screen
 

@@ -1,34 +1,97 @@
 import { useState } from "react";
 
 import {
+  Alert,
   View,
   Text,
   Pressable,
   StyleSheet,
 } from "react-native";
 
+import {
+  crearTrabajosAlumnos,
+} from "../../../services/auth-service";
+
+import {
+  useSessionService,
+} from "../../../services/session-service";
+
+
 export default function EntregaTrabajo() {
 
   const [archivo, setArchivo] = useState(null);
+
+  const { session } = useSessionService();
+
+
+  // ==========================================
+  // SELECCIONAR ARCHIVO
+  // ==========================================
 
   function seleccionarArchivo() {
 
     // Más adelante:
     // Expo Document Picker
 
-    console.log("Seleccionar archivo");
+    console.log(
+      "Seleccionar archivo"
+    );
 
   }
 
-  function entregarTrabajo() {
 
-    console.log({
+  // ==========================================
+  // ENVIAR ENTREGA
+  // ==========================================
 
-      archivo,
+  async function entregarTrabajo() {
 
-    });
+    if (!archivo) {
+
+      Alert.alert(
+        "Atención",
+        "Seleccioná un archivo antes de enviar."
+      );
+
+      return;
+
+    }
+
+
+    const respuesta = await crearTrabajosAlumnos(
+
+      session.usuarioID,
+
+      session.sessionID,
+
+      session.comisionID,
+
+      session.trabajo?.id,
+
+      [archivo]
+
+    );
+
+
+    if (!respuesta.ok) {
+
+      Alert.alert(
+        "Error",
+        respuesta.mensaje
+      );
+
+      return;
+
+    }
+
+
+    Alert.alert(
+      "Éxito",
+      "La entrega fue enviada correctamente."
+    );
 
   }
+
 
   return (
 
@@ -40,6 +103,7 @@ export default function EntregaTrabajo() {
 
       </Text>
 
+
       <Pressable
 
         style={styles.botonArchivo}
@@ -50,11 +114,12 @@ export default function EntregaTrabajo() {
 
         <Text>
 
-          {archivo ?? "Seleccionar archivo"}
+          {archivo?.name ?? "Seleccionar archivo"}
 
         </Text>
 
       </Pressable>
+
 
       <Pressable
 
@@ -77,6 +142,7 @@ export default function EntregaTrabajo() {
   );
 
 }
+
 
 const styles = StyleSheet.create({
 

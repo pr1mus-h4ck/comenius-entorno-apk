@@ -1113,3 +1113,138 @@ export function obtenerChat(
     });
 
 }
+
+// ===============================
+// CREAR ENTREGA DE TRABAJO
+// ===============================
+
+export function crearTrabajosAlumnos(
+  usuarioID,
+  sessionID,
+  comisionID,
+  trabajoID,
+  urlArchivos
+) {
+
+  const URL =
+    "http://localhost:3000/crearTrabajosAlumnos";
+
+  return fetch(URL, {
+
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      id: usuarioID,
+
+      session: sessionID,
+
+      urlArchivos: urlArchivos,
+
+      fechaHora: Date.now(),
+
+      comisionID: comisionID,
+
+      trabajoID: trabajoID,
+
+    }),
+
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta entrega:",
+        recibido
+      );
+
+      return {
+
+        ok: recibido.ok === true,
+
+        mensaje: recibido.mensaje,
+
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al enviar entrega:",
+        error
+      );
+
+      return {
+
+        ok: false,
+
+        mensaje:
+          "No se pudo enviar la entrega.",
+
+      };
+
+    });
+
+}
+
+// ===============================
+// CERRAR SESIÓN
+// ===============================
+
+export function cerrarSesion(usuarioID, sessionID) {
+
+  const URL = "http://localhost:3000/cerrar-sesion";
+
+  return fetch(URL, {
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      id: usuarioID,
+      session: sessionID,
+    }),
+  })
+
+    .then((recibir) => recibir.json())
+
+    .then((recibido) => {
+
+      console.log(
+        "✅ Respuesta cerrar sesión:",
+        recibido
+      );
+
+      return {
+        ok: recibido.cerrarSesion === true,
+        mensaje: recibido.mensaje,
+      };
+
+    })
+
+    .catch((error) => {
+
+      console.log(
+        "❌ Error al cerrar sesión:",
+        error
+      );
+
+      return {
+        ok: false,
+        mensaje: "No se pudo cerrar la sesión en el servidor.",
+      };
+
+    });
+
+}

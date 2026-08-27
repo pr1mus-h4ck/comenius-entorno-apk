@@ -1,12 +1,20 @@
 import { useSession } from "../context/SessionContext";
 import { SESSION_INICIAL } from "../constants/session";
+
 export function useSessionService() {
 
-  const { session, setSession } = useSession();
+  const {
+    session,
+    setSession,
+  } = useSession();
+
 
   function obtenerSesion() {
+
     return session;
+
   }
+
 
   function actualizarSesion(datos) {
 
@@ -20,11 +28,6 @@ export function useSessionService() {
 
   }
 
-  function limpiarSesion() {
-
-  setSession(SESSION_INICIAL);
-
-}
 
   function actualizarCampo(campo, valor) {
 
@@ -37,6 +40,14 @@ export function useSessionService() {
     }));
 
   }
+
+
+  function limpiarSesion() {
+
+    setSession(SESSION_INICIAL);
+
+  }
+
 
   return {
 

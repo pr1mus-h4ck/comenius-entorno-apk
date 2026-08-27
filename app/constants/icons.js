@@ -22,6 +22,7 @@ import XlsIcon from "../../assets/type/text_line_xls.svg";
 
 import PptIcon from "../../assets/type/text_line_ppt.svg";
 
+import IconCerrarSesion from "../../assets/icon-cerrar-sesion.svg";
 
 import JpgIcon from "../../assets/type/text_line_jpg.svg";
 import PngIcon from "../../assets/type/text_line_png.svg";
@@ -36,44 +37,31 @@ import JsIcon from "../../assets/type/text_line_js.svg";
 export const ICONS = {
 
   inicio: {
-
     black: IconInicioBlack,
-
     white: IconInicioWhite,
-
   },
 
   portada: {
-
     black: IconPortadaBlack,
-
     white: IconPortadaWhite,
-
   },
 
   panelClase: {
-
     black: IconPanelClaseBlack,
-
     white: IconPanelClaseWhite,
-
   },
 
   trabajos: {
-
     black: IconTrabajosBlack,
-
     white: IconTrabajosWhite,
-
   },
 
   listaTrabajo: {
-
     black: IconListaTrabajoBlack,
-
     white: IconListaTrabajoWhite,
-
   },
+
+  cerrarSesion: IconCerrarSesion,
 
   perfil: IconPerfil,
 
