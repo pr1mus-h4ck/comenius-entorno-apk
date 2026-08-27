@@ -1199,52 +1199,155 @@ export function crearTrabajosAlumnos(
 // CERRAR SESIÓN
 // ===============================
 
-export function cerrarSesion(usuarioID, sessionID) {
+export async function cerrarSesion(
+  usuarioID,
+  sessionID
+) {
 
   const URL = "http://localhost:3000/cerrar-sesion";
 
-  return fetch(URL, {
-    method: "POST",
+  try {
 
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
+    const respuesta = await fetch(URL, {
 
-    body: JSON.stringify({
-      id: usuarioID,
-      session: sessionID,
-    }),
-  })
+      method: "POST",
 
-    .then((recibir) => recibir.json())
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
 
-    .then((recibido) => {
+      body: JSON.stringify({
 
-      console.log(
-        "✅ Respuesta cerrar sesión:",
-        recibido
-      );
+        id: usuarioID,
 
-      return {
-        ok: recibido.cerrarSesion === true,
-        mensaje: recibido.mensaje,
-      };
+        session: sessionID,
 
-    })
-
-    .catch((error) => {
-
-      console.log(
-        "❌ Error al cerrar sesión:",
-        error
-      );
-
-      return {
-        ok: false,
-        mensaje: "No se pudo cerrar la sesión en el servidor.",
-      };
+      }),
 
     });
+
+    const recibido =
+      await respuesta.json();
+
+    console.log(
+      "✅ Respuesta cerrar sesión:",
+      recibido
+    );
+
+    return {
+
+      ok:
+        recibido.cerrarSesion === true ||
+        recibido.ok === true,
+
+      mensaje:
+        recibido.mensaje,
+
+    };
+
+  } catch (error) {
+
+    console.log(
+      "❌ Error cerrar sesión:",
+      error
+    );
+
+    return {
+
+      ok: false,
+
+      mensaje:
+        "No se pudo cerrar la sesión en el servidor.",
+
+    };
+
+  }
+
+}
+
+
+// ===============================
+// CHAT 
+// ===============================
+
+export async function obtenerChat(
+  usuarioID,
+  sessionID,
+  comisionID,
+  trabajoID
+) {
+
+  const URL =
+    "http://localhost:3000/actualizarChatTrabajo";
+
+  try {
+
+    const respuesta = await fetch(URL, {
+
+      method: "POST",
+
+      headers: {
+
+        Accept: "application/json",
+
+        "Content-Type":
+          "application/json",
+
+      },
+
+      body: JSON.stringify({
+
+        id: usuarioID,
+
+        session: sessionID,
+
+        comisionID: comisionID,
+
+        trabajo: trabajoID,
+
+      }),
+
+    });
+
+    const recibido =
+      await respuesta.json();
+
+    console.log(
+      "✅ Chat recibido:",
+      recibido
+    );
+
+    return {
+
+      ok: !recibido.tipo,
+
+      chat:
+        recibido.chat || [],
+
+      mensaje:
+        recibido.mensaje,
+
+    };
+
+  } catch (error) {
+
+    console.log(
+      "❌ Error al obtener chat:",
+      error
+    );
+
+    return {
+
+      ok: false,
+
+      chat: [],
+
+      mensaje:
+        "No se pudo obtener el chat.",
+
+    };
+
+  }
 
 }

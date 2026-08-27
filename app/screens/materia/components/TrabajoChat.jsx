@@ -4,44 +4,29 @@ import {
   View,
   Text,
   StyleSheet,
+  Alert,
 } from "react-native";
 
-import {
-  obtenerChat,
-} from "../../../services/auth-service";
+import { obtenerChat } from "../../../services/auth-service";
+import { useSessionService } from "../../../services/session-service";
 
-import {
-  useSessionService,
-} from "../../../services/session-service";
-
+import { COLORS } from "../../../constants/colors";
+import { SPACING } from "../../../constants/spacing";
+import { TYPOGRAPHY } from "../../../constants/typography";
 
 export default function TrabajoChat() {
 
+  const {
+    session,
+  } = useSessionService();
+
   const [mensajes, setMensajes] = useState([]);
-
-  const { session } = useSessionService();
-
-
-  // ==========================================
-  // OBTENER CHAT
-  // ==========================================
 
   useEffect(() => {
 
-    if (!session?.trabajo?.id) {
-      return;
-    }
-
     cargarMensajes();
 
-  }, [
-
-    session?.trabajo?.id,
-
-    session?.listaAlumno,
-
-  ]);
-
+  }, []);
 
   async function cargarMensajes() {
 
@@ -51,35 +36,29 @@ export default function TrabajoChat() {
 
       session.sessionID,
 
-      session.trabajo.id,
-
       session.comisionID,
 
-      session.listaAlumno,
-
-      session.rol
+      session.trabajo?.id
 
     );
 
-
     if (!respuesta.ok) {
 
-      console.log(
-        "❌ Error:",
-        respuesta.mensaje
+      Alert.alert(
+        "Error",
+        respuesta.mensaje ||
+        "No se pudo cargar el chat."
       );
 
       return;
 
     }
 
-
     setMensajes(
-      respuesta.mensajes
+      respuesta.chat
     );
 
   }
-
 
   return (
 
@@ -89,7 +68,6 @@ export default function TrabajoChat() {
         Chat
       </Text>
 
-
       {mensajes.map((mensaje, index) => (
 
         <View
@@ -97,24 +75,16 @@ export default function TrabajoChat() {
           style={styles.mensaje}
         >
 
-          <Text style={styles.autor}>
-
-            {mensaje.EmisorNombreCompleto}
-
-          </Text>
-
-
-          <Text>
-
-            {mensaje.Contenido}
-
-          </Text>
-
-
           <Text style={styles.fecha}>
-
             {mensaje.FechaHora}
+          </Text>
 
+          <Text style={styles.autor}>
+            {mensaje.EmisorNombreCompleto}
+          </Text>
+
+          <Text style={styles.contenido}>
+            {mensaje.Contenido}
           </Text>
 
         </View>
@@ -127,16 +97,15 @@ export default function TrabajoChat() {
 
 }
 
-
 const styles = StyleSheet.create({
 
   card: {
 
-    backgroundColor: "#FFF",
+    backgroundColor: COLORS.white,
 
-    margin: 20,
+    margin: SPACING.lg,
 
-    padding: 20,
+    padding: SPACING.lg,
 
     borderRadius: 12,
 
@@ -144,23 +113,35 @@ const styles = StyleSheet.create({
 
   titulo: {
 
-    fontSize: 18,
+    fontSize: TYPOGRAPHY.h3,
 
     fontWeight: "bold",
 
-    marginBottom: 15,
+    color: COLORS.primaryDark,
+
+    marginBottom: SPACING.lg,
 
   },
 
   mensaje: {
 
-    marginBottom: 15,
+    marginBottom: SPACING.lg,
 
     borderBottomWidth: 1,
 
-    borderBottomColor: "#EEE",
+    borderBottomColor: COLORS.border,
 
-    paddingBottom: 10,
+    paddingBottom: SPACING.md,
+
+  },
+
+  fecha: {
+
+    fontSize: TYPOGRAPHY.small,
+
+    color: COLORS.textSecondary,
+
+    marginBottom: SPACING.xs,
 
   },
 
@@ -168,17 +149,15 @@ const styles = StyleSheet.create({
 
     fontWeight: "bold",
 
-    marginBottom: 4,
+    color: COLORS.text,
+
+    marginBottom: SPACING.xs,
 
   },
 
-  fecha: {
+  contenido: {
 
-    fontSize: 12,
-
-    color: "#888",
-
-    marginTop: 5,
+    color: COLORS.text,
 
   },
 

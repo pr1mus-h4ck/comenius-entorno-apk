@@ -11,6 +11,7 @@ export default function Icon({
     : icon.black ?? icon;
 
   return (
+
     <Image
       source={source}
       style={{
@@ -19,6 +20,7 @@ export default function Icon({
       }}
       contentFit="contain"
     />
+
   );
 
 }

@@ -15,14 +15,13 @@ import IconListaTrabajoWhite from "../../assets/icon-listatrabajo-white.svg";
 
 import IconPerfil from "../../assets/icon-perfil.svg";
 
+import LogoutBlack from "../../assets/logout-black.svg";
+import LogoutWhite from "../../assets/logout-white.svg";
+
 import DocIcon from "../../assets/type/text_line_doc.svg";
 import PdfIcon from "../../assets/type/text_line_pdf.svg";
-
 import XlsIcon from "../../assets/type/text_line_xls.svg";
-
 import PptIcon from "../../assets/type/text_line_ppt.svg";
-
-import IconCerrarSesion from "../../assets/icon-cerrar-sesion.svg";
 
 import JpgIcon from "../../assets/type/text_line_jpg.svg";
 import PngIcon from "../../assets/type/text_line_png.svg";
@@ -61,40 +60,43 @@ export const ICONS = {
     white: IconListaTrabajoWhite,
   },
 
-  cerrarSesion: IconCerrarSesion,
-
   perfil: IconPerfil,
 
-files: {
+  logout: {
+    black: LogoutBlack,
+    white: LogoutWhite,
+  },
 
-  pdf: PdfIcon,
+  files: {
 
-  doc: DocIcon,
-  docx: DocIcon,
+    pdf: PdfIcon,
 
-  xls: XlsIcon,
-  xlsx: XlsIcon,
+    doc: DocIcon,
+    docx: DocIcon,
 
-  ppt: PptIcon,
-  pptx: PptIcon,
+    xls: XlsIcon,
+    xlsx: XlsIcon,
 
-  png: PngIcon,
+    ppt: PptIcon,
+    pptx: PptIcon,
 
-  jpg: JpgIcon,
-  jpeg: JpgIcon,
+    png: PngIcon,
 
-  gif: PngIcon,
+    jpg: JpgIcon,
+    jpeg: JpgIcon,
 
-  mp3: Mp3Icon,
-  wav: Mp3Icon,
+    gif: PngIcon,
 
-  zip: DocIcon,
+    mp3: Mp3Icon,
+    wav: Mp3Icon,
 
-  html: HtmlIcon,
-  css: CssIcon,
-  js: JsIcon,
-  java: JavaIcon,
+    zip: DocIcon,
 
-},
+    html: HtmlIcon,
+    css: CssIcon,
+    js: JsIcon,
+    java: JavaIcon,
+
+  },
 
 };

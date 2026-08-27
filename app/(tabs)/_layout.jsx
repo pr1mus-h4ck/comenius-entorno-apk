@@ -1,32 +1,19 @@
+import { Image } from "expo-image";
 import { Tabs } from "expo-router";
-
-import {
-  Image,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, View } from "react-native";
 
 import Icon from "../components/Icon";
 
 import { COLORS } from "../constants/colors";
 import { ICONS } from "../constants/icons";
 
-import { useSessionService } from "../services/session-service";
+import { cerrarSesion as cerrarSesionApi } from "../services/auth-service";
 import { irLogin } from "../services/navigation-service";
-
-import {
-  cerrarSesion as cerrarSesionApi,
-} from "../services/auth-service";
-
+import { useSessionService } from "../services/session-service";
 
 export default function TabsLayout() {
 
-  const {
-    session,
-    limpiarSesion,
-  } = useSessionService();
-
+  const { session, limpiarSesion } = useSessionService();
 
   async function cerrarSesion() {
 
@@ -40,22 +27,21 @@ export default function TabsLayout() {
     } catch (error) {
 
       console.log(
-        "Error cerrando sesión en backend:",
+        "Error al cerrar sesión en el servidor:",
         error
       );
 
     } finally {
 
-      // Siempre limpiar sesión local
+      // Aunque el servidor falle,
+      // siempre eliminamos la sesión local.
       limpiarSesion();
 
-      // Volver al login
       irLogin();
 
     }
 
   }
-
 
   return (
 
@@ -69,7 +55,8 @@ export default function TabsLayout() {
 
         tabBarActiveTintColor: COLORS.primary,
 
-        tabBarInactiveTintColor: COLORS.textSecondary,
+        tabBarInactiveTintColor:
+          COLORS.textSecondary,
 
         tabBarStyle: {
 
@@ -137,20 +124,13 @@ export default function TabsLayout() {
             >
 
               <Image
-
-                source={ICONS.logo}
-
-                style={{
-
-                  width: 30,
-
-                  height: 30,
-
-                }}
-
-                contentFit="contain"
-
-              />
+  source={require("../../assets/mini-logo.svg")}
+  style={{
+    width: 30,
+    height: 30,
+  }}
+  contentFit="contain"
+/>
 
             </View>
 
@@ -187,39 +167,17 @@ export default function TabsLayout() {
 
             >
 
-              <Image
+              <Icon
 
-                source={ICONS.logout}
+                icon={{
 
-                style={{
-
-                  width: 24,
-
-                  height: 24,
+                  black: ICONS.logout,
 
                 }}
 
-                contentFit="contain"
+                size={24}
 
               />
-
-              <Text
-
-                style={{
-
-                  fontSize: 11,
-
-                  color: COLORS.textSecondary,
-
-                  marginTop: 2,
-
-                }}
-
-              >
-
-                Cerrar sesión
-
-              </Text>
 
             </Pressable>
 
