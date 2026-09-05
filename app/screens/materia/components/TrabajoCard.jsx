@@ -5,6 +5,8 @@ import {
   View,
 } from "react-native";
 
+import { irTrabajo } from "../../../services/navigation-service";
+
 import Icon from "../../../components/Icon";
 import { ICONS } from "../../../constants/icons";
 
@@ -21,10 +23,9 @@ export default function TrabajoCard({ trabajo }) {
   const { actualizarCampo } = useSessionService();
 
   function seleccionarTrabajo() {
-
-    actualizarCampo("trabajo", trabajo);
-
-  }
+  actualizarCampo("trabajo", trabajo);
+  irTrabajo();
+}
 
   return (
 

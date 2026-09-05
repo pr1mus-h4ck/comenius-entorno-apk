@@ -85,51 +85,44 @@ export default function ListaComision() {
   // INGRESAR A COMISION
   // ==========================================
 
-  async function ingresarComision(comision) {
+async function ingresarComision(comision) {
+  const respuesta = await ingresarComisionApi(
+    comision,
+    comision.Comision_ID
+  );
 
-    const respuesta = await ingresarComisionApi(
-
-      comision,
-
-      comision.Comision_ID
-
+  if (!respuesta.ok) {
+    Alert.alert(
+      "Error",
+      "No se pudo ingresar a la comisión."
     );
-
-
-    if (!respuesta.ok) {
-
-      Alert.alert(
-        "Error",
-        "No se pudo ingresar a la comisión."
-      );
-
-      return;
-    }
-
-
-    actualizarCampo(
-      "comision",
-      comision
-    );
-
-    actualizarCampo(
-      "comisionID",
-      comision.Comision_ID
-    );
-
-    actualizarCampo(
-      "item",
-      "Materia"
-    );
-
-    actualizarCampo(
-      "enlace",
-      "Portada"
-    );
-
-    irMateria();
-
+    return;
   }
+
+  actualizarCampo("comision", {
+    id: comision.Comision_ID,
+    nombre: comision.Materia,
+    comision: comision.Comision,
+    profesor: comision.Instructores,
+  });
+
+  actualizarCampo(
+    "comisionID",
+    comision.Comision_ID
+  );
+
+  actualizarCampo(
+    "item",
+    "Materia"
+  );
+
+  actualizarCampo(
+    "enlace",
+    "Portada"
+  );
+
+  irMateria();
+}
 
 
   return (
