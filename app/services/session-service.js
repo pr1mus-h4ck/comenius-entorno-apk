@@ -5,6 +5,7 @@ export function useSessionService() {
   const {
     session,
     setSession,
+    limpiarSesion: limpiarSesionContext,
   } = useSession();
 
   function obtenerSesion() {
@@ -26,7 +27,7 @@ export function useSessionService() {
   }
 
   function limpiarSesion() {
-    setSession(SESSION_INICIAL);
+    limpiarSesionContext();
   }
 
   return {

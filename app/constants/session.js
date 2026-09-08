@@ -1,28 +1,22 @@
 export const SESSION_INICIAL = {
-
-  // Usuario
   usuarioID: null,
   sessionID: null,
+
   nombre: "",
-  rol: null,
+  correo: "",
+
+  rol: "",
+  verificacion: false,
   instructorID: null,
 
-  // Seguridad
-  otp: null,
-  correo: "",
-  verificacion: false,
+  otpSolicitado: false,
 
-  // Navegación
-  item: "Inicio",
-
-  // Materia
+  item: "",
   comision: null,
   comisionID: null,
-  enlace: null,
+  enlace: "",
 
-  // Trabajo
   trabajo: null,
   alumno: null,
   listaAlumno: null,
-
 };
