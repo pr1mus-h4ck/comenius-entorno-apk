@@ -90,157 +90,105 @@ export function enviarOtp(usuarioID, sessionID) {
 // CONFIRMAR OTP
 // ===============================
 
-export function confirmarOtp(
-  usuarioID,
-  sessionID,
-  otp
-) {
-
+export function confirmarOtp(usuarioID, sessionID, otp) {
   // ==========================================
   // VALIDAR OTP ANTES DEL FETCH
   // ==========================================
 
   if (!otp || otp.length !== 6) {
-
     return Promise.resolve({
-
       ok: false,
 
-      mensaje:
-        "Debe completar el código de 6 dígitos.",
-
+      mensaje: "Debe completar el código de 6 dígitos.",
     });
-
   }
-
 
   // ==========================================
   // URL DEL BACK-END
   // ==========================================
 
-  const URL =
-    "http://localhost:3000/confirmar-otp";
-
+  const URL = "http://localhost:3000/confirmar-otp";
 
   // ==========================================
   // FETCH
   // ==========================================
 
-  return fetch(URL, {
+  return (
+    fetch(URL, {
+      method: "POST",
 
-    method: "POST",
+      headers: {
+        Accept: "application/json",
 
-    headers: {
+        "Content-Type": "application/json",
+      },
 
-      Accept: "application/json",
+      body: JSON.stringify({
+        id: usuarioID,
 
-      "Content-Type": "application/json",
+        session: sessionID,
 
-    },
-
-    body: JSON.stringify({
-
-      id: usuarioID,
-
-      session: sessionID,
-
-      otp: otp,
-
-    }),
-
-  })
-
-
-    // ========================================
-    // CONVERTIR RESPUESTA A JSON
-    // ========================================
-
-    .then((recibir) => recibir.json())
-
-
-    // ========================================
-    // RESPUESTA DEL BACK-END
-    // ========================================
-
-    .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta confirmar OTP:",
-        recibido
-      );
-
-
-      return {
-
-        ok: !!recibido.verificacion,
-
-        verificacion:
-          recibido.verificacion,
-
-        rol:
-          recibido.rol,
-
-        nombre:
-          recibido.nombre,
-
-        instructorID:
-          recibido.instructorId,
-
-        intentos:
-          recibido.intentos,
-
-        mensaje:
-          recibido.tipo,
-
-        conexionError: false,
-
-      };
-
+        otp: otp,
+      }),
     })
+      // ========================================
+      // CONVERTIR RESPUESTA A JSON
+      // ========================================
 
+      .then((recibir) => recibir.json())
 
-    // ========================================
-    // ERROR DE CONEXIÓN
-    // ========================================
+      // ========================================
+      // RESPUESTA DEL BACK-END
+      // ========================================
 
-    .catch((error) => {
+      .then((recibido) => {
+        console.log("✅ Respuesta confirmar OTP:", recibido);
 
-      console.log(
-        "❌ Error confirmar OTP:",
-        error
-      );
+        return {
+          ok: !!recibido.verificacion,
 
+          verificacion: recibido.verificacion,
 
-      return {
+          rol: recibido.rol,
 
-        ok: false,
+          nombre: recibido.nombre,
 
-        conexionError: true,
+          instructorID: recibido.instructorId,
 
-        mensaje:
-          "No se pudo conectar con el servidor.",
+          intentos: recibido.intentos,
 
-      };
+          mensaje: recibido.tipo,
 
-    });
+          conexionError: false,
+        };
+      })
 
+      // ========================================
+      // ERROR DE CONEXIÓN
+      // ========================================
+
+      .catch((error) => {
+        console.log("❌ Error confirmar OTP:", error);
+
+        return {
+          ok: false,
+
+          conexionError: true,
+
+          mensaje: "No se pudo conectar con el servidor.",
+        };
+      })
+  );
 }
 
 // ===============================
 // OBTENER LISTA DE COMISIONES
 // ===============================
 
-export function actualizarListaComision(
-  usuarioID,
-  sessionID,
-  rol
-) {
-
-  const URL =
-    "http://localhost:3000/actualizarListaComision";
+export function actualizarListaComision(usuarioID, sessionID, rol) {
+  const URL = "http://localhost:3000/actualizarListaComision";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -249,77 +197,48 @@ export function actualizarListaComision(
     },
 
     body: JSON.stringify({
-
       id: usuarioID,
 
       session: sessionID,
 
       rol: rol,
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta lista de comisiones:",
-        recibido
-      );
+      console.log("✅ Respuesta lista de comisiones:", recibido);
 
       return {
-
         ok: Array.isArray(recibido.comision),
 
-        comisiones:
-          recibido.comision || [],
+        comisiones: recibido.comision || [],
 
-        mensaje:
-          recibido.mensaje,
-
+        mensaje: recibido.mensaje,
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al obtener comisiones:",
-        error
-      );
+      console.log("❌ Error al obtener comisiones:", error);
 
       return {
-
         ok: false,
 
         comisiones: [],
 
-        mensaje:
-          "No se pudieron obtener las comisiones.",
-
+        mensaje: "No se pudieron obtener las comisiones.",
       };
-
     });
-
 }
-
 
 // ===============================
 // INGRESAR A COMISION
 // ===============================
 
-export function ingresarComision(
-  comision,
-  comisionID
-) {
-
-  const URL =
-    "http://localhost:3000/ingresarComision";
+export function ingresarComision(comision, comisionID) {
+  const URL = "http://localhost:3000/ingresarComision";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -328,65 +247,40 @@ export function ingresarComision(
     },
 
     body: JSON.stringify({
-
       comision: comision,
 
       comisionID: comisionID,
-
     }),
-
   })
-
     .then((recibir) => {
-
-      console.log(
-        "✅ Respuesta ingresar comisión:",
-        recibir.status
-      );
+      console.log("✅ Respuesta ingresar comisión:", recibir.status);
 
       return recibir.ok;
-
     })
 
     .then((ok) => {
-
       return {
         ok: ok,
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al ingresar a la comisión:",
-        error
-      );
+      console.log("❌ Error al ingresar a la comisión:", error);
 
       return {
         ok: false,
       };
-
     });
-
 }
-
 
 // ===============================
 // OBTENER PORTADA
 // ===============================
 
-export function obtenerPortada(
-  usuarioID,
-  sessionID,
-  comisionID
-) {
-
-  const URL =
-    "http://localhost:3000/actualizarPortada";
+export function obtenerPortada(usuarioID, sessionID, comisionID) {
+  const URL = "http://localhost:3000/actualizarPortada";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -395,116 +289,75 @@ export function obtenerPortada(
     },
 
     body: JSON.stringify({
-
       id: usuarioID,
 
       session: sessionID,
 
       comisionID: comisionID,
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta portada:",
-        recibido
-      );
+      console.log("✅ Respuesta portada:", recibido);
 
       return {
-
         ok: !!recibido.portada,
 
-        portada:
-          recibido.portada,
+        portada: recibido.portada,
 
-        mensaje:
-          recibido.mensaje,
-
+        mensaje: recibido.mensaje,
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al obtener portada:",
-        error
-      );
+      console.log("❌ Error al obtener portada:", error);
 
       return {
-
         ok: false,
 
         portada: [],
 
-        mensaje:
-          "No se pudo obtener la portada.",
-
+        mensaje: "No se pudo obtener la portada.",
       };
-
     });
-
 }
 
 // ===============================
 // OBTENER PUBLICACIONES
 // ===============================
 
-export function obtenerPublicaciones(
-  usuarioID,
-  sessionID,
-  comisionID
-) {
+export function obtenerPublicaciones(usuarioID, sessionID, comisionID) {
+  const URL = "http://localhost:3000/actualizarPublicacion";
 
-  const URL =
-    "http://localhost:3000/actualizarPublicacion";
+  return (
+    fetch(URL, {
+      method: "POST",
 
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
 
-  return fetch(URL, {
+      body: JSON.stringify({
+        id: usuarioID,
 
-    method: "POST",
+        session: sessionID,
 
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
+        comisionID: comisionID,
+      }),
+    })
+      .then((recibir) => recibir.json())
 
-    body: JSON.stringify({
+      // ==========================================
+      // ADAPTAR RESPUESTA DEL BACK-END
+      // ==========================================
 
-      id: usuarioID,
+      .then((recibido) => {
+        console.log("✅ Respuesta publicaciones:", recibido);
 
-      session: sessionID,
-
-      comisionID: comisionID,
-
-    }),
-
-  })
-
-    .then((recibir) => recibir.json())
-
-
-    // ==========================================
-    // ADAPTAR RESPUESTA DEL BACK-END
-    // ==========================================
-
-    .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta publicaciones:",
-        recibido
-      );
-
-
-      const publicaciones =
-        (recibido.panelClase || []).map(
+        const publicaciones = (recibido.panelClase || []).map(
           (publicacion) => ({
-
             id: publicacion.id,
 
             Titulo: publicacion.Titulo,
@@ -513,72 +366,46 @@ export function obtenerPublicaciones(
 
             FechaHora: publicacion.FechaHora,
 
-            NombreCompleto:
-              publicacion.NombreCompleto,
+            NombreCompleto: publicacion.NombreCompleto,
 
+            comentarios: (publicacion.comentarios || []).map((comentario) => ({
+              id: comentario.ComentarioID,
 
-            comentarios:
-              (publicacion.comentarios || []).map(
-                (comentario) => ({
+              Contenido: comentario.ComentarioContenido,
 
-                  id:
-                    comentario.ComentarioID,
+              FechaHora: comentario.FechaHoraComentario,
 
-                  Contenido:
-                    comentario.ComentarioContenido,
-
-                  FechaHora:
-                    comentario.FechaHoraComentario,
-
-                  NombreCompleto:
-                    comentario.NombreCompletoComenterio,
-
-                })
-              ),
-
-          })
+              NombreCompleto: comentario.NombreCompletoComenterio,
+            })),
+          }),
         );
 
+        return {
+          ok: !!recibido.panelClase,
 
-      return {
+          publicaciones: publicaciones,
 
-        ok: !!recibido.panelClase,
+          mensaje: recibido.mensaje,
+        };
+      })
 
-        publicaciones: publicaciones,
+      // ==========================================
+      // ERROR DE CONEXIÓN
+      // ==========================================
 
-        mensaje: recibido.mensaje,
+      .catch((error) => {
+        console.log("❌ Error al obtener publicaciones:", error);
 
-      };
+        return {
+          ok: false,
 
-    })
+          publicaciones: [],
 
-
-    // ==========================================
-    // ERROR DE CONEXIÓN
-    // ==========================================
-
-    .catch((error) => {
-
-      console.log(
-        "❌ Error al obtener publicaciones:",
-        error
-      );
-
-      return {
-
-        ok: false,
-
-        publicaciones: [],
-
-        mensaje:
-          "No se pudieron obtener las publicaciones.",
-
-      };
-
-    });
-
+          mensaje: "No se pudieron obtener las publicaciones.",
+        };
+      })
+  );
 }
-
 
 // ===============================
 // CREAR PUBLICACIÓN
@@ -590,27 +417,19 @@ export function crearPublicacion(
   titulo,
   contenido,
   comisionID,
-  instructorID
+  instructorID,
 ) {
-
   if (!contenido.trim()) {
-
     return Promise.resolve({
-
       ok: false,
 
-      mensaje:
-        "El contenido de la publicación es obligatorio.",
-
+      mensaje: "El contenido de la publicación es obligatorio.",
     });
-
   }
 
-  const URL =
-    "http://localhost:3000/crearPublicacion";
+  const URL = "http://localhost:3000/crearPublicacion";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -619,7 +438,6 @@ export function crearPublicacion(
     },
 
     body: JSON.stringify({
-
       id: usuarioID,
 
       session: sessionID,
@@ -633,49 +451,29 @@ export function crearPublicacion(
       instructorId: instructorID,
 
       fechaHora: Date.now(),
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta crear publicación:",
-        recibido
-      );
+      console.log("✅ Respuesta crear publicación:", recibido);
 
       return {
-
         ok: recibido.ok === true,
 
-        mensaje:
-          recibido.mensaje,
-
+        mensaje: recibido.mensaje,
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al crear publicación:",
-        error
-      );
+      console.log("❌ Error al crear publicación:", error);
 
       return {
-
         ok: false,
 
-        mensaje:
-          "No se pudo crear la publicación.",
-
+        mensaje: "No se pudo crear la publicación.",
       };
-
     });
-
 }
 
 // ===============================
@@ -686,120 +484,78 @@ export function crearComentario(
   usuarioID,
   sessionID,
   publicacionId,
-  comentario
+  comentario,
 ) {
-
   // Validar comentario antes de hacer el fetch
   if (!comentario.trim()) {
-
     return Promise.resolve({
-
       ok: false,
 
-      mensaje:
-        "El comentario no puede estar vacío.",
-
+      mensaje: "El comentario no puede estar vacío.",
     });
-
   }
 
-
   // URL del Back-End
-  const URL =
-    "http://localhost:3000/crearComentario";
+  const URL = "http://localhost:3000/crearComentario";
 
+  return (
+    fetch(URL, {
+      method: "POST",
 
-  return fetch(URL, {
+      headers: {
+        Accept: "application/json",
 
-    method: "POST",
+        "Content-Type": "application/json",
+      },
 
-    headers: {
+      body: JSON.stringify({
+        id: usuarioID,
 
-      Accept: "application/json",
+        session: sessionID,
 
-      "Content-Type": "application/json",
+        publicacionId: publicacionId,
 
-    },
+        comentario: comentario,
 
-    body: JSON.stringify({
-
-      id: usuarioID,
-
-      session: sessionID,
-
-      publicacionId: publicacionId,
-
-      comentario: comentario,
-
-      fechaHora: Date.now(),
-
-    }),
-
-  })
-
-
-    // Convertir respuesta a JSON
-    .then((recibir) => recibir.json())
-
-
-    // Adaptar respuesta del Back-End
-    .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta crear comentario:",
-        recibido
-      );
-
-
-      return {
-
-        ok: recibido.ok === true,
-
-        mensaje:
-          recibido.mensaje,
-
-      };
-
+        fechaHora: Date.now(),
+      }),
     })
+      // Convertir respuesta a JSON
+      .then((recibir) => recibir.json())
 
+      // Adaptar respuesta del Back-End
+      .then((recibido) => {
+        console.log("✅ Respuesta crear comentario:", recibido);
 
-    // Error de conexión
-    .catch((error) => {
+        return {
+          ok: recibido.ok === true,
 
-      console.log(
-        "❌ Error al crear comentario:",
-        error
-      );
+          mensaje: recibido.mensaje,
+        };
+      })
 
+      // Error de conexión
+      .catch((error) => {
+        console.log("❌ Error al crear comentario:", error);
 
-      return {
+        return {
+          ok: false,
 
-        ok: false,
-
-        mensaje:
-          "No se pudo crear el comentario.",
-
-      };
-
-    });
-
+          mensaje: "No se pudo crear el comentario.",
+        };
+      })
+  );
 }
 
 // ===============================
 // OBTENER LISTA DE TRABAJOS
 // ===============================
 
-export function obtenerTrabajos(
-  usuarioID,
-  sessionID,
-  comisionID
-) {
-
+export function obtenerTrabajos(usuarioID, sessionID, comisionID) {
   // URL del Back-End
   const URL = "http://localhost:3000/actualizarTrabajos";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -808,60 +564,38 @@ export function obtenerTrabajos(
     },
 
     body: JSON.stringify({
-
       id: usuarioID,
 
       session: sessionID,
 
       comisionID: comisionID,
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta lista de trabajos:",
-        recibido
-      );
+      console.log("✅ Respuesta lista de trabajos:", recibido);
 
       return {
-
         ok: !!recibido.trabajos,
 
-        trabajos:
-          recibido.trabajos || [],
+        trabajos: recibido.trabajos || [],
 
-        mensaje:
-          recibido.mensaje,
-
+        mensaje: recibido.mensaje,
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al obtener trabajos:",
-        error
-      );
+      console.log("❌ Error al obtener trabajos:", error);
 
       return {
-
         ok: false,
 
         trabajos: [],
 
-        mensaje:
-          "No se pudieron obtener los trabajos.",
-
+        mensaje: "No se pudieron obtener los trabajos.",
       };
-
     });
-
 }
 
 // ===============================
@@ -872,14 +606,11 @@ export function obtenerTrabajoInstructor(
   usuarioID,
   sessionID,
   comisionID,
-  trabajoID
+  trabajoID,
 ) {
-
-  const URL =
-    "http://localhost:3000/actualizarTrabajoInstructor";
+  const URL = "http://localhost:3000/actualizarTrabajoInstructor";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -888,7 +619,6 @@ export function obtenerTrabajoInstructor(
     },
 
     body: JSON.stringify({
-
       id: usuarioID,
 
       session: sessionID,
@@ -896,54 +626,34 @@ export function obtenerTrabajoInstructor(
       comisionID: comisionID,
 
       trabajo: trabajoID,
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta trabajo instructor:",
-        recibido
-      );
+      console.log("✅ Respuesta trabajo instructor:", recibido);
 
       return {
-
         ok: !!recibido.id,
 
         trabajo: recibido,
 
         mensaje: recibido.mensaje,
-
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al obtener trabajo:",
-        error
-      );
+      console.log("❌ Error al obtener trabajo:", error);
 
       return {
-
         ok: false,
 
         trabajo: null,
 
-        mensaje:
-          "No se pudo obtener el trabajo.",
-
+        mensaje: "No se pudo obtener el trabajo.",
       };
-
     });
-
 }
-
 
 // ===============================
 // OBTENER TRABAJO - ALUMNO
@@ -954,14 +664,11 @@ export function obtenerTrabajoAlumno(
   sessionID,
   comisionID,
   trabajoID,
-  listaAlumno
+  listaAlumno,
 ) {
-
-  const URL =
-    "http://localhost:3000/actualizarTrabajoAlumno";
+  const URL = "http://localhost:3000/actualizarTrabajoAlumno";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -970,7 +677,6 @@ export function obtenerTrabajoAlumno(
     },
 
     body: JSON.stringify({
-
       id: usuarioID,
 
       session: sessionID,
@@ -980,52 +686,33 @@ export function obtenerTrabajoAlumno(
       trabajo: trabajoID,
 
       listaAlumno: listaAlumno,
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta trabajo alumno:",
-        recibido
-      );
+      console.log("✅ Respuesta trabajo alumno:", recibido);
 
       return {
-
         ok: true,
 
         trabajo: recibido,
 
         mensaje: recibido.mensaje,
-
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al obtener trabajo alumno:",
-        error
-      );
+      console.log("❌ Error al obtener trabajo alumno:", error);
 
       return {
-
         ok: false,
 
         trabajo: null,
 
-        mensaje:
-          "No se pudo obtener el trabajo.",
-
+        mensaje: "No se pudo obtener el trabajo.",
       };
-
     });
-
 }
 
 // ===============================
@@ -1038,14 +725,11 @@ export function obtenerChat(
   trabajoID,
   comisionID,
   listaAlumno,
-  rol
+  rol,
 ) {
-
-  const URL =
-    "http://localhost:3000/actualizarChatTrabajo";
+  const URL = "http://localhost:3000/actualizarChatTrabajo";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -1054,7 +738,6 @@ export function obtenerChat(
     },
 
     body: JSON.stringify({
-
       session: sessionID,
 
       id: usuarioID,
@@ -1066,52 +749,33 @@ export function obtenerChat(
       listaAlumno: listaAlumno,
 
       rol: rol,
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta chat:",
-        recibido
-      );
+      console.log("✅ Respuesta chat:", recibido);
 
       return {
-
         ok: Array.isArray(recibido.chat),
 
         mensajes: recibido.chat || [],
 
         mensaje: recibido.mensaje,
-
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al obtener chat:",
-        error
-      );
+      console.log("❌ Error al obtener chat:", error);
 
       return {
-
         ok: false,
 
         mensajes: [],
 
-        mensaje:
-          "No se pudo obtener el chat.",
-
+        mensaje: "No se pudo obtener el chat.",
       };
-
     });
-
 }
 
 // ===============================
@@ -1123,14 +787,11 @@ export function crearTrabajosAlumnos(
   sessionID,
   comisionID,
   trabajoID,
-  urlArchivos
+  urlArchivos,
 ) {
-
-  const URL =
-    "http://localhost:3000/crearTrabajosAlumnos";
+  const URL = "http://localhost:3000/crearTrabajosAlumnos";
 
   return fetch(URL, {
-
     method: "POST",
 
     headers: {
@@ -1139,7 +800,6 @@ export function crearTrabajosAlumnos(
     },
 
     body: JSON.stringify({
-
       id: usuarioID,
 
       session: sessionID,
@@ -1151,65 +811,40 @@ export function crearTrabajosAlumnos(
       comisionID: comisionID,
 
       trabajoID: trabajoID,
-
     }),
-
   })
-
     .then((recibir) => recibir.json())
 
     .then((recibido) => {
-
-      console.log(
-        "✅ Respuesta entrega:",
-        recibido
-      );
+      console.log("✅ Respuesta entrega:", recibido);
 
       return {
-
         ok: recibido.ok === true,
 
         mensaje: recibido.mensaje,
-
       };
-
     })
 
     .catch((error) => {
-
-      console.log(
-        "❌ Error al enviar entrega:",
-        error
-      );
+      console.log("❌ Error al enviar entrega:", error);
 
       return {
-
         ok: false,
 
-        mensaje:
-          "No se pudo enviar la entrega.",
-
+        mensaje: "No se pudo enviar la entrega.",
       };
-
     });
-
 }
 
 // ===============================
 // CERRAR SESIÓN
 // ===============================
 
-export async function cerrarSesion(
-  usuarioID,
-  sessionID
-) {
-
+export async function cerrarSesion(usuarioID, sessionID) {
   const URL = "http://localhost:3000/cerrar-sesion";
 
   try {
-
     const respuesta = await fetch(URL, {
-
       method: "POST",
 
       headers: {
@@ -1218,136 +853,86 @@ export async function cerrarSesion(
       },
 
       body: JSON.stringify({
-
         id: usuarioID,
 
         session: sessionID,
-
       }),
-
     });
 
-    const recibido =
-      await respuesta.json();
+    const recibido = await respuesta.json();
 
-    console.log(
-      "✅ Respuesta cerrar sesión:",
-      recibido
-    );
+    console.log("✅ Respuesta cerrar sesión:", recibido);
 
     return {
+      ok: recibido.cerrarSesion === true || recibido.ok === true,
 
-      ok:
-        recibido.cerrarSesion === true ||
-        recibido.ok === true,
-
-      mensaje:
-        recibido.mensaje,
-
+      mensaje: recibido.mensaje,
     };
-
   } catch (error) {
-
-    console.log(
-      "❌ Error cerrar sesión:",
-      error
-    );
+    console.log("❌ Error cerrar sesión:", error);
 
     return {
-
       ok: false,
 
-      mensaje:
-        "No se pudo cerrar la sesión en el servidor.",
-
+      mensaje: "No se pudo cerrar la sesión en el servidor.",
     };
-
   }
-
 }
 
-
 // ===============================
-// CHAT 
+// ACTUALIZAR COMISION
 // ===============================
 
-export async function obtenerChat(
+export async function actualizarComision(
   usuarioID,
   sessionID,
   comisionID,
-  trabajoID
+  rol,
+  instructorID,
 ) {
-
-  const URL =
-    "http://localhost:3000/actualizarChatTrabajo";
+  const URL = "http://localhost:3000/actualizarComision";
 
   try {
-
     const respuesta = await fetch(URL, {
-
       method: "POST",
 
       headers: {
-
         Accept: "application/json",
-
-        "Content-Type":
-          "application/json",
-
+        "Content-Type": "application/json",
       },
 
       body: JSON.stringify({
-
         id: usuarioID,
-
         session: sessionID,
-
         comisionID: comisionID,
-
-        trabajo: trabajoID,
-
+        rol: rol,
+        instructorId: instructorID,
       }),
-
     });
 
-    const recibido =
-      await respuesta.json();
+    const recibido = await respuesta.json();
 
-    console.log(
-      "✅ Chat recibido:",
-      recibido
-    );
+    console.log("✅ Respuesta actualizar comisión:", recibido);
+
+    if (!respuesta.ok) {
+      return {
+        ok: false,
+        mensaje: recibido.mensaje,
+      };
+    }
 
     return {
-
-      ok: !recibido.tipo,
-
-      chat:
-        recibido.chat || [],
-
-      mensaje:
-        recibido.mensaje,
-
+      ok: true,
+      comision: recibido.comision || [],
+      mensaje: recibido.mensaje,
     };
-
   } catch (error) {
-
-    console.log(
-      "❌ Error al obtener chat:",
-      error
-    );
+    console.log("❌ Error al actualizar comisión:", error);
 
     return {
-
       ok: false,
-
-      chat: [],
-
-      mensaje:
-        "No se pudo obtener el chat.",
-
+      conexionError: true,
+      mensaje: "No se pudo actualizar la comisión.",
     };
-
   }
-
 }
