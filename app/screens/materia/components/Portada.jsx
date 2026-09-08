@@ -26,43 +26,44 @@ export default function Portada() {
   // OBTENER PORTADA
   // ==========================================
 
-  useEffect(() => {
-
-    cargarPortada();
-
-  }, []);
-
-
+useEffect(() => {
   async function cargarPortada() {
+    if (
+      !session.usuarioID ||
+      !session.sessionID ||
+      !session.comisionID
+    ) {
+      return;
+    }
 
     const respuesta = await obtenerPortada(
-
       session.usuarioID,
-
       session.sessionID,
-
       session.comisionID
-
     );
 
-
     if (!respuesta.ok) {
-
       console.log(
         "❌ Error:",
         respuesta.mensaje
       );
-
       return;
-
     }
 
-
-    setPortada(
+    console.log(
+      "✅ Portada recibida:",
       respuesta.portada
     );
 
+    setPortada(respuesta.portada || []);
   }
+
+  cargarPortada();
+}, [
+  session.usuarioID,
+  session.sessionID,
+  session.comisionID,
+]);
 
 
   return (

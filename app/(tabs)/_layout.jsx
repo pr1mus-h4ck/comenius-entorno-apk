@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { Tabs } from "expo-router";
-import { Pressable, View } from "react-native";
+import {Alert, Pressable, View } from "react-native";
 
 import Icon from "../components/Icon";
 
@@ -15,33 +15,44 @@ export default function TabsLayout() {
 
   const { session, limpiarSesion } = useSessionService();
 
-  async function cerrarSesion() {
+function cerrarSesion() {
+  Alert.alert(
+    "Cerrar sesión",
+    "¿Estás seguro de que querés cerrar sesión?",
+    [
+      {
+        text: "No",
+        style: "cancel",
+      },
+      {
+        text: "Sí",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const respuesta =
+              await cerrarSesionApi(
+                session.usuarioID,
+                session.sessionID
+              );
 
-    try {
-
-      await cerrarSesionApi(
-        session.usuarioID,
-        session.sessionID
-      );
-
-    } catch (error) {
-
-      console.log(
-        "Error al cerrar sesión en el servidor:",
-        error
-      );
-
-    } finally {
-
-      // Aunque el servidor falle,
-      // siempre eliminamos la sesión local.
-      limpiarSesion();
-
-      irLogin();
-
-    }
-
-  }
+            console.log(
+              "✅ Cerrar sesión:",
+              respuesta
+            );
+          } catch (error) {
+            console.log(
+              "❌ Error al cerrar sesión:",
+              error
+            );
+          } finally {
+            await limpiarSesion();
+            irLogin();
+          }
+        },
+      },
+    ]
+  );
+}
 
   return (
 
@@ -182,19 +193,6 @@ export default function TabsLayout() {
             </Pressable>
 
           ),
-
-        }}
-
-      />
-
-
-      <Tabs.Screen
-
-        name="materia"
-
-        options={{
-
-          href: null,
 
         }}
 

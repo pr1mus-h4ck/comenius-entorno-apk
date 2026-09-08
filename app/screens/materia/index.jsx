@@ -27,11 +27,11 @@ export default function MateriaScreen() {
 
       <MateriaHeader
 
-        nombre={session.comision?.nombre}
+        nombre={session.comision?.Materia}
 
-        comision={session.comision?.comision}
-
-        profesor={session.comision?.profesor}
+        comision={session.comision?.Comision}
+        
+        profesor={session.comision?.Instructores}
 
       />
 

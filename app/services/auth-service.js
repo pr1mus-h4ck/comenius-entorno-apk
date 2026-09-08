@@ -231,47 +231,6 @@ export function actualizarListaComision(usuarioID, sessionID, rol) {
     });
 }
 
-// ===============================
-// INGRESAR A COMISION
-// ===============================
-
-export function ingresarComision(comision, comisionID) {
-  const URL = "http://localhost:3000/ingresarComision";
-
-  return fetch(URL, {
-    method: "POST",
-
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-
-    body: JSON.stringify({
-      comision: comision,
-
-      comisionID: comisionID,
-    }),
-  })
-    .then((recibir) => {
-      console.log("✅ Respuesta ingresar comisión:", recibir.status);
-
-      return recibir.ok;
-    })
-
-    .then((ok) => {
-      return {
-        ok: ok,
-      };
-    })
-
-    .catch((error) => {
-      console.log("❌ Error al ingresar a la comisión:", error);
-
-      return {
-        ok: false,
-      };
-    });
-}
 
 // ===============================
 // OBTENER PORTADA
