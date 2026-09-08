@@ -1,10 +1,10 @@
 import { useSession } from "../context/SessionContext";
+import { SESSION_INICIAL } from "../constants/session";
 
 export function useSessionService() {
   const {
     session,
     setSession,
-    limpiarSesion: limpiarSesionContext,
   } = useSession();
 
   function obtenerSesion() {
@@ -25,8 +25,8 @@ export function useSessionService() {
     }));
   }
 
-  async function limpiarSesion() {
-    await limpiarSesionContext();
+  function limpiarSesion() {
+    setSession(SESSION_INICIAL);
   }
 
   return {

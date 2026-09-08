@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { Tabs } from "expo-router";
-import {Alert, Pressable, View } from "react-native";
+import { Alert, Pressable, View, Platform } from "react-native";
 
 import Icon from "../components/Icon";
 
@@ -10,12 +10,25 @@ import { ICONS } from "../constants/icons";
 import { cerrarSesion as cerrarSesionApi } from "../services/auth-service";
 import { irLogin } from "../services/navigation-service";
 import { useSessionService } from "../services/session-service";
+import BottomMenu from "../components/BottomMenu";
 
 export default function TabsLayout() {
 
   const { session, limpiarSesion } = useSessionService();
 
 function cerrarSesion() {
+  if (Platform.OS === "web") {
+    const confirmar = window.confirm(
+      "¿Estás seguro de que querés cerrar sesión?"
+    );
+
+    if (confirmar) {
+      ejecutarCerrarSesion();
+    }
+
+    return;
+  }
+
   Alert.alert(
     "Cerrar sesión",
     "¿Estás seguro de que querés cerrar sesión?",
@@ -27,31 +40,32 @@ function cerrarSesion() {
       {
         text: "Sí",
         style: "destructive",
-        onPress: async () => {
-          try {
-            const respuesta =
-              await cerrarSesionApi(
-                session.usuarioID,
-                session.sessionID
-              );
-
-            console.log(
-              "✅ Cerrar sesión:",
-              respuesta
-            );
-          } catch (error) {
-            console.log(
-              "❌ Error al cerrar sesión:",
-              error
-            );
-          } finally {
-            await limpiarSesion();
-            irLogin();
-          }
-        },
+        onPress: ejecutarCerrarSesion,
       },
     ]
   );
+}
+
+async function ejecutarCerrarSesion() {
+  try {
+    const respuesta = await cerrarSesionApi(
+      session.usuarioID,
+      session.sessionID
+    );
+
+    console.log(
+      "✅ Cerrar sesión:",
+      respuesta
+    );
+  } catch (error) {
+    console.log(
+      "❌ Error al cerrar sesión:",
+      error
+    );
+  } finally {
+    await limpiarSesion();
+    irLogin();
+  }
 }
 
   return (
