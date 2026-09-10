@@ -5,22 +5,33 @@ import TrabajoInstructor from "./TrabajoInstructor";
 import TrabajoChat from "./TrabajoChat";
 import EntregaTrabajo from "./EntregaTrabajo";
 
+import {
+  useSessionService,
+} from "../../../services/session-service";
+
 export default function Trabajo() {
+  const { session } =
+    useSessionService();
 
   return (
-
     <ScrollView>
 
-        <TrabajoInstructor />
+      {session.rol === "instructor" ? (
+        <>
+          <TrabajoInstructor />
 
-        <TrabajoAlumno />
+          <TrabajoChat />
+        </>
+      ) : (
+        <>
+          <TrabajoAlumno />
 
-        <TrabajoChat />
+          <EntregaTrabajo />
 
-        <EntregaTrabajo />
+          <TrabajoChat />
+        </>
+      )}
 
     </ScrollView>
-
   );
-
 }

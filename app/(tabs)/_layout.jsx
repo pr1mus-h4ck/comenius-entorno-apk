@@ -111,7 +111,7 @@ async function ejecutarCerrarSesion() {
 
               icon={ICONS.inicio}
 
-              active={focused}
+              active={false}
 
               size={24}
 

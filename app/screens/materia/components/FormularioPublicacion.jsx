@@ -12,12 +12,7 @@ import { crearPublicacion } from "../../../services/auth-service";
 import { useSessionService } from "../../../services/session-service";
 
 export default function FormularioPublicacion() {
-
-  const { session } = useSessionService();
-
-  const [titulo, setTitulo] = useState("");
-
-  const [contenido, setContenido] = useState("");
+  onPublicado,
 
 
   // ==========================================
@@ -64,6 +59,8 @@ export default function FormularioPublicacion() {
     setTitulo("");
 
     setContenido("");
+
+    onPublicado?.();
 
   }
 

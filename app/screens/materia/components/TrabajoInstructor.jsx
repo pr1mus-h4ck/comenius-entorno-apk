@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 
 import {
   Linking,
+  Pressable,
   StyleSheet,
-  Text
+  Text,
 } from "react-native";
 
 import Card from "../../../components/Card";
@@ -27,11 +28,18 @@ export default function TrabajoInstructor() {
   // OBTENER TRABAJO
   // ==========================================
 
-  useEffect(() => {
-
+useEffect(() => {
+  if (
+    session?.trabajo?.id
+  ) {
     cargarTrabajo();
-
-  }, []);
+  }
+}, [
+  session?.trabajo?.id,
+  session?.usuarioID,
+  session?.sessionID,
+  session?.comisionID,
+]);
 
 
   async function cargarTrabajo() {

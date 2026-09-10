@@ -22,23 +22,31 @@ export default function TrabajoChat() {
 
   const [mensajes, setMensajes] = useState([]);
 
-  useEffect(() => {
-
+ useEffect(() => {
+  if (
+    session?.trabajo?.id
+  ) {
     cargarMensajes();
-
-  }, []);
+  }
+}, [
+  session?.trabajo?.id,
+  session?.usuarioID,
+  session?.sessionID,
+  session?.comisionID,
+  session?.rol,
+  session?.listaAlumno,
+]);
 
   async function cargarMensajes() {
 
     const respuesta = await obtenerChat(
 
-      session.usuarioID,
-
-      session.sessionID,
-
-      session.comisionID,
-
-      session.trabajo?.id
+        session.usuarioID,
+        session.sessionID,
+        session.trabajo?.id,
+        session.comisionID,
+        session.listaAlumno,
+        session.rol
 
     );
 
@@ -55,8 +63,8 @@ export default function TrabajoChat() {
     }
 
     setMensajes(
-      respuesta.chat
-    );
+  respuesta.mensajes || []
+);
 
   }
 

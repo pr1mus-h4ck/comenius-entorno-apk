@@ -1,3 +1,4 @@
+
 // ✅ Fetch usando .then() — sin async/await
 export function login(correo, contrasena) {
   if (!correo.trim() || !contrasena.trim()) {
@@ -678,14 +679,15 @@ export function obtenerTrabajoAlumno(
 // OBTENER CHAT DEL TRABAJO
 // ===============================
 
-export function obtenerChat(
-  usuarioID,
-  sessionID,
-  trabajoID,
-  comisionID,
-  listaAlumno,
-  rol,
-) {
+const respuesta =
+  await obtenerChat(
+    session.usuarioID,
+    session.sessionID,
+    session.trabajo?.id,
+    session.comisionID,
+    session.listaAlumno,
+    session.rol
+  ); {
   const URL = "http://localhost:3000/actualizarChatTrabajo";
 
   return fetch(URL, {
@@ -894,4 +896,58 @@ export async function actualizarComision(
       mensaje: "No se pudo actualizar la comisión.",
     };
   }
+}
+
+export function crearTrabajo(
+  usuarioID,
+  sessionID,
+  titulo,
+  contenido,
+  comisionID,
+  instructorID,
+  urlArchivos = []
+) {
+  const URL =
+    "http://localhost:3000/crearTrabajos";
+
+  return fetch(URL, {
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      id: usuarioID,
+      session: sessionID,
+      titulo,
+      contenido,
+      comisionID,
+      instructorId: instructorID,
+      fechaHora: Date.now(),
+      urlArchivos,
+    }),
+  })
+    .then((recibir) =>
+      recibir.json()
+    )
+    .then((recibido) => ({
+      ok: recibido.ok === true,
+      mensaje:
+        recibido.mensaje ||
+        recibido.error,
+    }))
+    .catch((error) => {
+      console.log(
+        "❌ Error al crear trabajo:",
+        error
+      );
+
+      return {
+        ok: false,
+        mensaje:
+          "No se pudo crear el trabajo.",
+      };
+    });
 }

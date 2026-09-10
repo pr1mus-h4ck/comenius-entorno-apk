@@ -6,10 +6,11 @@ export const SESSION_INICIAL = {
   correo: "",
 
   rol: "",
-  verificacion: false,
-  instructorID: null,
 
+  verificacion: false,
   otpSolicitado: false,
+
+  instructorID: null,
 
   item: "",
   comision: null,
