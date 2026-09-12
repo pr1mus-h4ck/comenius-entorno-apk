@@ -652,10 +652,10 @@ export function obtenerTrabajoAlumno(
       console.log("✅ Respuesta trabajo alumno:", recibido);
 
       return {
-        ok: true,
+         ok: recibido.ok === true,
 
-        trabajo: recibido,
-
+        trabajo: recibido.archivosEntregas || null,
+        
         mensaje: recibido.mensaje,
       };
     })
