@@ -1,119 +1,55 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { useSessionService } from "../../services/session-service";
 
-import MateriaHeader from "./components/MateriaHeader";
-import MateriaMenu from "../../components/MateriaMenu";
 import BottomMenu from "../../components/BottomMenu";
+import MateriaMenu from "../../components/MateriaMenu";
+import MateriaHeader from "./components/MateriaHeader";
 
-import Portada from "./components/Portada";
 import PanelClase from "./components/PanelClase";
+import Portada from "./components/Portada";
 import Trabajos from "./components/Trabajos";
 
 import { COLORS } from "../../constants/colors";
 
 export default function MateriaScreen() {
-
   const { session } = useSessionService();
 
   return (
+    <View style={styles.container}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <MateriaHeader
+          nombre={session.comision?.Materia}
+          comision={session.comision?.Comision}
+          profesor={session.comision?.Instructores}
+        />
 
-    <ScrollView
+        <MateriaMenu />
 
-        style={styles.container}
+        {session.enlace === "Portada" && <Portada />}
 
-        contentContainerStyle={styles.content}
+        {session.enlace === "Panel de Clase" && <PanelClase />}
 
-      >
+        {session.enlace === "Trabajos" && <Trabajos />}
+      </ScrollView>
 
-      <MateriaHeader
-
-        nombre={session.comision?.Materia}
-
-        comision={session.comision?.Comision}
-        
-        profesor={session.comision?.Instructores}
-
-      />
-
-      <MateriaMenu />
-
-      {session.enlace === "Portada" && (
-        <Portada />
-      )}
-
-      {session.enlace === "Panel de Clase" && (
-        <PanelClase />
-      )}
-
-      {session.enlace === "Trabajos" && (
-        <Trabajos />
-      )}
-
-    </ScrollView>
-
+      <BottomMenu />
+    </View>
   );
-
 }
 
 const styles = StyleSheet.create({
-
-  container: {
-
-  flex: 1,
-
-  backgroundColor: COLORS.background,
-
-},
-
-  content: {
-
-    paddingHorizontal: 20,
-
-    paddingBottom: 30,
-
-},
-
-});
-
-return (
-  <View style={styles.container}>
-
-    <MateriaHeader
-      nombre={session.comision?.Materia}
-      comision={session.comision?.Comision}
-      profesor={session.comision?.Instructores}
-    />
-
-    <View style={styles.contenido}>
-
-      {session.enlace === "Portada" && (
-        <Portada />
-      )}
-
-      {session.enlace === "Panel de Clase" && (
-        <PanelClase />
-      )}
-
-      {session.enlace === "Trabajos" && (
-        <Trabajos />
-      )}
-
-    </View>
-
-    <BottomMenu />
-
-  </View>
-);
-
-const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: COLORS.background,
   },
 
-  contenido: {
+  scroll: {
     flex: 1,
-    paddingBottom: 75,
+  },
+
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 90,
   },
 });
