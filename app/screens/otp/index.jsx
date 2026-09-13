@@ -1,4 +1,7 @@
-import { useRef, useState } from "react";
+import {
+  useRef,
+  useState,
+} from "react";
 
 import {
   Alert,
@@ -9,40 +12,37 @@ import {
   View,
 } from "react-native";
 
-import AuthLayout from "../../components/AuthLayout";
-import AuthSide from "../../components/AuthSide";
-
-import {
-  irLogin,
-  irInicio,
-} from "../../services/navigation-service";
-
-import { useSessionService } from "../../services/session-service";
-
 import {
   enviarOtp,
   confirmarOtp,
 } from "../../services/auth-service";
 
-import { COLORS } from "../../constants/colors";
-import { RADIUS } from "../../constants/radius";
-import { SPACING } from "../../constants/spacing";
-import { TYPOGRAPHY } from "../../constants/typography";
+import {
+  useSessionService,
+} from "../../services/session-service";
 
+import {
+  irInicio,
+} from "../../services/navigation-service";
+
+import {
+  COLORS,
+} from "../../constants/colors";
+
+import {
+  SPACING,
+} from "../../constants/spacing";
 
 export default function OtpScreen() {
-
   const {
     session,
     actualizarSesion,
-    limpiarSesion,
   } = useSessionService();
 
-
-  const [codigoEnviado, setCodigoEnviado] = useState(false);
-
-
-  const [codigo, setCodigo] = useState([
+  const [
+    codigo,
+    setCodigo,
+  ] = useState([
     "",
     "",
     "",
@@ -51,451 +51,327 @@ export default function OtpScreen() {
     "",
   ]);
 
+  const [
+    enviandoOtp,
+    setEnviandoOtp,
+  ] = useState(false);
 
-  const inputs = useRef([]);
+  const [
+    confirmando,
+    setConfirmando,
+  ] = useState(false);
 
+  const inputs =
+    useRef([]);
 
-  // ==========================================
-  // ENVIAR OTP
-  // ==========================================
-
-  async function enviarCodigo() {
-
-    const respuesta = await enviarOtp(
-
-      session.usuarioID,
-
-      session.sessionID
-
-    );
-
-
-    if (!respuesta.ok) {
-
+  async function solicitarOtp() {
+    if (
+      !session.usuarioID ||
+      !session.sessionID
+    ) {
       Alert.alert(
         "Error",
-        respuesta.mensaje
+        "No existe una sesión válida."
       );
 
       return;
-
     }
 
+    if (enviandoOtp) {
+      return;
+    }
 
-    setCodigoEnviado(true);
+    setEnviandoOtp(true);
 
+    try {
+      const respuesta =
+        await enviarOtp(
+          session.usuarioID,
+          session.sessionID
+        );
+
+      console.log(
+        "✅ Respuesta OTP:",
+        respuesta
+      );
+
+      if (!respuesta.ok) {
+        Alert.alert(
+          "Error",
+          respuesta.mensaje ||
+            "No se pudo enviar el código."
+        );
+
+        return;
+      }
+
+      actualizarSesion({
+        otpSolicitado: true,
+      });
+
+      Alert.alert(
+        "Código enviado",
+        "Revisá el medio donde recibís el código OTP."
+      );
+    } catch (error) {
+      console.log(
+        "❌ Error enviando OTP:",
+        error
+      );
+
+      Alert.alert(
+        "Error",
+        "No se pudo enviar el código."
+      );
+    } finally {
+      setEnviandoOtp(false);
+    }
   }
 
+  function cambiarCodigo(
+    valor,
+    indice
+  ) {
+    const nuevoCodigo = [
+      ...codigo,
+    ];
 
-  // ==========================================
-  // CAMBIAR DIGITO
-  // ==========================================
-
-  function cambiarCodigo(valor, indice) {
-
-    const nuevoCodigo = [...codigo];
-
-    nuevoCodigo[indice] = valor;
+    nuevoCodigo[indice] =
+      valor.slice(-1);
 
     setCodigo(nuevoCodigo);
 
-
-    if (valor && indice < 5) {
-
-      inputs.current[indice + 1]?.focus();
-
+    if (
+      valor &&
+      indice < 5
+    ) {
+      inputs.current[
+        indice + 1
+      ]?.focus();
     }
-
   }
-
-
-  // ==========================================
-  // CONFIRMAR OTP
-  // ==========================================
 
   async function confirmarCodigo() {
+    const codigoCompleto =
+      codigo.join("");
 
-    const codigoCompleto = codigo.join("");
-
-
-    // ========================================
-    // VALIDACIÓN ANTES DEL FETCH
-    // ========================================
-
-    if (!codigoCompleto) {
-
+    if (
+      codigoCompleto.length !== 6
+    ) {
       Alert.alert(
         "Error",
-        "Debe ingresar el código de verificación."
+        "Ingresá el código completo."
       );
 
       return;
-
     }
 
+    if (confirmando) {
+      return;
+    }
 
-    if (codigoCompleto.length !== 6) {
+    setConfirmando(true);
 
-      Alert.alert(
-        "Error",
-        "Debe completar el código de 6 dígitos."
+    try {
+      const respuesta =
+        await confirmarOtp(
+          session.usuarioID,
+          session.sessionID,
+          codigoCompleto
+        );
+
+      console.log(
+        "✅ Confirmación OTP:",
+        respuesta
       );
 
-      return;
+      if (!respuesta.ok) {
+        Alert.alert(
+          "Error",
+          respuesta.mensaje ||
+            "El código ingresado no es válido."
+        );
 
-    }
-
-
-    // ========================================
-    // FETCH
-    // ========================================
-
-    const respuesta = await confirmarOtp(
-
-      session.usuarioID,
-
-      session.sessionID,
-
-      codigoCompleto
-
-    );
-
-
-    // ========================================
-    // ERROR DE CONEXIÓN
-    // ========================================
-
-    if (respuesta.conexionError) {
-
-      limpiarSesion();
-
-      irLogin();
-
-      return;
-
-    }
-
-
-    // ========================================
-    // OTP INCORRECTO
-    // ========================================
-
-    if (!respuesta.ok) {
-
-      Alert.alert(
-        "Error",
-        respuesta.mensaje
-      );
-
-      return;
-
-    }
-
-
-    // ========================================
-    // LOGIN COMPLETADO
-    // ========================================
-
-    actualizarSesion({
-
-      verificacion:
-        respuesta.verificacion,
-
-      rol:
-        respuesta.rol,
-
-      nombre:
-        respuesta.nombre,
-
-      instructorID:
-        respuesta.instructorID,
-
-    });
-
-
-    irInicio();
-
-  }
-
-
-  return (
-
-    <AuthLayout
-
-      left={
-
-        <AuthSide
-
-          title="¿Te arrepentiste?"
-
-          subtitle='Haz click en "Cancelar" para volver al inicio.'
-
-          buttonText="Cancelar"
-
-          onPress={() => {
-
-            limpiarSesion();
-
-            irLogin();
-
-          }}
-
-        />
-
+        return;
       }
 
-    >
+      actualizarSesion({
+        verificacion: true,
+        otpSolicitado: false,
+      });
 
-      {!codigoEnviado ? (
+      irInicio();
+    } catch (error) {
+      console.log(
+        "❌ Error confirmando OTP:",
+        error
+      );
 
-        <>
+      Alert.alert(
+        "Error",
+        "No se pudo validar el código."
+      );
+    } finally {
+      setConfirmando(false);
+    }
+  }
 
-          <Text style={styles.paso}>
-            Paso 1/2
-          </Text>
+  return (
+    <View style={styles.container}>
+      <View style={styles.card}>
+        <Text style={styles.titulo}>
+          Verificación OTP
+        </Text>
 
+        <Text style={styles.descripcion}>
+          Ingresá el código de 6 caracteres
+          enviado para verificar tu identidad.
+        </Text>
 
-          <Text style={styles.titulo}>
-            OTP Verificación
-          </Text>
-
-
-          <Text style={styles.descripcion}>
-            Te enviaremos un código al siguiente correo.
-          </Text>
-
-
-          <Text style={styles.correo}>
-            {session.correo}
-          </Text>
-
-
-          <Pressable
-
-            style={styles.boton}
-
-            onPress={enviarCodigo}
-
-          >
-
-            <Text style={styles.textoBoton}>
-              Continuar
-            </Text>
-
-          </Pressable>
-
-        </>
-
-      ) : (
-
-        <>
-
-          <Text style={styles.paso}>
-            Paso 2/2
-          </Text>
-
-
-          <Text style={styles.titulo}>
-            Confirmar código
-          </Text>
-
-
-          <Text style={styles.descripcion}>
-            Ingresá el código recibido.
-          </Text>
-
-
-          <View style={styles.codigoContainer}>
-
-            {codigo.map((digito, indice) => (
-
+        <View style={styles.codigoContainer}>
+          {codigo.map(
+            (digito, indice) => (
               <TextInput
-
                 key={indice}
-
                 ref={(input) => {
-
-                  inputs.current[indice] = input;
-
+                  inputs.current[
+                    indice
+                  ] = input;
                 }}
-
-                style={styles.codigoInput}
-
-                value={digito}
-
-                onChangeText={(valor) =>
-                  cambiarCodigo(valor, indice)
+                style={
+                  styles.codigoInput
                 }
-
-                keyboardType="number-pad"
-
+                value={digito}
+                onChangeText={(valor) =>
+                  cambiarCodigo(
+                    valor,
+                    indice
+                  )
+                }
+                keyboardType="default"
+                autoCapitalize="none"
+                autoCorrect={false}
                 maxLength={1}
-
                 textAlign="center"
-
               />
+            )
+          )}
+        </View>
 
-            ))}
-
-          </View>
-
-
-          <Pressable
-
-            style={styles.boton}
-
-            onPress={confirmarCodigo}
-
+        <Pressable
+          style={[
+            styles.boton,
+            confirmando &&
+              styles.botonDeshabilitado,
+          ]}
+          onPress={
+            confirmarCodigo
+          }
+          disabled={confirmando}
+        >
+          <Text
+            style={styles.textoBoton}
           >
+            {confirmando
+              ? "Verificando..."
+              : "Confirmar código"}
+          </Text>
+        </Pressable>
 
-            <Text style={styles.textoBoton}>
-              Confirmar
-            </Text>
-
-          </Pressable>
-
-        </>
-
-      )}
-
-    </AuthLayout>
-
+        <Pressable
+          style={
+            styles.botonSecundario
+          }
+          onPress={solicitarOtp}
+          disabled={enviandoOtp}
+        >
+          <Text
+            style={
+              styles.textoBotonSecundario
+            }
+          >
+            {enviandoOtp
+              ? "Enviando..."
+              : "Solicitar código nuevamente"}
+          </Text>
+        </Pressable>
+      </View>
+    </View>
   );
-
 }
 
-
 const styles = StyleSheet.create({
-
-  paso: {
-
-    fontSize: TYPOGRAPHY.small,
-
-    color: COLORS.textSecondary,
-
-    marginBottom: SPACING.xs,
-
-    textAlign: "center",
-
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: SPACING.lg,
+    backgroundColor:
+      COLORS.background,
   },
 
+  card: {
+    padding: SPACING.lg,
+    borderRadius: 12,
+    backgroundColor:
+      COLORS.white,
+  },
 
   titulo: {
-
-    fontSize: TYPOGRAPHY.h1,
-
+    fontSize: 24,
     fontWeight: "bold",
-
-    color: COLORS.primary,
-
-    textAlign: "center",
-
-    marginBottom: SPACING.sm,
-
+    color: COLORS.text,
+    marginBottom: SPACING.md,
   },
-
 
   descripcion: {
-
-    fontSize: TYPOGRAPHY.body,
-
-    color: COLORS.text,
-
-    textAlign: "center",
-
+    color:
+      COLORS.textSecondary,
     marginBottom: SPACING.lg,
-
   },
-
-
-  correo: {
-
-    fontSize: TYPOGRAPHY.body,
-
-    fontWeight: "bold",
-
-    color: COLORS.primary,
-
-    textAlign: "center",
-
-    backgroundColor: COLORS.surface,
-
-    borderWidth: 1,
-
-    borderColor: COLORS.border,
-
-    borderRadius: RADIUS.md,
-
-    padding: SPACING.md,
-
-    marginBottom: SPACING.xl,
-
-  },
-
-
-  boton: {
-
-    backgroundColor: COLORS.primary,
-
-    borderRadius: RADIUS.md,
-
-    padding: SPACING.lg,
-
-    alignItems: "center",
-
-  },
-
-
-  textoBoton: {
-
-    color: COLORS.white,
-
-    fontWeight: "bold",
-
-    fontSize: TYPOGRAPHY.body,
-
-  },
-
 
   codigoContainer: {
-
     flexDirection: "row",
-
-    justifyContent: "center",
-
-    alignItems: "center",
-
-    gap: SPACING.sm,
-
-    marginBottom: SPACING.xl,
-
+    justifyContent:
+      "space-between",
+    marginBottom: SPACING.lg,
   },
-
 
   codigoInput: {
-
-    width: 48,
-
-    height: 58,
-
+    width: 42,
+    height: 52,
     borderWidth: 1,
-
-    borderColor: COLORS.border,
-
-    borderRadius: RADIUS.md,
-
-    backgroundColor: COLORS.white,
-
-    fontSize: TYPOGRAPHY.h2,
-
+    borderColor:
+      COLORS.border,
+    borderRadius: 8,
     color: COLORS.text,
-
-    textAlign: "center",
-
-    textAlignVertical: "center",
-
-    padding: 0,
-
+    fontSize: 20,
   },
 
+  boton: {
+    padding: SPACING.md,
+    borderRadius: 8,
+    backgroundColor:
+      COLORS.primary,
+    alignItems: "center",
+    marginBottom: SPACING.md,
+  },
+
+  botonDeshabilitado: {
+    opacity: 0.6,
+  },
+
+  textoBoton: {
+    color: COLORS.white,
+    fontWeight: "bold",
+  },
+
+  botonSecundario: {
+    padding: SPACING.md,
+    alignItems: "center",
+  },
+
+  textoBotonSecundario: {
+    color: COLORS.primary,
+    fontWeight: "bold",
+  },
 });

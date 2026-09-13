@@ -59,15 +59,19 @@ export default function TrabajoAlumno() {
 
     const respuesta = await obtenerTrabajoAlumno(
 
-      session.usuarioID,
+          session.usuarioID,
 
-      session.sessionID,
+          session.sessionID,
 
-      session.comisionID,
+          session.comisionID,
 
-      session.trabajo.id,
+          session.trabajo.id,
 
-      session.listaAlumno
+          session.listaAlumno,
+
+          session.rol,
+          
+          session.instructorID
 
     );
 
