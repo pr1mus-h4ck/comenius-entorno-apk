@@ -8,8 +8,14 @@ import {
   View,
 } from "react-native";
 
-import { irMateria } from "../../../services/navigation-service";
-import { useSessionService } from "../../../services/session-service";
+import {
+  irLogin,
+  irMateria,
+} from "../../../services/navigation-service";
+
+import {
+  useSessionService,
+} from "../../../services/session-service";
 
 import {
   actualizarListaComision,
@@ -29,6 +35,7 @@ export default function ListaComision() {
   const {
     session,
     actualizarSesion,
+    limpiarSesion,
   } = useSessionService();
 
   useEffect(() => {
@@ -41,27 +48,45 @@ export default function ListaComision() {
         return;
       }
 
-      const respuesta = await actualizarListaComision(
-        session.usuarioID,
-        session.sessionID,
-        session.rol
-      );
+      try {
+        const respuesta =
+          await actualizarListaComision(
+            session.usuarioID,
+            session.sessionID,
+            session.rol
+          );
 
-      if (!respuesta.ok) {
+        console.log(
+          "✅ Respuesta comisiones:",
+          respuesta
+        );
+
+        if (!respuesta.ok) {
+          Alert.alert(
+            "Sesión expirada",
+            "La sesión ya no es válida. Iniciá sesión nuevamente."
+          );
+
+          await limpiarSesion();
+          irLogin();
+
+          return;
+        }
+
+        setComisiones(
+          respuesta.comisiones || []
+        );
+      } catch (error) {
+        console.log(
+          "❌ Error al cargar comisiones:",
+          error
+        );
+
         Alert.alert(
           "Error",
-          respuesta.mensaje ||
-            "No se pudieron obtener las comisiones."
+          "No se pudieron obtener las comisiones."
         );
-        return;
       }
-
-      console.log(
-        "✅ Comisiones recibidas:",
-        respuesta.comisiones
-      );
-
-      setComisiones(respuesta.comisiones);
     }
 
     cargar();
@@ -77,53 +102,70 @@ export default function ListaComision() {
       comision
     );
 
-    const respuesta = await actualizarComision(
-      session.usuarioID,
-      session.sessionID,
-      comision.Comision_ID,
-      session.rol,
-      session.instructorID
-    );
+    try {
+      const respuesta =
+        await actualizarComision(
+          session.usuarioID,
+          session.sessionID,
+          comision.Comision_ID,
+          session.rol,
+          session.instructorID
+        );
 
-    if (!respuesta.ok) {
+      console.log(
+        "✅ Comisión actualizada:",
+        respuesta
+      );
+
+      if (!respuesta.ok) {
+        Alert.alert(
+          "Error",
+          respuesta.mensaje ||
+            "No se pudo cargar la comisión."
+        );
+
+        return;
+      }
+
+      const datosComision =
+        Array.isArray(
+          respuesta.comision
+        )
+          ? respuesta.comision[0]
+          : respuesta.comision;
+
+      if (!datosComision) {
+        Alert.alert(
+          "Error",
+          "No se encontraron datos de la comisión."
+        );
+
+        return;
+      }
+
+      actualizarSesion({
+        comision: datosComision,
+        comisionID:
+          comision.Comision_ID,
+        enlace: "Portada",
+        item: "Materia",
+        trabajo: null,
+        alumno: null,
+        listaAlumno: null,
+      });
+
+      irMateria();
+    } catch (error) {
+      console.log(
+        "❌ Error al seleccionar comisión:",
+        error
+      );
+
       Alert.alert(
         "Error",
-        respuesta.mensaje ||
-          "No se pudo cargar la comisión."
+        "No se pudo cargar la comisión."
       );
-      return;
     }
-
-    console.log(
-      "✅ Comisión actualizada:",
-      respuesta.comision
-    );
-
-    const datosComision = Array.isArray(
-      respuesta.comision
-    )
-      ? respuesta.comision[0]
-      : respuesta.comision;
-
-    if (!datosComision) {
-      Alert.alert(
-        "Error",
-        "No se encontraron datos de la comisión."
-      );
-      return;
-    }
-
-    actualizarSesion({
-      comision: datosComision,
-      comisionID: comision.Comision_ID,
-      enlace: "Portada",
-      item: "Materia",
-      trabajo: null,
-      alumno: null,
-      listaAlumno: null,
-    });
-
-    irMateria();
   }
 
   return (
@@ -131,27 +173,41 @@ export default function ListaComision() {
       <Header />
 
       <View style={styles.lista}>
-        {comisiones.map((comision) => (
-          <Pressable
-            key={comision.Comision_ID}
-            style={styles.comision}
-            onPress={() =>
-              ingresarComision(comision)
-            }
-          >
-            <Text style={styles.materia}>
-              {comision.Materia}
-            </Text>
+        {comisiones.map(
+          (comision) => (
+            <Pressable
+              key={
+                comision.Comision_ID
+              }
+              style={styles.comision}
+              onPress={() =>
+                ingresarComision(
+                  comision
+                )
+              }
+            >
+              <Text
+                style={styles.materia}
+              >
+                {comision.Materia}
+              </Text>
 
-            <Text style={styles.comisionNombre}>
-              {comision.Comision}
-            </Text>
+              <Text
+                style={
+                  styles.comisionNombre
+                }
+              >
+                {comision.Comision}
+              </Text>
 
-            <Text style={styles.horarios}>
-              {comision.Horarios}
-            </Text>
-          </Pressable>
-        ))}
+              <Text
+                style={styles.horarios}
+              >
+                {comision.Horarios}
+              </Text>
+            </Pressable>
+          )
+        )}
       </View>
     </View>
   );
@@ -160,7 +216,8 @@ export default function ListaComision() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor:
+      COLORS.background,
   },
 
   lista: {
