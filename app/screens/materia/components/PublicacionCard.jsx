@@ -17,6 +17,7 @@ import { TYPOGRAPHY } from "../../../constants/typography";
 export default function PublicacionCard({
 
   publicacion,
+  onComentado,
 
 }) {
 
@@ -61,6 +62,7 @@ export default function PublicacionCard({
 
       <FormularioComentario
         publicacionId={publicacion.id}
+        onComentado={onComentado}
       />
 
     </Card>

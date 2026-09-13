@@ -557,6 +557,74 @@ export function obtenerTrabajos(usuarioID, sessionID, comisionID) {
 }
 
 // ===============================
+// OBTENER LISTA DE ALUMNOS
+// ===============================
+
+export function obtenerAlumnos(
+  usuarioID,
+  sessionID,
+  comisionID,
+  instructorID
+) {
+  const URL =
+    "http://localhost:3000/actualizarAlumnos";
+
+  return fetch(URL, {
+    method: "POST",
+
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+      id: usuarioID,
+      session: sessionID,
+      comisionID: comisionID,
+      instructorId: instructorID,
+    }),
+  })
+    .then((recibir) =>
+      recibir.json()
+    )
+
+    .then((recibido) => {
+      console.log(
+        "✅ Respuesta lista de alumnos:",
+        recibido
+      );
+
+      return {
+        ok: Array.isArray(
+          recibido.listaAlumnos
+        ),
+
+        alumnos:
+          recibido.listaAlumnos || [],
+
+        mensaje:
+          recibido.mensaje,
+      };
+    })
+
+    .catch((error) => {
+      console.log(
+        "❌ Error al obtener alumnos:",
+        error
+      );
+
+      return {
+        ok: false,
+
+        alumnos: [],
+
+        mensaje:
+          "No se pudo obtener la lista de alumnos.",
+      };
+    });
+}
+
+// ===============================
 // OBTENER TRABAJO - INSTRUCTOR
 // ===============================
 
@@ -652,7 +720,7 @@ export function obtenerTrabajoAlumno(
       console.log("✅ Respuesta trabajo alumno:", recibido);
 
       return {
-         ok: recibido.ok === true,
+        ok: recibido.ok === true,
 
         trabajo: recibido.archivosEntregas || null,
         

@@ -101,13 +101,15 @@ export default function PanelClase() {
           {mensaje}
         </Text>
       ) : null}
-
       {publicaciones.map(
         (publicacion) => (
           <PublicacionCard
             key={publicacion.id}
             publicacion={
               publicacion
+            }
+            onComentado={
+              cargarPublicaciones
             }
           />
         )
