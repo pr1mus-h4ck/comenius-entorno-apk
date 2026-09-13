@@ -46,7 +46,6 @@ export function login(correo, contrasena) {
 // ===============================
 
 export function enviarOtp(usuarioID, sessionID) {
-  // URL del Back-End
   const URL = "http://localhost:3000/enviar-otp";
 
   return fetch(URL, {
@@ -55,33 +54,22 @@ export function enviarOtp(usuarioID, sessionID) {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-
     body: JSON.stringify({
       id: usuarioID,
       session: sessionID,
     }),
   })
     .then((recibir) => recibir.json())
-
-    .then((recibido) => {
-      console.log("✅ Respuesta enviar OTP:", recibido);
-
-      return {
-        ok: recibido.correoEnviado === "success",
-
-        correoEnviado: recibido.correoEnviado,
-
-        otp: recibido.otp,
-
-        mensaje: recibido.tipo,
-      };
-    })
+    .then((recibido) => ({
+      ok: recibido.ok === true,
+      mensaje: recibido.mensaje,
+    }))
     .catch((error) => {
-      console.log("Error en enviar OTP:", error);
+      console.log("❌ Error enviando OTP:", error);
 
       return {
         ok: false,
-        mensaje: "No se pudo enviar el código de verificación",
+        mensaje: "No se pudo enviar el código.",
       };
     });
 }
