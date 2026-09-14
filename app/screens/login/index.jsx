@@ -18,10 +18,7 @@ import { TYPOGRAPHY } from "../../constants/typography";
 
 import { useSession } from "../../context/SessionContext";
 
-import {
-  login,
-  enviarOtp,
-} from "../../services/auth-service";
+import { login } from "../../services/auth-service";
 import { irOtp } from "../../services/navigation-service";
 import { iniciarSesion } from "../../services/session";
 
@@ -38,72 +35,43 @@ export default function LoginScreen() {
   // LOGIN
   // ==========================================
 
-async function iniciarSesionClick() {
-  try {
+  async function iniciarSesionClick() {
+
     const respuesta = await login(
       correo,
       contrasena
     );
 
+
     if (!respuesta.ok) {
+
       Alert.alert(
         "Error",
-        respuesta.mensaje ||
-          "No se pudo iniciar sesión."
+        respuesta.mensaje || "No se pudo iniciar sesión."
       );
 
       return;
+
     }
+
 
     console.log(
       "✅ Login correcto:",
       respuesta
     );
 
+
     iniciarSesion(
       respuesta,
       setSession
     );
 
-    const respuestaOtp = await enviarOtp(
-      respuesta.usuarioID,
-      respuesta.sessionID
-    );
-
-    console.log(
-      "✅ Respuesta OTP:",
-      respuestaOtp
-    );
-
-    if (!respuestaOtp.ok) {
-      Alert.alert(
-        "Error",
-        respuestaOtp.mensaje ||
-          "No se pudo enviar el código."
-      );
-
-      return;
-    }
-
-    setSession((anterior) => ({
-      ...anterior,
-      otpSolicitado: true,
-    }));
 
     irOtp();
 
-  } catch (error) {
-    console.log(
-      "❌ Error en login:",
-      error
-    );
-
-    Alert.alert(
-      "Error",
-      "No se pudo conectar con el servidor."
-    );
   }
-}
+
+
   return (
 
     <AuthLayout

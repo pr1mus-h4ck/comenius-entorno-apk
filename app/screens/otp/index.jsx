@@ -13,6 +13,7 @@ import {
 } from "react-native";
 
 import {
+  enviarOtp,
   confirmarOtp,
 } from "../../services/auth-service";
 
@@ -51,12 +52,81 @@ export default function OtpScreen() {
   ]);
 
   const [
+    enviandoOtp,
+    setEnviandoOtp,
+  ] = useState(false);
+
+  const [
     confirmando,
     setConfirmando,
   ] = useState(false);
 
   const inputs =
     useRef([]);
+
+  async function solicitarOtp() {
+    if (
+      !session.usuarioID ||
+      !session.sessionID
+    ) {
+      Alert.alert(
+        "Error",
+        "No existe una sesión válida."
+      );
+
+      return;
+    }
+
+    if (enviandoOtp) {
+      return;
+    }
+
+    setEnviandoOtp(true);
+
+    try {
+      const respuesta =
+        await enviarOtp(
+          session.usuarioID,
+          session.sessionID
+        );
+
+      console.log(
+        "✅ Respuesta OTP:",
+        respuesta
+      );
+
+      if (!respuesta.ok) {
+        Alert.alert(
+          "Error",
+          respuesta.mensaje ||
+            "No se pudo enviar el código."
+        );
+
+        return;
+      }
+
+      actualizarSesion({
+        otpSolicitado: true,
+      });
+
+      Alert.alert(
+        "Código enviado",
+        "Revisá el medio donde recibís el código OTP."
+      );
+    } catch (error) {
+      console.log(
+        "❌ Error enviando OTP:",
+        error
+      );
+
+      Alert.alert(
+        "Error",
+        "No se pudo enviar el código."
+      );
+    } finally {
+      setEnviandoOtp(false);
+    }
+  }
 
   function cambiarCodigo(
     valor,
@@ -207,6 +277,24 @@ export default function OtpScreen() {
               : "Confirmar código"}
           </Text>
         </Pressable>
+
+        <Pressable
+          style={
+            styles.botonSecundario
+          }
+          onPress={solicitarOtp}
+          disabled={enviandoOtp}
+        >
+          <Text
+            style={
+              styles.textoBotonSecundario
+            }
+          >
+            {enviandoOtp
+              ? "Enviando..."
+              : "Solicitar código nuevamente"}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -274,6 +362,16 @@ const styles = StyleSheet.create({
 
   textoBoton: {
     color: COLORS.white,
+    fontWeight: "bold",
+  },
+
+  botonSecundario: {
+    padding: SPACING.md,
+    alignItems: "center",
+  },
+
+  textoBotonSecundario: {
+    color: COLORS.primary,
     fontWeight: "bold",
   },
 });
