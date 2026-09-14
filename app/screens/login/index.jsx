@@ -19,8 +19,8 @@ import { TYPOGRAPHY } from "../../constants/typography";
 import { useSession } from "../../context/SessionContext";
 
 import {
-  enviarOtp,
   login,
+  enviarOtp,
 } from "../../services/auth-service";
 import { irOtp } from "../../services/navigation-service";
 import { iniciarSesion } from "../../services/session";
