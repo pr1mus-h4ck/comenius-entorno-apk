@@ -15,3 +15,11 @@ export function irInicio() {
 export function irMateria() {
   router.push("/materia");
 }
+
+export function irTrabajo() {
+  router.push("/trabajo");
+}
+
+export function irNotificaciones() {
+  router.push("/(tabs)/notificaciones");
+}

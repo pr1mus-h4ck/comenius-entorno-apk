@@ -1,5 +1,6 @@
 import {
   Alert,
+  Pressable,
   Text,
   StyleSheet,
 } from "react-native";
@@ -9,8 +10,6 @@ import { useState } from "react";
 import {
   crearTrabajo as crearTrabajoApi,
 } from "../../../services/auth-service";
-
-import CloudinaryPicker from "../../../components/CloudinaryPicker";
 
 import {
   useSessionService,
@@ -22,6 +21,7 @@ import Input from "../../../components/Input";
 
 import { COLORS } from "../../../constants/colors";
 import { SPACING } from "../../../constants/spacing";
+import { RADIUS } from "../../../constants/radius";
 
 export default function FormularioTrabajo({
   onCreado,
@@ -39,6 +39,16 @@ export default function FormularioTrabajo({
 
   const { session } =
     useSessionService();
+
+  function seleccionarArchivo() {
+    // Más adelante abrirá DocumentPicker.
+    // Por ahora solamente dejamos preparado
+    // el botón.
+
+    console.log(
+      "Seleccionar archivo"
+    );
+  }
 
   async function crearTrabajo() {
     if (!titulo.trim()) {
@@ -100,7 +110,7 @@ export default function FormularioTrabajo({
         Alert.alert(
           "Error",
           respuesta.mensaje ||
-          "No se pudo crear el trabajo."
+            "No se pudo crear el trabajo."
         );
 
         return;
@@ -149,21 +159,15 @@ export default function FormularioTrabajo({
         style={styles.contenido}
       />
 
-      <CloudinaryPicker
-        onUploaded={(archivoSubido) => {
-          setArchivo(
-            archivoSubido
-          );
-        }}
-      />
-
-      {archivo ? (
+      <Pressable
+        style={styles.botonArchivo}
+        onPress={seleccionarArchivo}
+      >
         <Text style={styles.textoArchivo}>
-          Archivo:
-          {" "}
-          {archivo.name}
+          {archivo ||
+            "Seleccionar archivo"}
         </Text>
-      ) : null}
+      </Pressable>
 
       <Button
         title={
@@ -186,6 +190,16 @@ const styles = StyleSheet.create({
   contenido: {
     minHeight: 120,
     textAlignVertical: "top",
+  },
+
+  botonArchivo: {
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    alignItems: "center",
+    marginBottom: SPACING.lg,
   },
 
   textoArchivo: {

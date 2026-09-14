@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -19,21 +20,33 @@ import {
   useSessionService,
 } from "../../../services/session-service";
 
+import {
+  COLORS,
+} from "../../../constants/colors";
+
+import {
+  SPACING,
+} from "../../../constants/spacing";
+
+import {
+  RADIUS,
+} from "../../../constants/radius";
+
+import {
+  TYPOGRAPHY,
+} from "../../../constants/typography";
+
 export default function ListaAlumno() {
   const {
     session,
     actualizarCampo,
   } = useSessionService();
 
-  const [
-    alumnos,
-    setAlumnos,
-  ] = useState([]);
+  const [alumnos, setAlumnos] =
+    useState([]);
 
-  const [
-    cargando,
-    setCargando,
-  ] = useState(true);
+  const [cargando, setCargando] =
+    useState(true);
 
   const cargarAlumnos =
     useCallback(async () => {
@@ -58,20 +71,35 @@ export default function ListaAlumno() {
           );
 
         console.log(
-          "✅ Alumnos recibidos:",
-          respuesta
+          "✅ Alumnos:",
+          respuesta.alumnos
         );
+
+        if (!respuesta.ok) {
+          setAlumnos([]);
+
+          Alert.alert(
+            "Información",
+            respuesta.mensaje ||
+              "No se encontraron alumnos."
+          );
+
+          return;
+        }
 
         setAlumnos(
           respuesta.alumnos || []
         );
       } catch (error) {
         console.log(
-          "❌ Error alumnos:",
+          "❌ Error cargando alumnos:",
           error
         );
 
-        setAlumnos([]);
+        Alert.alert(
+          "Error",
+          "No se pudo cargar la lista de alumnos."
+        );
       } finally {
         setCargando(false);
       }
@@ -86,9 +114,7 @@ export default function ListaAlumno() {
     cargarAlumnos();
   }, [cargarAlumnos]);
 
-  function seleccionarAlumno(
-    alumno
-  ) {
+  function seleccionarAlumno(alumno) {
     actualizarCampo(
       "listaAlumno",
       alumno.id
@@ -100,7 +126,7 @@ export default function ListaAlumno() {
     );
   }
 
-  function volver() {
+  function volverAListaTrabajos() {
     actualizarCampo(
       "trabajo",
       null
@@ -120,10 +146,10 @@ export default function ListaAlumno() {
   return (
     <View style={styles.container}>
       <Pressable
-        style={styles.volver}
-        onPress={volver}
+        style={styles.botonVolver}
+        onPress={volverAListaTrabajos}
       >
-        <Text style={styles.volverTexto}>
+        <Text style={styles.textoVolver}>
           ← Volver a trabajos
         </Text>
       </Pressable>
@@ -138,30 +164,24 @@ export default function ListaAlumno() {
         </Text>
       ) : alumnos.length === 0 ? (
         <Text style={styles.texto}>
-          No hay alumnos asignados.
+          No hay alumnos asignados a esta comisión.
         </Text>
       ) : (
-        alumnos.map(
-          (alumno) => (
-            <Pressable
-              key={alumno.id}
-              style={styles.alumno}
-              onPress={() =>
-                seleccionarAlumno(
-                  alumno
-                )
-              }
-            >
-              <Text
-                style={
-                  styles.nombre
-                }
-              >
-                {alumno.Nombre}
-              </Text>
-            </Pressable>
-          )
-        )
+        alumnos.map((alumno) => (
+          <Pressable
+            key={alumno.id}
+            style={styles.alumno}
+            onPress={() =>
+              seleccionarAlumno(
+                alumno
+              )
+            }
+          >
+            <Text style={styles.nombre}>
+              {alumno.Nombre}
+            </Text>
+          </Pressable>
+        ))
       )}
     </View>
   );
@@ -169,71 +189,46 @@ export default function ListaAlumno() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: SPACING.md,
   },
 
-  volver: {
-    alignSelf:
-      "flex-start",
-
-    marginBottom: 20,
-
-    paddingVertical: 10,
-
-    paddingHorizontal: 15,
-
-    borderRadius: 8,
-
-    backgroundColor:
-      "#FFFFFF",
-
-    borderWidth: 1,
-
-    borderColor:
-      "#DDDDDD",
+  botonVolver: {
+    alignSelf: "flex-start",
+    marginBottom: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.surface,
   },
 
-  volverTexto: {
-    color:
-      "#2563EB",
-
-    fontWeight:
-      "bold",
+  textoVolver: {
+    color: COLORS.primary,
+    fontWeight: "bold",
   },
 
   titulo: {
-    fontSize: 22,
-
-    fontWeight:
-      "bold",
-
-    marginBottom: 20,
-  },
-
-  texto: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.h2,
+    fontWeight: "bold",
+    color: COLORS.text,
+    marginBottom: SPACING.lg,
   },
 
   alumno: {
-    padding: 15,
-
-    marginBottom: 10,
-
-    borderRadius: 8,
-
-    backgroundColor:
-      "#FFFFFF",
-
+    padding: SPACING.md,
+    marginBottom: SPACING.sm,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-
-    borderColor:
-      "#DDDDDD",
+    borderColor: COLORS.border,
   },
 
   nombre: {
-    fontSize: 16,
+    fontSize: TYPOGRAPHY.body,
+    color: COLORS.text,
+  },
 
-    fontWeight:
-      "500",
+  texto: {
+    fontSize: TYPOGRAPHY.body,
+    color: COLORS.textSecondary,
   },
 });

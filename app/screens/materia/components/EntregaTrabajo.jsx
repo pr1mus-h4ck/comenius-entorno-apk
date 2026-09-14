@@ -16,13 +16,29 @@ import {
   useSessionService,
 } from "../../../services/session-service";
 
-import CloudinaryPicker from "../../../components/CloudinaryPicker";
 
 export default function EntregaTrabajo() {
 
   const [archivo, setArchivo] = useState(null);
 
   const { session } = useSessionService();
+
+
+  // ==========================================
+  // SELECCIONAR ARCHIVO
+  // ==========================================
+
+  function seleccionarArchivo() {
+
+    // Más adelante:
+    // Expo Document Picker
+
+    console.log(
+      "Seleccionar archivo"
+    );
+
+  }
+
 
   // ==========================================
   // ENVIAR ENTREGA
@@ -88,21 +104,21 @@ export default function EntregaTrabajo() {
       </Text>
 
 
-      <CloudinaryPicker
-        onUploaded={(archivoSubido) => {
-          setArchivo(
-            archivoSubido
-          );
-        }}
-      />
+      <Pressable
 
-      {archivo ? (
+        style={styles.botonArchivo}
+
+        onPress={seleccionarArchivo}
+
+      >
+
         <Text>
-          Archivo:
-          {" "}
-          {archivo.name}
+
+          {archivo?.name ?? "Seleccionar archivo"}
+
         </Text>
-      ) : null}
+
+      </Pressable>
 
 
       <Pressable
