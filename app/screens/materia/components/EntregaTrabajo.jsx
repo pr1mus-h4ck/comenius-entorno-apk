@@ -1,12 +1,14 @@
-import { useState } from "react";
-
 import {
   Alert,
-  View,
-  Text,
   Pressable,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
+
+import React from "react";
+
+import CloudinaryPicker from "../../../components/CloudinaryPicker";
 
 import {
   crearTrabajosAlumnos,
@@ -16,190 +18,151 @@ import {
   useSessionService,
 } from "../../../services/session-service";
 
+import {
+  COLORS,
+} from "../../../constants/colors";
+
+import {
+  SPACING,
+} from "../../../constants/spacing";
 
 export default function EntregaTrabajo() {
-
-  const [archivo, setArchivo] = useState(null);
-
   const { session } = useSessionService();
 
-
-  // ==========================================
-  // SELECCIONAR ARCHIVO
-  // ==========================================
-
-  function seleccionarArchivo() {
-
-    // Más adelante:
-    // Expo Document Picker
-
-    console.log(
-      "Seleccionar archivo"
-    );
-
-  }
-
-
-  // ==========================================
-  // ENVIAR ENTREGA
-  // ==========================================
+  const [archivo, setArchivo] = React.useState(null);
+  const [enviando, setEnviando] = React.useState(false);
 
   async function entregarTrabajo() {
-
     if (!archivo) {
-
       Alert.alert(
         "Atención",
-        "Seleccioná un archivo antes de enviar."
+        "Primero tenés que seleccionar un archivo."
       );
-
       return;
-
     }
 
+    if (enviando) {
+      return;
+    }
 
-    const respuesta = await crearTrabajosAlumnos(
+    setEnviando(true);
 
-      session.usuarioID,
+    try {
+      const respuesta =
+        await crearTrabajosAlumnos(
+          session.usuarioID,
+          session.sessionID,
+          session.comisionID,
+          session.trabajo.id,
+          [archivo]
+        );
 
-      session.sessionID,
+      console.log(
+        "📨 Respuesta entrega:",
+        respuesta
+      );
 
-      session.comisionID,
+      if (!respuesta.ok) {
+        Alert.alert(
+          "Error",
+          respuesta.mensaje ||
+            "No se pudo enviar la entrega."
+        );
+        return;
+      }
 
-      session.trabajo?.id,
+      Alert.alert(
+        "Entrega enviada",
+        "El trabajo fue enviado correctamente."
+      );
 
-      [archivo]
-
-    );
-
-
-    if (!respuesta.ok) {
+      setArchivo(null);
+    } catch (error) {
+      console.log(
+        "❌ Error enviando entrega:",
+        error
+      );
 
       Alert.alert(
         "Error",
-        respuesta.mensaje
+        "No se pudo enviar la entrega."
       );
-
-      return;
-
+    } finally {
+      setEnviando(false);
     }
-
-
-    Alert.alert(
-      "Éxito",
-      "La entrega fue enviada correctamente."
-    );
-
   }
 
-
   return (
-
     <View style={styles.card}>
-
       <Text style={styles.titulo}>
-
         Entregar Trabajo
-
       </Text>
 
+      <CloudinaryPicker
+        onUploaded={setArchivo}
+      />
 
-      <Pressable
-
-        style={styles.botonArchivo}
-
-        onPress={seleccionarArchivo}
-
-      >
-
-        <Text>
-
-          {archivo?.name ?? "Seleccionar archivo"}
-
+      {archivo && (
+        <Text style={styles.archivo}>
+          📎 {archivo.name}
         </Text>
+      )}
 
-      </Pressable>
-
-
-      <Pressable
-
-        style={styles.boton}
-
-        onPress={entregarTrabajo}
-
-      >
-
-        <Text style={styles.textoBoton}>
-
-          Enviar Entrega
-
-        </Text>
-
-      </Pressable>
-
+      {archivo && (
+        <Pressable
+          style={[
+            styles.boton,
+            enviando &&
+              styles.botonDeshabilitado,
+          ]}
+          onPress={entregarTrabajo}
+          disabled={enviando}
+        >
+          <Text style={styles.textoBoton}>
+            {enviando
+              ? "Enviando..."
+              : "Enviar"}
+          </Text>
+        </Pressable>
+      )}
     </View>
-
   );
-
 }
 
-
 const styles = StyleSheet.create({
-
   card: {
-
-    backgroundColor: "#FFF",
-
-    margin: 20,
-
-    padding: 20,
-
+    backgroundColor: COLORS.white,
+    margin: SPACING.lg,
+    padding: SPACING.lg,
     borderRadius: 12,
-
   },
 
   titulo: {
-
-    fontSize: 18,
-
+    fontSize: 20,
     fontWeight: "bold",
-
-    marginBottom: 20,
-
+    marginBottom: SPACING.lg,
+    color: COLORS.primaryDark,
   },
 
-  botonArchivo: {
-
-    backgroundColor: "#EEE",
-
-    padding: 15,
-
-    borderRadius: 8,
-
-    alignItems: "center",
-
-    marginBottom: 15,
-
+  archivo: {
+    marginBottom: SPACING.md,
+    fontWeight: "bold",
+    color: COLORS.text,
   },
 
   boton: {
-
-    backgroundColor: "#2563EB",
-
-    padding: 15,
-
+    backgroundColor: COLORS.primary,
+    padding: SPACING.md,
     borderRadius: 8,
-
     alignItems: "center",
+  },
 
+  botonDeshabilitado: {
+    opacity: 0.6,
   },
 
   textoBoton: {
-
-    color: "#FFF",
-
+    color: COLORS.white,
     fontWeight: "bold",
-
   },
-
 });

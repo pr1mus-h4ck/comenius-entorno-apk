@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -28,15 +29,20 @@ export default function PanelClase() {
   const { session } =
     useSessionService();
 
-  const [
-    publicaciones,
-    setPublicaciones,
-  ] = useState([]);
+const [
+  publicaciones,
+  setPublicaciones,
+] = useState([]);
 
   const [
     mensaje,
     setMensaje,
-  ] = useState("");
+  ] = useState();
+
+  const [
+  mostrarFormulario,
+  setMostrarFormulario,
+] = useState(false);
 
   const cargarPublicaciones =
     useCallback(async () => {
@@ -88,13 +94,30 @@ export default function PanelClase() {
         styles.content
       }
     >
-      {session.rol === "instructor" && (
-        <FormularioPublicacion
-          onPublicado={
-            cargarPublicaciones
-          }
-        />
-      )}
+{session.rol === "instructor" && (
+  <>
+    <Pressable
+      style={styles.botonFormulario}
+      onPress={() =>
+        setMostrarFormulario(
+          (anterior) => !anterior
+        )
+      }
+    >
+      <Text style={styles.textoBotonFormulario}>
+        {mostrarFormulario
+          ? "Ocultar formulario"
+          : "Mostrar formulario"}
+      </Text>
+    </Pressable>
+
+    {mostrarFormulario && (
+      <FormularioPublicacion
+        onPublicado={cargarPublicaciones}
+      />
+    )}
+  </>
+)}
 
       {mensaje ? (
         <Text style={styles.mensaje}>
@@ -145,4 +168,18 @@ const styles = StyleSheet.create({
 
     borderRadius: 8,
   },
+
+  botonFormulario: {
+  marginHorizontal: SPACING.md,
+  marginBottom: SPACING.md,
+  padding: SPACING.md,
+  borderRadius: 8,
+  backgroundColor: COLORS.primary,
+  alignItems: "center",
+},
+
+textoBotonFormulario: {
+  color: COLORS.white,
+  fontWeight: "bold",
+},
 });

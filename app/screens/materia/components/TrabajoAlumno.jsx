@@ -57,19 +57,15 @@ export default function TrabajoAlumno() {
 
   async function cargarEntrega() {
 
-    const respuesta = await obtenerTrabajoAlumno(
-
-      session.usuarioID,
-
-      session.sessionID,
-
-      session.comisionID,
-
-      session.trabajo.id,
-
-      session.listaAlumno
-
-    );
+   const respuesta = await obtenerTrabajoAlumno(
+  session.usuarioID,
+  session.sessionID,
+  session.comisionID,
+  session.trabajo.id,
+  session.listaAlumno,
+  session.rol,
+  session.instructorID
+);
 
 
     if (!respuesta.ok) {

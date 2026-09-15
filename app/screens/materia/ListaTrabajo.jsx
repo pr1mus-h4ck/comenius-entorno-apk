@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -34,6 +35,11 @@ export default function ListaTrabajo() {
     mensaje,
     setMensaje,
   ] = useState("");
+
+  const [
+  mostrarFormulario,
+  setMostrarFormulario,
+] = useState(false);
 
   const cargarTrabajos =
     useCallback(async () => {
@@ -84,11 +90,30 @@ export default function ListaTrabajo() {
         styles.content
       }
     >
-      {session.rol === "instructor" && (
-        <FormularioTrabajo
-          onCreado={cargarTrabajos}
-        />
-      )}
+{session.rol === "instructor" && (
+  <>
+    <Pressable
+      style={styles.botonFormulario}
+      onPress={() =>
+        setMostrarFormulario(
+          (anterior) => !anterior
+        )
+      }
+    >
+      <Text style={styles.textoBotonFormulario}>
+        {mostrarFormulario
+          ? "Ocultar formulario"
+          : "Mostrar formulario"}
+      </Text>
+    </Pressable>
+
+    {mostrarFormulario && (
+      <FormularioTrabajo
+        onCreado={cargarTrabajos}
+      />
+    )}
+  </>
+)}
 
       {mensaje ? (
         <Text style={styles.mensaje}>
@@ -117,4 +142,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     margin: 20,
   },
+
+  botonFormulario: {
+  marginHorizontal: 20,
+  marginBottom: 15,
+  padding: 15,
+  borderRadius: 8,
+  backgroundColor: "#16A34A",
+  alignItems: "center",
+},
+
+textoBotonFormulario: {
+  color: "#FFFFFF",
+  fontWeight: "bold",
+},
 });

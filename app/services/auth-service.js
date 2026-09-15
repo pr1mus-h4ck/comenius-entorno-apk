@@ -691,6 +691,8 @@ export function obtenerTrabajoAlumno(
   comisionID,
   trabajoID,
   listaAlumno,
+  rol,
+  instructorID,
 ) {
   const URL = "http://localhost:3000/actualizarTrabajoAlumno";
 
@@ -701,18 +703,15 @@ export function obtenerTrabajoAlumno(
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-
-    body: JSON.stringify({
-      id: usuarioID,
-
-      session: sessionID,
-
-      comisionID: comisionID,
-
-      trabajo: trabajoID,
-
-      listaAlumno: listaAlumno,
-    }),
+body: JSON.stringify({
+  id: usuarioID,
+  session: sessionID,
+  comisionID: comisionID,
+  trabajo: trabajoID,
+  listaAlumno: listaAlumno,
+  rol: rol,
+  instructorId: instructorID,
+}),
   })
     .then((recibir) => recibir.json())
 
@@ -753,7 +752,8 @@ export function obtenerChat(
   listaAlumno,
   rol,
 ) {
-  const URL = "http://localhost:3000/actualizarChatTrabajo";
+  const URL =
+    "http://localhost:3000/actualizarChatTrabajo";
 
   return fetch(URL, {
     method: "POST",
@@ -768,25 +768,35 @@ export function obtenerChat(
       session: sessionID,
       trabajo: trabajoID,
       comision: comisionID,
-      listaAlumno,
-      rol,
+      listaAlumno: listaAlumno,
+      rol: rol,
     }),
   })
-    .then((recibir) => recibir.json())
+    .then((recibir) =>
+      recibir.json()
+    )
     .then((recibido) => {
       return {
-        ok: recibido.ok === true,
-        mensajes: recibido.chat || [],
-        mensaje: recibido.mensaje,
+        ok: Array.isArray(
+          recibido.chat
+        ),
+        mensajes:
+          recibido.chat || [],
+        mensaje:
+          recibido.mensaje,
       };
     })
     .catch((error) => {
-      console.log("❌ Error al obtener chat:", error);
+      console.log(
+        "❌ Error al obtener chat:",
+        error
+      );
 
       return {
         ok: false,
         mensajes: [],
-        mensaje: "No se pudo obtener el chat.",
+        mensaje:
+          "No se pudo obtener el chat.",
       };
     });
 }
@@ -803,8 +813,10 @@ export function actualizarChatTrabajo(
   mensaje,
   alumnoID,
   rol,
+  instructorID,
 ) {
-  const URL = "http://localhost:3000/actualizarChatTrabajo";
+  const URL =
+    "http://localhost:3000/crearChatTrabajo";
 
   return fetch(URL, {
     method: "POST",
@@ -817,15 +829,24 @@ export function actualizarChatTrabajo(
     body: JSON.stringify({
       id: usuarioID,
       session: sessionID,
-      trabajo: trabajoID,
-      comision: comisionID,
-      mensaje,
-      alumnoID,
-      rol,
+      instructorId: instructorID || 1,
+      listaAlumno: alumnoID,
+      chat: mensaje,
+      fechaHora: Date.now(),
+      comisionID: comisionID,
+      trabajoID: trabajoID,
+      rol: rol,
     }),
   })
-    .then((recibir) => recibir.json())
+    .then((recibir) =>
+      recibir.json()
+    )
     .then((recibido) => {
+      console.log(
+        "✅ Respuesta enviar chat:",
+        recibido
+      );
+
       return {
         ok: recibido.ok === true,
         mensaje: recibido.mensaje,
@@ -833,11 +854,15 @@ export function actualizarChatTrabajo(
       };
     })
     .catch((error) => {
-      console.log("❌ Error al enviar mensaje del chat:", error);
+      console.log(
+        "❌ Error al enviar mensaje:",
+        error
+      );
 
       return {
         ok: false,
-        mensaje: "No se pudo enviar el mensaje.",
+        mensaje:
+          "No se pudo enviar el mensaje.",
       };
     });
 }

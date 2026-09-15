@@ -1,8 +1,7 @@
 import {
   Alert,
-  Pressable,
-  Text,
   StyleSheet,
+  Text,
 } from "react-native";
 
 import { useState } from "react";
@@ -15,13 +14,13 @@ import {
   useSessionService,
 } from "../../../services/session-service";
 
+import CloudinaryPicker from "../../../components/CloudinaryPicker";
+
 import Card from "../../../components/Card";
 import Button from "../../../components/Button";
 import Input from "../../../components/Input";
 
-import { COLORS } from "../../../constants/colors";
 import { SPACING } from "../../../constants/spacing";
-import { RADIUS } from "../../../constants/radius";
 
 export default function FormularioTrabajo({
   onCreado,
@@ -39,16 +38,6 @@ export default function FormularioTrabajo({
 
   const { session } =
     useSessionService();
-
-  function seleccionarArchivo() {
-    // Más adelante abrirá DocumentPicker.
-    // Por ahora solamente dejamos preparado
-    // el botón.
-
-    console.log(
-      "Seleccionar archivo"
-    );
-  }
 
   async function crearTrabajo() {
     if (!titulo.trim()) {
@@ -90,16 +79,16 @@ export default function FormularioTrabajo({
     setCreando(true);
 
     try {
-      const respuesta =
-        await crearTrabajoApi(
-          session.usuarioID,
-          session.sessionID,
-          titulo.trim(),
-          contenido.trim(),
-          session.comisionID,
-          session.instructorID,
-          []
-        );
+const respuesta =
+  await crearTrabajoApi(
+    session.usuarioID,
+    session.sessionID,
+    titulo.trim(),
+    contenido.trim(),
+    session.comisionID,
+    session.instructorID,
+    archivo ? [archivo] : []
+  );
 
       console.log(
         "✅ Respuesta crear trabajo:",
@@ -159,15 +148,15 @@ export default function FormularioTrabajo({
         style={styles.contenido}
       />
 
-      <Pressable
-        style={styles.botonArchivo}
-        onPress={seleccionarArchivo}
-      >
-        <Text style={styles.textoArchivo}>
-          {archivo ||
-            "Seleccionar archivo"}
-        </Text>
-      </Pressable>
+<CloudinaryPicker
+  onUploaded={setArchivo}
+/>
+
+{archivo && (
+  <Text style={styles.archivo}>
+    {archivo.name}
+  </Text>
+)}
 
       <Button
         title={
@@ -191,18 +180,7 @@ const styles = StyleSheet.create({
     minHeight: 120,
     textAlignVertical: "top",
   },
-
-  botonArchivo: {
-    padding: SPACING.md,
-    borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    backgroundColor: COLORS.surface,
-    alignItems: "center",
-    marginBottom: SPACING.lg,
-  },
-
-  textoArchivo: {
-    color: COLORS.text,
-  },
+  archivo: {
+  marginBottom: SPACING.lg,
+},
 });

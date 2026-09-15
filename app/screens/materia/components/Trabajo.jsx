@@ -1,15 +1,15 @@
 import {
-  ScrollView,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 
-import TrabajoAlumno from "./TrabajoAlumno";
-import TrabajoInstructor from "./TrabajoInstructor";
-import TrabajoChat from "./TrabajoChat";
 import EntregaTrabajo from "./EntregaTrabajo";
+import TrabajoAlumno from "./TrabajoAlumno";
+import TrabajoChat from "./TrabajoChat";
+import TrabajoInstructor from "./TrabajoInstructor";
 
 import {
   useSessionService,
@@ -72,11 +72,13 @@ export default function Trabajo() {
           </>
         ) : (
           <>
-            <TrabajoAlumno />
+            <TrabajoInstructor />
 
-            <EntregaTrabajo />
+    <TrabajoAlumno />
 
-            <TrabajoChat />
+    <EntregaTrabajo />
+
+    <TrabajoChat />
           </>
         )}
       </ScrollView>
