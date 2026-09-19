@@ -97,31 +97,20 @@ async function ejecutarCerrarSesion() {
 
     >
 
-      <Tabs.Screen
+<Tabs.Screen
+  name="inicio"
+  options={{
+    title: "🏠",
 
-        name="inicio"
-
-        options={{
-
-          title: "Inicio",
-
-          tabBarIcon: ({ focused }) => (
-
-            <Icon
-
-              icon={ICONS.inicio}
-
-              active={false}
-
-              size={24}
-
-            />
-
-          ),
-
-        }}
-
+    tabBarIcon: ({ focused }) => (
+      <Icon
+        icon={ICONS.inicio}
+        active={focused}
+        size={24}
       />
+    ),
+  }}
+/>
 
 
       <Tabs.Screen
@@ -192,17 +181,10 @@ async function ejecutarCerrarSesion() {
 
             >
 
-              <Icon
-
-                icon={{
-
-                  black: ICONS.logout,
-
-                }}
-
-                size={24}
-
-              />
+<Icon
+  icon={ICONS.logout}
+  size={24}
+/>
 
             </Pressable>
 

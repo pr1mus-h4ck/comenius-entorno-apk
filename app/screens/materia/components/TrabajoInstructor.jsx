@@ -100,14 +100,6 @@ useEffect(() => {
 
       </Text>
 
-
-      <Text style={styles.subtitulo}>
-
-        Archivos
-
-      </Text>
-
-
       {trabajo.Archivos?.map((archivo) => (
 
        <Pressable

@@ -6,6 +6,7 @@ import {
   View,
 } from "react-native";
 
+import { useState } from "react";
 import EntregaTrabajo from "./EntregaTrabajo";
 import TrabajoAlumno from "./TrabajoAlumno";
 import TrabajoChat from "./TrabajoChat";
@@ -20,6 +21,11 @@ export default function Trabajo() {
     session,
     actualizarCampo,
   } = useSessionService();
+
+    const [
+    entregaActualizada,
+    setEntregaActualizada,
+  ] = useState(0);
 
   function volver() {
     if (
@@ -61,26 +67,35 @@ export default function Trabajo() {
       </Pressable>
 
       <ScrollView>
-        {session.rol ===
-        "instructor" ? (
-          <>
-            <TrabajoInstructor />
+{session.rol === "instructor" ? (
+  <>
+    <TrabajoInstructor />
 
-            <TrabajoAlumno />
-
-            <TrabajoChat />
-          </>
-        ) : (
-          <>
-            <TrabajoInstructor />
-
-    <TrabajoAlumno />
-
-    <EntregaTrabajo />
+    <TrabajoAlumno
+      entregaActualizada={entregaActualizada}
+    />
 
     <TrabajoChat />
-          </>
-        )}
+  </>
+) : (
+  <>
+    <TrabajoInstructor />
+
+    <TrabajoAlumno
+      entregaActualizada={entregaActualizada}
+    />
+
+    <EntregaTrabajo
+      onEntregada={() =>
+        setEntregaActualizada(
+          (anterior) => anterior + 1
+        )
+      }
+    />
+
+    <TrabajoChat />
+  </>
+)}
       </ScrollView>
     </View>
   );

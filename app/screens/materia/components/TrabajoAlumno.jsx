@@ -30,7 +30,9 @@ import {
 } from "../../../constants/typography";
 
 
-export default function TrabajoAlumno() {
+export default function TrabajoAlumno({
+  entregaActualizada,
+}) {
 
   const [entrega, setEntrega] = useState(null);
 
@@ -51,21 +53,23 @@ export default function TrabajoAlumno() {
 
   }, [
     session?.trabajo?.id,
-    session?.listaAlumno
+    session?.listaAlumno,
+    entregaActualizada,
   ]);
 
 
   async function cargarEntrega() {
 
-   const respuesta = await obtenerTrabajoAlumno(
-  session.usuarioID,
-  session.sessionID,
-  session.comisionID,
-  session.trabajo.id,
-  session.listaAlumno,
-  session.rol,
-  session.instructorID
-);
+    const respuesta =
+      await obtenerTrabajoAlumno(
+        session.usuarioID,
+        session.sessionID,
+        session.comisionID,
+        session.trabajo.id,
+        session.listaAlumno,
+        session.rol,
+        session.instructorID
+      );
 
 
     if (!respuesta.ok) {
@@ -120,19 +124,13 @@ export default function TrabajoAlumno() {
       {entrega.Archivos?.map((archivo) => (
 
         <View
-
           key={archivo.id}
-
           style={styles.archivo}
-
         >
 
           <FileIcon
-
             fileName={archivo.Nombre}
-
             size={28}
-
           />
 
           <Text style={styles.nombreArchivo}>
