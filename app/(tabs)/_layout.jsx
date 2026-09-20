@@ -1,72 +1,105 @@
 import { Image } from "expo-image";
 import { Tabs } from "expo-router";
-import { Alert, Pressable, View, Platform } from "react-native";
+import {
+  Alert,
+  Pressable,
+  View,
+  Platform,
+} from "react-native";
 
 import Icon from "../components/Icon";
 
 import { COLORS } from "../constants/colors";
 import { ICONS } from "../constants/icons";
 
-import { cerrarSesion as cerrarSesionApi } from "../services/auth-service";
-import { irLogin } from "../services/navigation-service";
-import { useSessionService } from "../services/session-service";
-import BottomMenu from "../components/BottomMenu";
+import {
+  cerrarSesion as cerrarSesionApi,
+} from "../services/auth-service";
+
+import {
+  irLogin,
+} from "../services/navigation-service";
+
+import {
+  useSessionService,
+} from "../services/session-service";
 
 export default function TabsLayout() {
 
-  const { session, limpiarSesion } = useSessionService();
+  const {
+    session,
+    limpiarSesion,
+  } = useSessionService();
 
-function cerrarSesion() {
-  if (Platform.OS === "web") {
-    const confirmar = window.confirm(
-      "¿Estás seguro de que querés cerrar sesión?"
-    );
 
-    if (confirmar) {
-      ejecutarCerrarSesion();
+  function cerrarSesion() {
+
+    if (Platform.OS === "web") {
+
+      const confirmar =
+        window.confirm(
+          "¿Estás seguro de que querés cerrar sesión?"
+        );
+
+      if (confirmar) {
+        ejecutarCerrarSesion();
+      }
+
+      return;
     }
 
-    return;
+
+    Alert.alert(
+      "Cerrar sesión",
+      "¿Estás seguro de que querés cerrar sesión?",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+
+        {
+          text: "Sí",
+          style: "destructive",
+          onPress: ejecutarCerrarSesion,
+        },
+      ]
+    );
   }
 
-  Alert.alert(
-    "Cerrar sesión",
-    "¿Estás seguro de que querés cerrar sesión?",
-    [
-      {
-        text: "No",
-        style: "cancel",
-      },
-      {
-        text: "Sí",
-        style: "destructive",
-        onPress: ejecutarCerrarSesion,
-      },
-    ]
-  );
-}
 
-async function ejecutarCerrarSesion() {
-  try {
-    const respuesta = await cerrarSesionApi(
-      session.usuarioID,
-      session.sessionID
-    );
+  async function ejecutarCerrarSesion() {
 
-    console.log(
-      "✅ Cerrar sesión:",
-      respuesta
-    );
-  } catch (error) {
-    console.log(
-      "❌ Error al cerrar sesión:",
-      error
-    );
-  } finally {
-    await limpiarSesion();
-    irLogin();
+    try {
+
+      const respuesta =
+        await cerrarSesionApi(
+          session.usuarioID,
+          session.sessionID
+        );
+
+      console.log(
+        "✅ Cerrar sesión:",
+        respuesta
+      );
+
+    } catch (error) {
+
+      console.log(
+        "❌ Error al cerrar sesión:",
+        error
+      );
+
+    } finally {
+
+      await limpiarSesion();
+
+      irLogin();
+
+    }
+
   }
-}
+
 
   return (
 
@@ -78,10 +111,14 @@ async function ejecutarCerrarSesion() {
 
         headerShown: false,
 
-        tabBarActiveTintColor: COLORS.primary,
+        tabBarActiveTintColor:
+          COLORS.white,
 
         tabBarInactiveTintColor:
           COLORS.textSecondary,
+
+        tabBarActiveBackgroundColor:
+          COLORS.primary,
 
         tabBarStyle: {
 
@@ -97,21 +134,36 @@ async function ejecutarCerrarSesion() {
 
     >
 
-<Tabs.Screen
-  name="inicio"
-  options={{
-    title: "🏠",
+      {/* ============================= */}
+      {/* INICIO */}
+      {/* ============================= */}
 
-    tabBarIcon: ({ focused }) => (
-      <Icon
-        icon={ICONS.inicio}
-        active={focused}
-        size={24}
+      <Tabs.Screen
+
+        name="inicio"
+
+        options={{
+
+          title: "🏠",
+
+          tabBarIcon: ({ focused }) => (
+
+            <Icon
+              icon={ICONS.inicio}
+              active={focused}
+              size={24}
+            />
+
+          ),
+
+        }}
+
       />
-    ),
-  }}
-/>
 
+
+      {/* ============================= */}
+      {/* LOGO */}
+      {/* ============================= */}
 
       <Tabs.Screen
 
@@ -129,22 +181,33 @@ async function ejecutarCerrarSesion() {
 
                 flex: 1,
 
-                justifyContent: "center",
+                justifyContent:
+                  "center",
 
-                alignItems: "center",
+                alignItems:
+                  "center",
 
               }}
 
             >
 
               <Image
-  source={require("../../assets/mini-logo.svg")}
-  style={{
-    width: 30,
-    height: 30,
-  }}
-  contentFit="contain"
-/>
+
+                source={require(
+                  "../../assets/mini-logo.svg"
+                )}
+
+                style={{
+
+                  width: 30,
+
+                  height: 30,
+
+                }}
+
+                contentFit="contain"
+
+              />
 
             </View>
 
@@ -154,6 +217,10 @@ async function ejecutarCerrarSesion() {
 
       />
 
+
+      {/* ============================= */}
+      {/* CERRAR SESIÓN */}
+      {/* ============================= */}
 
       <Tabs.Screen
 
@@ -173,18 +240,23 @@ async function ejecutarCerrarSesion() {
 
                 flex: 1,
 
-                justifyContent: "center",
+                justifyContent:
+                  "center",
 
-                alignItems: "center",
+                alignItems:
+                  "center",
 
               }}
 
             >
 
-<Icon
-  icon={ICONS.logout}
-  size={24}
-/>
+              <Icon
+
+                icon={ICONS.logout}
+
+                size={24}
+
+              />
 
             </Pressable>
 

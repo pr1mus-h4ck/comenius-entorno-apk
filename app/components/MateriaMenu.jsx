@@ -14,19 +14,58 @@ import { SPACING } from "../constants/spacing";
 import { RADIUS } from "../constants/radius";
 import { TYPOGRAPHY } from "../constants/typography";
 
-import { useSessionService } from "../services/session-service";
+import {
+  useSessionService,
+} from "../services/session-service";
+
 
 export default function MateriaMenu() {
 
-  const { session, actualizarCampo } = useSessionService();
+  const {
+    session,
+    actualizarCampo,
+  } = useSessionService();
 
-  const opciones = menuMateria[session.rol] || [];
+
+  const opciones =
+    menuMateria[session.rol] || [];
+
 
   function seleccionarOpcion(opcion) {
 
-    actualizarCampo("enlace", opcion.label);
+    // Cambiamos la sección.
+    actualizarCampo(
+      "enlace",
+      opcion.label
+    );
+
+
+    // IMPORTANTE:
+    // Cada vez que cambiamos de sección
+    // eliminamos el trabajo seleccionado.
+
+    actualizarCampo(
+      "trabajo",
+      null
+    );
+
+
+    // También limpiamos el alumno
+    // seleccionado del instructor.
+
+    actualizarCampo(
+      "alumno",
+      null
+    );
+
+
+    actualizarCampo(
+      "listaAlumno",
+      null
+    );
 
   }
+
 
   return (
 
@@ -34,7 +73,10 @@ export default function MateriaMenu() {
 
       {opciones.map((opcion) => {
 
-        const activo = session.enlace === opcion.label;
+        const activo =
+          session.enlace ===
+          opcion.label;
+
 
         return (
 
@@ -43,29 +85,42 @@ export default function MateriaMenu() {
             key={opcion.label}
 
             style={[
+
               styles.boton,
-              activo && styles.botonActivo,
+
+              activo &&
+                styles.botonActivo,
+
             ]}
 
-            onPress={() => seleccionarOpcion(opcion)}
+            onPress={() =>
+              seleccionarOpcion(opcion)
+            }
 
           >
 
             <Icon
 
-            icon={ICONS[opcion.icon]}
+              icon={
+                ICONS[opcion.icon]
+              }
 
-            active={activo}
+              active={activo}
 
-            size={28}
+              size={28}
 
-          />
+            />
+
 
             <Text
 
               style={[
+
                 styles.texto,
-                activo && styles.textoActivo,
+
+                activo &&
+                  styles.textoActivo,
+
               ]}
 
             >
@@ -86,73 +141,97 @@ export default function MateriaMenu() {
 
 }
 
+
 const styles = StyleSheet.create({
 
   container: {
 
     flexDirection: "row",
 
-    justifyContent: "space-between",
+    justifyContent:
+      "space-between",
 
-    marginHorizontal: SPACING.md,
+    marginHorizontal:
+      SPACING.md,
 
-    marginBottom: SPACING.md,
+    marginBottom:
+      SPACING.md,
+
+  },
+
+
+  boton: {
+
+    flex: 1,
+
+    minHeight: 72,
+
+    marginHorizontal:
+      SPACING.xs,
+
+    paddingVertical:
+      SPACING.md,
+
+    paddingHorizontal:
+      SPACING.sm,
+
+    borderRadius:
+      RADIUS.md,
+
+    backgroundColor:
+      COLORS.surface,
+
+    alignItems: "center",
+
+    justifyContent:
+      "center",
+
+    borderWidth: 1,
+
+    borderColor:
+      COLORS.border,
 
   },
 
- boton: {
-
-  flex: 1,
-
-  minHeight: 72,
-
-  marginHorizontal: SPACING.xs,
-
-  paddingVertical: SPACING.md,
-
-  paddingHorizontal: SPACING.sm,
-
-  borderRadius: RADIUS.md,
-
-  backgroundColor: COLORS.surface,
-
-  alignItems: "center",
-
-  justifyContent: "center",
-
-  borderWidth: 1,
-
-  borderColor: COLORS.border,
-
-  },
 
   botonActivo: {
 
-    backgroundColor: COLORS.primary,
+    backgroundColor:
+      COLORS.primary,
 
-    borderColor: COLORS.primary,
+    borderColor:
+      COLORS.primary,
 
   },
+
 
   texto: {
 
-    marginTop: SPACING.sm,
+    marginTop:
+      SPACING.sm,
 
-    color: COLORS.text,
+    color:
+      COLORS.text,
 
-    fontWeight: "500",
+    fontWeight:
+      "500",
 
-    fontSize: TYPOGRAPHY.small,
+    fontSize:
+      TYPOGRAPHY.small,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
   },
 
+
   textoActivo: {
 
-    color: COLORS.white,
+    color:
+      COLORS.white,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
   },
 

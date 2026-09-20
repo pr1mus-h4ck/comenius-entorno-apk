@@ -1,4 +1,5 @@
 import { Image } from "expo-image";
+
 import {
   Alert,
   Platform,
@@ -11,22 +12,62 @@ import Icon from "./Icon";
 
 import { ICONS } from "../constants/icons";
 
-import { cerrarSesion as cerrarSesionApi } from "../services/auth-service";
-import { irInicio, irLogin } from "../services/navigation-service";
-import { useSessionService } from "../services/session-service";
+import {
+  cerrarSesion as cerrarSesionApi,
+} from "../services/auth-service";
+
+import {
+  irInicio,
+  irLogin,
+} from "../services/navigation-service";
+
+import {
+  useSessionService,
+} from "../services/session-service";
+
 
 export default function BottomMenu() {
+
   const {
     session,
     limpiarSesion,
+    actualizarCampo,
   } = useSessionService();
 
+
+  function irInicioLimpio() {
+
+    // Limpiamos cualquier trabajo
+    // que haya quedado seleccionado.
+
+    actualizarCampo(
+      "trabajo",
+      null
+    );
+
+    actualizarCampo(
+      "alumno",
+      null
+    );
+
+    actualizarCampo(
+      "listaAlumno",
+      null
+    );
+
+    irInicio();
+
+  }
+
+
   function confirmarCerrarSesion() {
-    // Expo Web
+
     if (Platform.OS === "web") {
-      const confirmar = window.confirm(
-        "¿Estás seguro de que querés cerrar sesión?"
-      );
+
+      const confirmar =
+        window.confirm(
+          "¿Estás seguro de que querés cerrar sesión?"
+        );
 
       if (confirmar) {
         ejecutarCerrarSesion();
@@ -35,93 +76,158 @@ export default function BottomMenu() {
       return;
     }
 
-    // Android / iOS
+
     Alert.alert(
       "Cerrar sesión",
       "¿Estás seguro de que querés cerrar sesión?",
       [
+
         {
           text: "No",
           style: "cancel",
         },
+
         {
           text: "Sí",
           style: "destructive",
-          onPress: ejecutarCerrarSesion,
+          onPress:
+            ejecutarCerrarSesion,
         },
+
       ]
     );
+
   }
 
+
   async function ejecutarCerrarSesion() {
+
     try {
-      const respuesta = await cerrarSesionApi(
-        session.usuarioID,
-        session.sessionID
-      );
+
+      const respuesta =
+        await cerrarSesionApi(
+          session.usuarioID,
+          session.sessionID
+        );
 
       console.log(
         "✅ Cerrar sesión:",
         respuesta
       );
+
     } catch (error) {
+
       console.log(
         "❌ Error al cerrar sesión:",
         error
       );
+
     } finally {
+
       await limpiarSesion();
+
       irLogin();
+
     }
+
   }
 
+
   return (
+
     <View style={styles.menu}>
+
+
+      {/* ============================= */}
       {/* INICIO */}
+      {/* ============================= */}
+
       <Pressable
+
         style={styles.boton}
-        onPress={irInicio}
+
+        onPress={irInicioLimpio}
+
       >
+
         <Icon
+
           icon={ICONS.inicio}
+
           size={24}
+
         />
+
       </Pressable>
 
+
+      {/* ============================= */}
       {/* LOGO */}
+      {/* ============================= */}
+
       <Pressable
+
         style={styles.boton}
-        onPress={irInicio}
+
+        onPress={irInicioLimpio}
+
       >
+
         <Image
-          source={require("../../assets/mini-logo.svg")}
+
+          source={require(
+            "../../assets/mini-logo.svg"
+          )}
+
           style={styles.logo}
+
           contentFit="contain"
+
         />
+
       </Pressable>
 
+
+      {/* ============================= */}
       {/* CERRAR SESIÓN */}
+      {/* ============================= */}
+
       <Pressable
+
         style={styles.boton}
+
         onPress={confirmarCerrarSesion}
+
       >
+
         <Icon
-          icon={{
-            black: ICONS.logout,
-          }}
+
+          icon={ICONS.logout}
+
           size={24}
+
         />
+
       </Pressable>
+
+
     </View>
+
   );
+
 }
 
+
 const styles = StyleSheet.create({
+
   menu: {
+
     position: "absolute",
 
     bottom: 0,
+
     left: 0,
+
     right: 0,
 
     height: 65,
@@ -129,26 +235,40 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
 
     borderTopWidth: 1,
+
     borderTopColor: "#DDDDDD",
 
     flexDirection: "row",
+
     alignItems: "center",
-    justifyContent: "space-around",
+
+    justifyContent:
+      "space-around",
 
     zIndex: 100,
+
   },
 
+
   boton: {
+
     flex: 1,
 
     height: 65,
 
     alignItems: "center",
+
     justifyContent: "center",
+
   },
 
+
   logo: {
+
     width: 32,
+
     height: 32,
+
   },
+
 });
