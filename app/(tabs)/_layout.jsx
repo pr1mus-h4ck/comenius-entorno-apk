@@ -2,9 +2,9 @@ import { Image } from "expo-image";
 import { Tabs } from "expo-router";
 import {
   Alert,
+  Platform,
   Pressable,
   View,
-  Platform,
 } from "react-native";
 
 import Icon from "../components/Icon";
@@ -138,28 +138,20 @@ export default function TabsLayout() {
       {/* INICIO */}
       {/* ============================= */}
 
-<Tabs.Screen
+      <Tabs.Screen
+        name="inicio"
+        options={{
+          title: "",
 
-  name="inicio"
-
-  options={{
-
-    title: "",
-
-    tabBarIcon: () => (
-
-      <Icon
-        icon={ICONS.inicio}
-        active={false}
-        size={24}
+          tabBarIcon: ({ focused }) => (
+            <Icon
+              icon={ICONS.inicio}
+              active={focused}
+              size={24}
+            />
+          ),
+        }}
       />
-
-    ),
-
-  }}
-
-/>
-
 
       {/* ============================= */}
       {/* LOGO */}
@@ -234,17 +226,39 @@ export default function TabsLayout() {
 
             <Pressable
 
-              onPress={cerrarSesion}
+              style={({ pressed }) => [
 
-              style={{
+                {
+                  flex: 1,
 
-                flex: 1,
+                  justifyContent:
+                    "center",
 
-                justifyContent:
-                  "center",
+                  alignItems:
+                    "center",
+                },
 
-                alignItems:
-                  "center",
+                pressed && {
+                  opacity: 0.6,
+
+                  transform: [
+                    {
+                      scale: 0.94,
+                    },
+                  ],
+                },
+
+              ]}
+
+              android_ripple={{
+                color: "#DDDDDD",
+              }}
+
+              onPress={() => {
+
+                setTimeout(() => {
+                  cerrarSesion();
+                }, 80);
 
               }}
 

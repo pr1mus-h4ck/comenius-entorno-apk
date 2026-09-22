@@ -28,30 +28,30 @@ import {
 
 export default function BottomMenu() {
 
-const {
-  session,
-  limpiarSesion,
-  actualizarSesion,
-} = useSessionService();
+  const {
+    session,
+    limpiarSesion,
+    actualizarSesion,
+  } = useSessionService();
 
 
-function irInicioLimpio() {
+  function irInicioLimpio() {
 
-  actualizarSesion({
+    actualizarSesion({
 
-    enlace: "",
+      enlace: "",
 
-    trabajo: null,
+      trabajo: null,
 
-    alumno: null,
+      alumno: null,
 
-    listaAlumno: null,
+      listaAlumno: null,
 
-  });
+    });
 
-  irInicio();
+    irInicio();
 
-}
+  }
 
   function confirmarCerrarSesion() {
 
@@ -187,9 +187,24 @@ function irInicioLimpio() {
 
       <Pressable
 
-        style={styles.boton}
+        style={({ pressed }) => [
+          styles.boton,
 
-        onPress={confirmarCerrarSesion}
+          pressed &&
+          styles.botonPresionado,
+        ]}
+
+        android_ripple={{
+          color: "#DDDDDD",
+        }}
+
+        onPress={() => {
+
+          setTimeout(() => {
+            confirmarCerrarSesion();
+          }, 80);
+
+        }}
 
       >
 
@@ -252,6 +267,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
 
     justifyContent: "center",
+
+  },
+
+  botonPresionado: {
+
+    opacity: 0.6,
+
+    transform: [
+      {
+        scale: 0.94,
+      },
+    ],
 
   },
 
