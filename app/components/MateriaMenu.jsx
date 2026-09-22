@@ -23,7 +23,7 @@ export default function MateriaMenu() {
 
   const {
     session,
-    actualizarCampo,
+    actualizarSesion,
   } = useSessionService();
 
 
@@ -33,36 +33,24 @@ export default function MateriaMenu() {
 
   function seleccionarOpcion(opcion) {
 
-    // Cambiamos la sección.
-    actualizarCampo(
-      "enlace",
-      opcion.label
-    );
+    actualizarSesion({
 
+      enlace: opcion.label,
 
-    // IMPORTANTE:
-    // Cada vez que cambiamos de sección
-    // eliminamos el trabajo seleccionado.
+      // Cada vez que cambiamos
+      // de sección, reiniciamos
+      // el trabajo seleccionado.
 
-    actualizarCampo(
-      "trabajo",
-      null
-    );
+      trabajo: null,
 
+      // También reiniciamos
+      // el alumno seleccionado.
 
-    // También limpiamos el alumno
-    // seleccionado del instructor.
+      alumno: null,
 
-    actualizarCampo(
-      "alumno",
-      null
-    );
+      listaAlumno: null,
 
-
-    actualizarCampo(
-      "listaAlumno",
-      null
-    );
+    });
 
   }
 

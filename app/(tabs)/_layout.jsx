@@ -138,27 +138,27 @@ export default function TabsLayout() {
       {/* INICIO */}
       {/* ============================= */}
 
-      <Tabs.Screen
+<Tabs.Screen
 
-        name="inicio"
+  name="inicio"
 
-        options={{
+  options={{
 
-          title: "🏠",
+    title: "",
 
-          tabBarIcon: ({ focused }) => (
+    tabBarIcon: () => (
 
-            <Icon
-              icon={ICONS.inicio}
-              active={focused}
-              size={24}
-            />
-
-          ),
-
-        }}
-
+      <Icon
+        icon={ICONS.inicio}
+        active={false}
+        size={24}
       />
+
+    ),
+
+  }}
+
+/>
 
 
       {/* ============================= */}

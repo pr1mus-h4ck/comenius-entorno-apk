@@ -28,37 +28,30 @@ import {
 
 export default function BottomMenu() {
 
-  const {
-    session,
-    limpiarSesion,
-    actualizarCampo,
-  } = useSessionService();
+const {
+  session,
+  limpiarSesion,
+  actualizarSesion,
+} = useSessionService();
 
 
-  function irInicioLimpio() {
+function irInicioLimpio() {
 
-    // Limpiamos cualquier trabajo
-    // que haya quedado seleccionado.
+  actualizarSesion({
 
-    actualizarCampo(
-      "trabajo",
-      null
-    );
+    enlace: "",
 
-    actualizarCampo(
-      "alumno",
-      null
-    );
+    trabajo: null,
 
-    actualizarCampo(
-      "listaAlumno",
-      null
-    );
+    alumno: null,
 
-    irInicio();
+    listaAlumno: null,
 
-  }
+  });
 
+  irInicio();
+
+}
 
   function confirmarCerrarSesion() {
 
