@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 import {
+  Linking,
+  Pressable,
   View,
   Text,
   StyleSheet,
@@ -37,6 +39,29 @@ export default function TrabajoAlumno({
   const [entrega, setEntrega] = useState(null);
 
   const { session } = useSessionService();
+
+  async function abrirArchivo(archivo) {
+
+  if (!archivo?.URL) {
+    return;
+  }
+
+  try {
+
+    await Linking.openURL(
+      archivo.URL
+    );
+
+  } catch (error) {
+
+    console.log(
+      "❌ No se pudo abrir el archivo:",
+      error
+    );
+
+  }
+
+}
 
 
   // ==========================================
@@ -121,28 +146,30 @@ export default function TrabajoAlumno({
       </Text>
 
 
-      {entrega.Archivos?.map((archivo) => (
+{entrega.Archivos?.map((archivo) => (
 
-        <View
-          key={archivo.id}
-          style={styles.archivo}
-        >
+  <Pressable
+    key={archivo.id}
+    style={styles.archivo}
+    onPress={() =>
+      abrirArchivo(archivo)
+    }
+  >
 
-          <FileIcon
-            fileName={archivo.Nombre}
-            size={28}
-          />
+    <FileIcon
+      fileName={archivo.Nombre}
+      size={28}
+    />
 
-          <Text style={styles.nombreArchivo}>
+    <Text
+      style={styles.nombreArchivo}
+    >
+      {archivo.Nombre}
+    </Text>
 
-            {archivo.Nombre}
+  </Pressable>
 
-          </Text>
-
-        </View>
-
-      ))}
-
+))}
     </Card>
 
   );
@@ -186,15 +213,19 @@ const styles = StyleSheet.create({
 
   },
 
-  nombreArchivo: {
+nombreArchivo: {
 
-    marginLeft: SPACING.md,
+  marginLeft: SPACING.md,
 
-    fontSize: TYPOGRAPHY.body,
+  fontSize: TYPOGRAPHY.body,
 
-    color: COLORS.text,
+  color: COLORS.primary,
 
-  },
+  textDecorationLine: "underline",
+
+  flex: 1,
+
+},
 
   sinEntrega: {
 
