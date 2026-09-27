@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 import {
-  Alert,
   StyleSheet,
 } from "react-native";
 
 import Card from "../../../components/Card";
 import Button from "../../../components/Button";
 import Input from "../../../components/Input";
+import AlertaModal from "../../../components/AlertaModal";
 
 import {
   crearPublicacion,
@@ -20,6 +20,7 @@ import {
 export default function FormularioPublicacion({
   onPublicado,
 }) {
+
   const { session } =
     useSessionService();
 
@@ -29,18 +30,43 @@ export default function FormularioPublicacion({
   const [contenido, setContenido] =
     useState("");
 
-  const [publicando, setPublicando] =
-    useState(false);
+  // ==========================================
+  // PUBLICANDO
+  // ==========================================
+
+  const [
+    publicando,
+    setPublicando,
+  ] = useState(false);
+
+  // ==========================================
+  // MODAL PUBLICACIÓN EXITOSA
+  // ==========================================
+
+  const [
+    mostrarPublicacionExitosa,
+    setMostrarPublicacionExitosa,
+  ] = useState(false);
+
+  // ==========================================
+  // PUBLICAR
+  // ==========================================
 
   async function publicar() {
+
+    // ========================================
+    // VALIDAR CONTENIDO
+    // ========================================
+
     if (!contenido.trim()) {
-      Alert.alert(
-        "Error",
-        "El contenido de la publicación es obligatorio."
-      );
 
       return;
+
     }
+
+    // ========================================
+    // VALIDAR SESIÓN
+    // ========================================
 
     if (
       !session.usuarioID ||
@@ -48,13 +74,14 @@ export default function FormularioPublicacion({
       !session.comisionID ||
       !session.instructorID
     ) {
-      Alert.alert(
-        "Error",
-        "No se encontraron los datos del instructor."
-      );
 
       return;
+
     }
+
+    // ========================================
+    // EVITAR DOBLE CLICK
+    // ========================================
 
     if (publicando) {
       return;
@@ -63,6 +90,7 @@ export default function FormularioPublicacion({
     setPublicando(true);
 
     try {
+
       const respuesta =
         await crearPublicacion(
           session.usuarioID,
@@ -78,78 +106,165 @@ export default function FormularioPublicacion({
         respuesta
       );
 
-      if (!respuesta.ok) {
-        Alert.alert(
-          "Error",
-          respuesta.mensaje ||
-            "No se pudo crear la publicación."
-        );
+      // ======================================
+      // ERROR DE CONEXIÓN
+      // ======================================
+
+      if (
+        respuesta.conexionError
+      ) {
 
         return;
+
       }
 
-      Alert.alert(
-        "Publicación creada",
-        "La publicación se creó correctamente."
-      );
+      // ======================================
+      // OTRO ERROR DEL BACK-END
+      // ======================================
+
+      if (!respuesta.ok) {
+
+        return;
+
+      }
+
+      // ======================================
+      // PUBLICACIÓN CREADA
+      // ======================================
 
       setTitulo("");
+
       setContenido("");
+
+      setMostrarPublicacionExitosa(
+        true
+      );
+
+      // ======================================
+      // ACTUALIZAR PUBLICACIONES
+      // ======================================
 
       if (onPublicado) {
         onPublicado();
       }
+
+      // ======================================
+      // OCULTAR MENSAJE
+      // ======================================
+
+      setTimeout(() => {
+
+        setMostrarPublicacionExitosa(
+          false
+        );
+
+      }, 2000);
+
     } catch (error) {
+
       console.log(
         "❌ Error al crear publicación:",
         error
       );
 
-      Alert.alert(
-        "Error",
-        "No se pudo crear la publicación."
-      );
     } finally {
+
       setPublicando(false);
+
     }
+
   }
 
   return (
+
     <Card style={styles.container}>
+
       <Input
+
         placeholder="Título (opcional)"
+
         value={titulo}
+
         onChangeText={setTitulo}
+
       />
 
       <Input
+
         placeholder="Contenido"
+
         value={contenido}
+
         onChangeText={setContenido}
+
         multiline
+
         style={styles.contenido}
+
       />
 
       <Button
+
         title={
           publicando
             ? "Publicando..."
             : "Publicar"
         }
+
         onPress={publicar}
+
         disabled={publicando}
+
       />
+
+      {/* ================================== */}
+      {/* PUBLICACIÓN EXITOSA */}
+      {/* ================================== */}
+
+      <AlertaModal
+
+        visible={
+          mostrarPublicacionExitosa
+        }
+
+        titulo="¡Muy Bien!"
+
+        mensaje={
+          "¡Se ha creado la\npublicación con éxito!"
+        }
+
+        tipo="exito"
+
+        mostrarBoton={false}
+
+        onAceptar={() =>
+          setMostrarPublicacionExitosa(
+            false
+          )
+        }
+
+      />
+
     </Card>
+
   );
+
 }
 
 const styles = StyleSheet.create({
+
   container: {
+
     margin: 20,
+
   },
 
   contenido: {
+
     minHeight: 100,
+
     textAlignVertical: "top",
+
   },
+
 });

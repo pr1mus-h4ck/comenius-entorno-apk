@@ -10,6 +10,8 @@ import React from "react";
 
 import CloudinaryPicker from "../../../components/CloudinaryPicker";
 
+import AlertaModal from "../../../components/AlertaModal";
+
 import {
   crearTrabajosAlumnos,
 } from "../../../services/auth-service";
@@ -31,16 +33,45 @@ export default function EntregaTrabajo({
   onEntregada,
 }) {
 
-  const { session } = useSessionService();
+  const { session } =
+    useSessionService();
+
+
+  // ==========================================
+  // ARCHIVO
+  // ==========================================
 
   const [archivo, setArchivo] =
     React.useState(null);
+
+
+  // ==========================================
+  // ENVIANDO
+  // ==========================================
 
   const [enviando, setEnviando] =
     React.useState(false);
 
 
+  // ==========================================
+  // MODAL ENTREGA EXITOSA
+  // ==========================================
+
+  const [
+    mostrarEntregaExitosa,
+    setMostrarEntregaExitosa,
+  ] = React.useState(false);
+
+
+  // ==========================================
+  // ENVIAR ENTREGA
+  // ==========================================
+
   async function entregarTrabajo() {
+
+    // ========================================
+    // VALIDAR ARCHIVO
+    // ========================================
 
     if (!archivo) {
 
@@ -54,6 +85,10 @@ export default function EntregaTrabajo({
     }
 
 
+    // ========================================
+    // EVITAR DOBLE CLICK
+    // ========================================
+
     if (enviando) {
       return;
     }
@@ -66,11 +101,17 @@ export default function EntregaTrabajo({
 
       const respuesta =
         await crearTrabajosAlumnos(
+
           session.usuarioID,
+
           session.sessionID,
+
           session.comisionID,
+
           session.trabajo.id,
+
           [archivo]
+
         );
 
 
@@ -79,6 +120,29 @@ export default function EntregaTrabajo({
         respuesta
       );
 
+
+      // ======================================
+      // ERROR DE CONEXIÓN
+      // ======================================
+
+      if (
+        respuesta.conexionError
+      ) {
+
+        // No mostramos el mensaje
+        // de éxito.
+        //
+        // El auth-service ya dispara
+        // la alerta global de conexión.
+
+        return;
+
+      }
+
+
+      // ======================================
+      // OTRO ERROR DEL BACKEND
+      // ======================================
 
       if (!respuesta.ok) {
 
@@ -93,20 +157,41 @@ export default function EntregaTrabajo({
       }
 
 
-      Alert.alert(
-        "Entrega enviada",
-        "El trabajo fue enviado correctamente."
-      );
-
+      // ======================================
+      // ENTREGA EXITOSA
+      // ======================================
 
       setArchivo(null);
 
 
+      // Mostrar ventana verde
+
+      setMostrarEntregaExitosa(
+        true
+      );
+
+
       // Avisamos a Trabajo.jsx
       // que la entrega fue enviada.
+
       if (onEntregada) {
+
         onEntregada();
+
       }
+
+
+      // ======================================
+      // OCULTAR MODAL
+      // ======================================
+
+      setTimeout(() => {
+
+        setMostrarEntregaExitosa(
+          false
+        );
+
+      }, 2000);
 
 
     } catch (error) {
@@ -144,13 +229,19 @@ export default function EntregaTrabajo({
 
 
       <CloudinaryPicker
-        onUploaded={setArchivo}
+        onUploaded={
+          setArchivo
+        }
       />
 
 
       {archivo && (
 
-        <Text style={styles.archivo}>
+        <Text
+          style={
+            styles.archivo
+          }
+        >
 
           📎 {archivo.name}
 
@@ -162,19 +253,35 @@ export default function EntregaTrabajo({
       {archivo && (
 
         <Pressable
+
           style={[
             styles.boton,
+
             enviando &&
               styles.botonDeshabilitado,
+
           ]}
-          onPress={entregarTrabajo}
-          disabled={enviando}
+
+          onPress={
+            entregarTrabajo
+          }
+
+          disabled={
+            enviando
+          }
+
         >
 
-          <Text style={styles.textoBoton}>
+          <Text
+            style={
+              styles.textoBoton
+            }
+          >
 
             {enviando
+
               ? "Enviando..."
+
               : "Enviar"}
 
           </Text>
@@ -182,6 +289,35 @@ export default function EntregaTrabajo({
         </Pressable>
 
       )}
+
+
+      {/* ================================== */}
+      {/* ENTREGA EXITOSA */}
+      {/* ================================== */}
+
+      <AlertaModal
+
+        visible={
+          mostrarEntregaExitosa
+        }
+
+        titulo="¡Muy Bien!"
+
+        mensaje={
+          "¡Se ha subido su entrega\ncon éxito"
+        }
+
+        tipo="exito"
+
+        mostrarBoton={false}
+
+        onAceptar={() =>
+          setMostrarEntregaExitosa(
+            false
+          )
+        }
+
+      />
 
     </View>
 
@@ -194,66 +330,84 @@ const styles = StyleSheet.create({
 
   card: {
 
-    backgroundColor: COLORS.white,
+    backgroundColor:
+      COLORS.white,
 
-    margin: SPACING.lg,
+    margin:
+      SPACING.lg,
 
-    padding: SPACING.lg,
+    padding:
+      SPACING.lg,
 
-    borderRadius: 12,
+    borderRadius:
+      12,
 
   },
 
 
   titulo: {
 
-    fontSize: 20,
+    fontSize:
+      20,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
-    marginBottom: SPACING.lg,
+    marginBottom:
+      SPACING.lg,
 
-    color: COLORS.primaryDark,
+    color:
+      COLORS.primaryDark,
 
   },
 
 
   archivo: {
 
-    marginBottom: SPACING.md,
+    marginBottom:
+      SPACING.md,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
-    color: COLORS.text,
+    color:
+      COLORS.text,
 
   },
 
 
   boton: {
 
-    backgroundColor: COLORS.primary,
+    backgroundColor:
+      COLORS.primary,
 
-    padding: SPACING.md,
+    padding:
+      SPACING.md,
 
-    borderRadius: 8,
+    borderRadius:
+      8,
 
-    alignItems: "center",
+    alignItems:
+      "center",
 
   },
 
 
   botonDeshabilitado: {
 
-    opacity: 0.6,
+    opacity:
+      0.6,
 
   },
 
 
   textoBoton: {
 
-    color: COLORS.white,
+    color:
+      COLORS.white,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
   },
 

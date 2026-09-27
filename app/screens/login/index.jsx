@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import {
-  Alert,
   StyleSheet,
   Text,
   View,
@@ -11,6 +10,7 @@ import AuthLayout from "../../components/AuthLayout";
 import AuthSide from "../../components/AuthSide";
 import Button from "../../components/Button";
 import Input from "../../components/Input";
+import AlertaModal from "../../components/AlertaModal";
 
 import { COLORS } from "../../constants/colors";
 import { SPACING } from "../../constants/spacing";
@@ -22,13 +22,96 @@ import { login } from "../../services/auth-service";
 import { irOtp } from "../../services/navigation-service";
 import { iniciarSesion } from "../../services/session";
 
+
+// ==========================================
+// FORMATEAR MENSAJE DE BLOQUEO
+// ==========================================
+
+function formatearMensajeBloqueo(mensaje) {
+
+  if (!mensaje) {
+    return "Ha ocurrido un error.";
+  }
+
+
+  // Busca un número seguido de "minuto(s)"
+  //
+  // Ejemplo:
+  //
+  // "Intente de nuevo en 4 minuto(s)."
+  //
+  // obtiene:
+  //
+  // 4
+
+  const coincidencia =
+    mensaje.match(
+      /(\d+)\s*minuto\(s\)/
+    );
+
+
+  // Si no encuentra el formato esperado,
+  // mostramos directamente el mensaje
+  // que vino del backend.
+
+  if (!coincidencia) {
+    return mensaje;
+  }
+
+
+  const minutos =
+    Number(coincidencia[1]);
+
+
+  // Si queda solamente 1:
+  //
+  // 1 minuto
+  //
+  // Si quedan 2, 3, 4...:
+  //
+  // 2 minutos
+
+  const palabraMinuto =
+    minutos === 1
+      ? "minuto"
+      : "minutos";
+
+
+  return mensaje.replace(
+    /(\d+)\s*minuto\(s\)/,
+    `${minutos} ${palabraMinuto}`
+  );
+
+}
+
+
 export default function LoginScreen() {
 
   const { setSession } = useSession();
 
-  const [correo, setCorreo] = useState("");
 
-  const [contrasena, setContrasena] = useState("");
+  const [correo, setCorreo] =
+    useState("");
+
+
+  const [contrasena, setContrasena] =
+    useState("");
+
+
+  const [mostrarAlerta, setMostrarAlerta] =
+    useState(false);
+
+
+  const [tipoAlerta, setTipoAlerta] =
+    useState("error");
+
+
+  const [tituloAlerta, setTituloAlerta] =
+    useState("");
+
+
+  const [mensajeAlerta, setMensajeAlerta] =
+    useState("");
 
 
   // ==========================================
@@ -37,37 +120,214 @@ export default function LoginScreen() {
 
   async function iniciarSesionClick() {
 
-    const respuesta = await login(
-      correo,
-      contrasena
-    );
 
+    // ========================================
+    // CAMPOS VACÍOS
+    // ========================================
 
-    if (!respuesta.ok) {
+    if (
+      !correo.trim() ||
+      !contrasena.trim()
+    ) {
 
-      Alert.alert(
-        "Error",
-        respuesta.mensaje || "No se pudo iniciar sesión."
+      setTipoAlerta(
+        "camposObligatorios"
       );
+
+
+      setTituloAlerta(
+        "Campos Obligatorios"
+      );
+
+
+      setMensajeAlerta(
+        "Todos los campos del formulario son obligatorios"
+      );
+
+
+      setMostrarAlerta(true);
+
 
       return;
 
     }
 
 
+    // ========================================
+    // LOGIN
+    // ========================================
+
+    const respuesta =
+      await login(
+        correo,
+        contrasena
+      );
+
+      // ==========================================
+// ERROR DE CONEXIÓN
+// ==========================================
+
+if (respuesta.conexionError) {
+
+  setTipoAlerta("error");
+
+  setTituloAlerta("Error");
+
+  setMensajeAlerta(
+    "No se pudo iniciar la sesión, vuelva a intentarlo más tarde"
+  );
+
+  setMostrarAlerta(true);
+
+  return;
+
+}
+
     console.log(
-      "✅ Login correcto:",
+      "📨 Resultado login:",
       respuesta
     );
 
 
-    iniciarSesion(
-      respuesta,
-      setSession
-    );
+    // ========================================
+    // LOGIN CORRECTO
+    // ========================================
 
+if (respuesta.ok) {
+
+  iniciarSesion(
+    respuesta,
+    setSession
+  );
+
+
+  setTipoAlerta(
+    "exito"
+  );
+
+
+  setTituloAlerta(
+    "Autenticación exitosa"
+  );
+
+
+  setMensajeAlerta(
+    "¡Haz iniciado sesión correctamente!"
+  );
+
+
+  setMostrarAlerta(true);
+
+
+  // Mostramos el mensaje durante
+  // un momento y luego continuamos
+  // con el OTP.
+
+  setTimeout(() => {
+
+    setMostrarAlerta(false);
 
     irOtp();
+
+  }, 1500);
+
+
+  return;
+
+}
+
+
+    // ========================================
+    // BLOQUEO / ERROR FINAL
+    // ========================================
+
+    if (
+      respuesta.tipo === "error" ||
+      respuesta.tipo === "errorLogin"
+    ) {
+
+      setTipoAlerta(
+        "error"
+      );
+
+
+      setTituloAlerta(
+        "Error"
+      );
+
+
+      // ======================================
+      // MENSAJE DE BLOQUEO
+      // ======================================
+      //
+      // El backend controla el tiempo.
+      //
+      // Ejemplo:
+      //
+      // "Ha excedido el límite de intentos.
+      //  Intente de nuevo en 4 minuto(s)."
+      //
+      // La APK solamente cambia:
+      //
+      // 1 minuto(s) → 1 minuto
+      // 4 minuto(s) → 4 minutos
+
+      setMensajeAlerta(
+        formatearMensajeBloqueo(
+          respuesta.mensaje
+        )
+      );
+
+
+      setMostrarAlerta(true);
+
+
+      return;
+
+    }
+
+
+    // ========================================
+    // PRIMER / SEGUNDO INTENTO
+    // ========================================
+
+    if (
+      respuesta.tipo === "aviso"
+    ) {
+
+      setTipoAlerta(
+        "aviso"
+      );
+
+
+      setTituloAlerta(
+        "Error"
+      );
+
+
+      const intentos =
+        respuesta.intentos;
+
+
+      const palabraIntento =
+        intentos === 1
+          ? "intento"
+          : "intentos";
+
+
+      setMensajeAlerta(
+
+        `Correo y/o Contraseña son incorrectos. Te quedan ${intentos} ${palabraIntento}.`
+
+      );
+
+
+      setMostrarAlerta(true);
+
+
+      return;
+
+    }
 
   }
 
@@ -77,22 +337,23 @@ export default function LoginScreen() {
     <AuthLayout
 
       left={
-
         <AuthSide />
-
       }
 
     >
 
       <View style={styles.container}>
 
+
         <Text style={styles.bienvenido}>
           ¡Bienvenido!
         </Text>
 
+
         <Text style={styles.titulo}>
           Inicia sesión
         </Text>
+
 
         <Text style={styles.subtitulo}>
           Usando tu cuenta de estudiante.
@@ -101,9 +362,11 @@ export default function LoginScreen() {
 
         <View style={styles.form}>
 
+
           <Text style={styles.label}>
             Correo Electrónico
           </Text>
+
 
           <Input
             placeholder="Ingresa tu correo electrónico"
@@ -116,6 +379,7 @@ export default function LoginScreen() {
           <Text style={styles.label}>
             Contraseña
           </Text>
+
 
           <Input
             placeholder="Ingresa tu contraseña"
@@ -130,13 +394,36 @@ export default function LoginScreen() {
             onPress={iniciarSesionClick}
           />
 
+
         </View>
 
       </View>
 
+
+      <AlertaModal
+
+        visible={mostrarAlerta}
+
+        titulo={tituloAlerta}
+
+        mensaje={mensajeAlerta}
+
+        tipo={tipoAlerta}
+
+         mostrarBoton={
+          tipoAlerta !== "exito"
+        }
+
+        onAceptar={() =>
+          setMostrarAlerta(false)
+        }
+
+      />
+
     </AuthLayout>
 
   );
+
 }
 
 
@@ -156,57 +443,79 @@ const styles = StyleSheet.create({
 
   },
 
+
   bienvenido: {
 
-    fontSize: TYPOGRAPHY.body,
+    fontSize:
+      TYPOGRAPHY.body,
 
-    color: COLORS.text,
+    color:
+      COLORS.text,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
-    marginBottom: 2,
+    marginBottom:
+      2,
 
   },
+
 
   titulo: {
 
-    fontSize: TYPOGRAPHY.h2,
+    fontSize:
+      TYPOGRAPHY.h2,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
-    color: COLORS.primary,
+    color:
+      COLORS.primary,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
-    marginBottom: SPACING.xs,
+    marginBottom:
+      SPACING.xs,
 
   },
+
 
   subtitulo: {
 
-    fontSize: TYPOGRAPHY.small,
+    fontSize:
+      TYPOGRAPHY.small,
 
-    color: COLORS.text,
+    color:
+      COLORS.text,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
-    marginBottom: SPACING.xxl,
+    marginBottom:
+      SPACING.xxl,
 
   },
+
 
   form: {
 
-    width: "100%",
+    width:
+      "100%",
 
   },
 
+
   label: {
 
-    fontSize: TYPOGRAPHY.small,
+    fontSize:
+      TYPOGRAPHY.small,
 
-    color: COLORS.text,
+    color:
+      COLORS.text,
 
-    marginBottom: SPACING.xs,
+    marginBottom:
+      SPACING.xs,
 
   },
 

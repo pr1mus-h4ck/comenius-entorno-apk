@@ -1,15 +1,19 @@
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+} from "react-native";
 
 import { COLORS } from "../../../constants/colors";
 import { SPACING } from "../../../constants/spacing";
 import { RADIUS } from "../../../constants/radius";
 
 export default function MateriaHeader({
-
   nombre,
   comision,
+  turno,
+  horarios,
   profesor,
-
 }) {
 
   return (
@@ -21,7 +25,15 @@ export default function MateriaHeader({
       </Text>
 
       <Text style={styles.info}>
-        Comisión: {comision}
+        Comision: {comision}
+      </Text>
+
+      <Text style={styles.info}>
+        Turno: {turno}
+      </Text>
+
+      <Text style={styles.info}>
+        {horarios}
       </Text>
 
       <Text style={styles.info}>
@@ -31,7 +43,6 @@ export default function MateriaHeader({
     </View>
 
   );
-
 }
 
 const styles = StyleSheet.create({

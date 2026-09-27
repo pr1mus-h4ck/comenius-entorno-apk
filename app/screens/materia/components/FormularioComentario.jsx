@@ -1,13 +1,14 @@
 import { useState } from "react";
 
 import {
-  Alert,
   StyleSheet,
+  View,
 } from "react-native";
 
 import Card from "../../../components/Card";
 import Button from "../../../components/Button";
 import Input from "../../../components/Input";
+import AlertaModal from "../../../components/AlertaModal";
 
 import {
   crearComentario,
@@ -18,104 +19,212 @@ import {
 } from "../../../services/session-service";
 
 export default function FormularioComentario({
-  publicacionId,
+  publicacion,
   onComentado,
 }) {
+
   const { session } =
     useSessionService();
 
   const [comentario, setComentario] =
     useState("");
 
-  const [enviando, setEnviando] =
-    useState(false);
+  // ==========================================
+  // COMENTANDO
+  // ==========================================
+
+  const [
+    comentando,
+    setComentando,
+  ] = useState(false);
+
+  // ==========================================
+  // MODAL COMENTARIO EXITOSO
+  // ==========================================
+
+  const [
+    mostrarComentarioExitoso,
+    setMostrarComentarioExitoso,
+  ] = useState(false);
+
+  // ==========================================
+  // COMENTAR
+  // ==========================================
 
   async function comentar() {
+
     if (!comentario.trim()) {
-      Alert.alert(
-        "Error",
-        "El comentario no puede estar vacío."
-      );
-
       return;
     }
 
-    if (enviando) {
+    if (comentando) {
       return;
     }
 
-    setEnviando(true);
+    if (
+      !session.usuarioID ||
+      !session.sessionID ||
+      !publicacion?.id
+    ) {
+      return;
+    }
+
+    setComentando(true);
 
     try {
+
       const respuesta =
         await crearComentario(
           session.usuarioID,
           session.sessionID,
-          publicacionId,
+          publicacion.id,
           comentario.trim()
         );
 
       console.log(
-        "✅ Comentario creado:",
+        "✅ Respuesta crear comentario:",
         respuesta
       );
 
-      if (!respuesta.ok) {
-        Alert.alert(
-          "Error",
-          respuesta.mensaje ||
-            "No se pudo crear el comentario."
-        );
+      // ======================================
+      // ERROR DE CONEXIÓN
+      // ======================================
+
+      if (
+        respuesta.conexionError
+      ) {
 
         return;
+
       }
+
+      // ======================================
+      // OTRO ERROR
+      // ======================================
+
+      if (!respuesta.ok) {
+
+        return;
+
+      }
+
+      // ======================================
+      // COMENTARIO CREADO
+      // ======================================
 
       setComentario("");
 
-      // 🔄 Actualizar inmediatamente
-      // la lista de publicaciones
+      setMostrarComentarioExitoso(
+        true
+      );
+
+      // Actualizar comentarios
+
       if (onComentado) {
-        await onComentado();
+        onComentado();
       }
+
+      // ======================================
+      // OCULTAR MENSAJE
+      // ======================================
+
+      setTimeout(() => {
+
+        setMostrarComentarioExitoso(
+          false
+        );
+
+      }, 2000);
+
     } catch (error) {
+
       console.log(
-        "❌ Error al comentar:",
+        "❌ Error al crear comentario:",
         error
       );
 
-      Alert.alert(
-        "Error",
-        "No se pudo crear el comentario."
-      );
     } finally {
-      setEnviando(false);
+
+      setComentando(false);
+
     }
+
   }
 
   return (
-    <Card style={styles.container}>
+
+    <View style={styles.container}>
+
       <Input
-        placeholder="Escribí un comentario..."
+
+        placeholder="Escribir comentario..."
+
         value={comentario}
+
         onChangeText={setComentario}
-        multiline
+
       />
 
       <Button
+
         title={
-          enviando
+          comentando
             ? "Comentando..."
-            : "Comentar"
+            : "Enviar"
         }
+
         onPress={comentar}
-        disabled={enviando}
+
+        disabled={comentando}
+
       />
-    </Card>
+
+      {/* ================================== */}
+      {/* COMENTARIO EXITOSO */}
+      {/* ================================== */}
+
+      <AlertaModal
+
+        visible={
+          mostrarComentarioExitoso
+        }
+
+        titulo="¡Muy Bien!"
+
+        mensaje={
+          "¡Se ha enviado su\ncomentario con éxito!"
+        }
+
+        tipo="exito"
+
+        mostrarBoton={false}
+
+        onAceptar={() =>
+          setMostrarComentarioExitoso(
+            false
+          )
+        }
+
+      />
+
+    </View>
+
   );
+
 }
 
 const styles = StyleSheet.create({
+
   container: {
+
+    flexDirection: "row",
+
+    alignItems: "center",
+
+    gap: 10,
+
     marginTop: 10,
+
   },
+
 });

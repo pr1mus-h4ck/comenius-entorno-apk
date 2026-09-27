@@ -11,13 +11,17 @@ import {
 
 import AuthLayout from "../../components/AuthLayout";
 import AuthSide from "../../components/AuthSide";
+import ConfirmacionModal from "../../components/ConfirmacionModal";
+import AlertaModal from "../../components/AlertaModal";
 
 import {
   irLogin,
   irInicio,
 } from "../../services/navigation-service";
 
-import { useSessionService } from "../../services/session-service";
+import {
+  useSessionService,
+} from "../../services/session-service";
 
 import {
   enviarOtp,
@@ -39,7 +43,8 @@ export default function OtpScreen() {
   } = useSessionService();
 
 
-  const [codigoEnviado, setCodigoEnviado] = useState(false);
+  const [codigoEnviado, setCodigoEnviado] =
+    useState(false);
 
 
   const [codigo, setCodigo] = useState([
@@ -51,8 +56,133 @@ export default function OtpScreen() {
     "",
   ]);
 
+  
+// ==========================================
+// ALERTA OTP
+// ==========================================
+
+const [
+  mostrarAlerta,
+  setMostrarAlerta,
+] = useState(false);
+
+const [
+  tipoAlerta,
+  setTipoAlerta,
+] = useState("error");
+
+const [
+  tituloAlerta,
+  setTituloAlerta,
+] = useState("");
+
+const [
+  mensajeAlerta,
+  setMensajeAlerta,
+] = useState("");
+
 
   const inputs = useRef([]);
+
+
+  // ==========================================
+  // MODAL CANCELAR AUTENTICACIÓN
+  // ==========================================
+
+  const [
+    mostrarConfirmacionCancelar,
+    setMostrarConfirmacionCancelar,
+  ] = useState(false);
+
+
+  // ==========================================
+  // MODAL SESIÓN FINALIZADA
+  // ==========================================
+
+  const [
+    mostrarSesionFinalizada,
+    setMostrarSesionFinalizada,
+  ] = useState(false);
+
+  const [
+    mostrarErrorConexion,
+    setMostrarErrorConexion,
+  ] = useState(false);
+
+  // ==========================================
+  // MODAL ENVÍO OTP EXITOSO
+  // ==========================================
+
+  const [
+    mostrarEnvioExitoso,
+    setMostrarEnvioExitoso,
+  ] = useState(false);
+
+
+  // ==========================================
+  // MODAL CONFIRMACIÓN OTP EXITOSA
+  // ==========================================
+
+  const [
+    mostrarConfirmacionExitosa,
+    setMostrarConfirmacionExitosa,
+  ] = useState(false);
+
+
+  // ==========================================
+  // MOSTRAR CONFIRMACIÓN DE CANCELACIÓN
+  // ==========================================
+
+  function cancelarAutenticacion() {
+
+    setMostrarConfirmacionCancelar(true);
+
+  }
+
+
+  // ==========================================
+  // CONFIRMAR CANCELACIÓN
+  // ==========================================
+
+  function confirmarCancelar() {
+
+    setMostrarConfirmacionCancelar(false);
+
+    limpiarSesion();
+
+    setMostrarSesionFinalizada(true);
+
+
+    setTimeout(() => {
+
+      setMostrarSesionFinalizada(false);
+
+      irLogin();
+
+    }, 1500);
+
+  }
+
+
+  // ==========================================
+  // NO CANCELAR
+  // ==========================================
+
+  function noCancelar() {
+
+    setMostrarConfirmacionCancelar(false);
+
+  }
+
+  function aceptarErrorConexion() {
+
+    setMostrarErrorConexion(false);
+
+    limpiarSesion();
+
+    irLogin();
+
+  }
 
 
   // ==========================================
@@ -61,14 +191,32 @@ export default function OtpScreen() {
 
   async function enviarCodigo() {
 
-    const respuesta = await enviarOtp(
+    const respuesta =
+      await enviarOtp(
 
-      session.usuarioID,
+        session.usuarioID,
 
-      session.sessionID
+        session.sessionID
 
-    );
+      );
 
+
+    // ========================================
+    // ERROR DE CONEXIÓN
+    // ========================================
+
+    if (respuesta.conexionError) {
+
+      setMostrarErrorConexion(true);
+
+      return;
+
+    }
+
+
+    // ========================================
+    // OTRO ERROR
+    // ========================================
 
     if (!respuesta.ok) {
 
@@ -82,7 +230,20 @@ export default function OtpScreen() {
     }
 
 
-    setCodigoEnviado(true);
+    // ========================================
+    // ENVÍO EXITOSO
+    // ========================================
+
+    setMostrarEnvioExitoso(true);
+
+
+    setTimeout(() => {
+
+      setMostrarEnvioExitoso(false);
+
+      setCodigoEnviado(true);
+
+    }, 2000);
 
   }
 
@@ -100,9 +261,14 @@ export default function OtpScreen() {
     setCodigo(nuevoCodigo);
 
 
-    if (valor && indice < 5) {
+    if (
+      valor &&
+      indice < 5
+    ) {
 
-      inputs.current[indice + 1]?.focus();
+      inputs.current[
+        indice + 1
+      ]?.focus();
 
     }
 
@@ -115,7 +281,8 @@ export default function OtpScreen() {
 
   async function confirmarCodigo() {
 
-    const codigoCompleto = codigo.join("");
+    const codigoCompleto =
+      codigo.join("");
 
 
     // ========================================
@@ -134,7 +301,9 @@ export default function OtpScreen() {
     }
 
 
-    if (codigoCompleto.length !== 6) {
+    if (
+      codigoCompleto.length !== 6
+    ) {
 
       Alert.alert(
         "Error",
@@ -150,15 +319,16 @@ export default function OtpScreen() {
     // FETCH
     // ========================================
 
-    const respuesta = await confirmarOtp(
+    const respuesta =
+      await confirmarOtp(
 
-      session.usuarioID,
+        session.usuarioID,
 
-      session.sessionID,
+        session.sessionID,
 
-      codigoCompleto
+        codigoCompleto
 
-    );
+      );
 
 
     // ========================================
@@ -167,29 +337,111 @@ export default function OtpScreen() {
 
     if (respuesta.conexionError) {
 
-      limpiarSesion();
-
-      irLogin();
+      setMostrarErrorConexion(true);
 
       return;
 
     }
 
 
-    // ========================================
-    // OTP INCORRECTO
-    // ========================================
+// ========================================
+// OTP INCORRECTO / BLOQUEO
+// ========================================
 
-    if (!respuesta.ok) {
+if (!respuesta.ok) {
 
-      Alert.alert(
-        "Error",
-        respuesta.mensaje
-      );
+  // ======================================
+  // USUARIO BLOQUEADO
+  // ======================================
 
-      return;
+  if (
+    respuesta.minutos !== undefined &&
+    respuesta.minutos !== null
+  ) {
 
-    }
+    const minutos =
+      Number(respuesta.minutos);
+
+
+    const palabraMinuto =
+      minutos === 1
+        ? "minuto"
+        : "minutos";
+
+
+    setTipoAlerta("error");
+
+    setTituloAlerta("Error");
+
+    setMensajeAlerta(
+
+      `Ha excedido el límite de intentos. Intente de nuevo en ${minutos} ${palabraMinuto}.`
+
+    );
+
+    setMostrarAlerta(true);
+
+    return;
+
+  }
+
+
+  // ======================================
+  // CÓDIGO INCORRECTO
+  // ======================================
+
+  if (
+    respuesta.intentos !== undefined &&
+    respuesta.intentos !== null
+  ) {
+
+    const intentos =
+      Number(respuesta.intentos);
+
+
+    const palabraIntento =
+      intentos === 1
+        ? "intento"
+        : "intentos";
+
+
+    setTipoAlerta("aviso");
+
+    setTituloAlerta("Error");
+
+    setMensajeAlerta(
+
+      `El Código ingresado es incorrecto. Te quedan ${intentos} ${palabraIntento}.`
+
+    );
+
+    setMostrarAlerta(true);
+
+    return;
+
+  }
+
+
+  // ======================================
+  // OTRO ERROR
+  // ======================================
+
+  setTipoAlerta("error");
+
+  setTituloAlerta("Error");
+
+  setMensajeAlerta(
+
+    respuesta.mensaje ||
+    "No se pudo validar el código."
+
+  );
+
+  setMostrarAlerta(true);
+
+  return;
+
+}
 
 
     // ========================================
@@ -213,101 +465,119 @@ export default function OtpScreen() {
     });
 
 
-    irInicio();
+    // ========================================
+    // CONFIRMACIÓN EXITOSA
+    // ========================================
+
+    setMostrarConfirmacionExitosa(true);
+
+
+    // Mostramos el mensaje durante
+    // 2 segundos y después
+    // vamos directamente a Inicio.
+
+    setTimeout(() => {
+
+      setMostrarConfirmacionExitosa(false);
+
+      irInicio();
+
+    }, 2000);
 
   }
 
 
-  return (
+return (
 
-    <AuthLayout
+  <AuthLayout
 
-      left={
+    left={
 
-        <AuthSide
+      <AuthSide
 
-          title="¿Te arrepentiste?"
+        title="¿Te arrepentiste?"
 
-          subtitle='Haz click en "Cancelar" para volver al inicio.'
+        subtitle='Haz click en "Cancelar" para volver al inicio.'
 
-          buttonText="Cancelar"
+        buttonText="Cancelar"
 
-          onPress={() => {
+        onPress={
+          cancelarAutenticacion
+        }
 
-            limpiarSesion();
+      />
 
-            irLogin();
+    }
 
-          }}
+  >
 
-        />
+    {/* ================================== */}
+    {/* CONTENIDO OTP */}
+    {/* ================================== */}
 
-      }
+    {!codigoEnviado ? (
 
-    >
+      <>
 
-      {!codigoEnviado ? (
+        <Text style={styles.paso}>
+          Paso 1/2
+        </Text>
 
-        <>
 
-          <Text style={styles.paso}>
-            Paso 1/2
+        <Text style={styles.titulo}>
+          OTP Verificación
+        </Text>
+
+
+        <Text style={styles.descripcion}>
+          Te enviaremos un código al siguiente correo.
+        </Text>
+
+
+        <Text style={styles.correo}>
+          {session.correo}
+        </Text>
+
+
+        <Pressable
+
+          style={styles.boton}
+
+          onPress={enviarCodigo}
+
+        >
+
+          <Text style={styles.textoBoton}>
+            Continuar
           </Text>
 
+        </Pressable>
 
-          <Text style={styles.titulo}>
-            OTP Verificación
-          </Text>
+      </>
 
+    ) : (
 
-          <Text style={styles.descripcion}>
-            Te enviaremos un código al siguiente correo.
-          </Text>
+      <>
 
-
-          <Text style={styles.correo}>
-            {session.correo}
-          </Text>
+        <Text style={styles.paso}>
+          Paso 2/2
+        </Text>
 
 
-          <Pressable
-
-            style={styles.boton}
-
-            onPress={enviarCodigo}
-
-          >
-
-            <Text style={styles.textoBoton}>
-              Continuar
-            </Text>
-
-          </Pressable>
-
-        </>
-
-      ) : (
-
-        <>
-
-          <Text style={styles.paso}>
-            Paso 2/2
-          </Text>
+        <Text style={styles.titulo}>
+          Confirmar código
+        </Text>
 
 
-          <Text style={styles.titulo}>
-            Confirmar código
-          </Text>
+        <Text style={styles.descripcion}>
+          Ingresá el código recibido.
+        </Text>
 
 
-          <Text style={styles.descripcion}>
-            Ingresá el código recibido.
-          </Text>
+        <View style={styles.codigoContainer}>
 
-
-          <View style={styles.codigoContainer}>
-
-            {codigo.map((digito, indice) => (
+          {codigo.map(
+            (digito, indice) => (
 
               <TextInput
 
@@ -315,16 +585,22 @@ export default function OtpScreen() {
 
                 ref={(input) => {
 
-                  inputs.current[indice] = input;
+                  inputs.current[indice] =
+                    input;
 
                 }}
 
-                style={styles.codigoInput}
+                style={
+                  styles.codigoInput
+                }
 
                 value={digito}
 
                 onChangeText={(valor) =>
-                  cambiarCodigo(valor, indice)
+                  cambiarCodigo(
+                    valor,
+                    indice
+                  )
                 }
 
                 keyboardType="number-pad"
@@ -335,32 +611,219 @@ export default function OtpScreen() {
 
               />
 
-            ))}
+            )
+          )}
 
-          </View>
+        </View>
 
 
-          <Pressable
+        <Pressable
 
-            style={styles.boton}
+          style={styles.boton}
 
-            onPress={confirmarCodigo}
+          onPress={confirmarCodigo}
 
-          >
+        >
 
-            <Text style={styles.textoBoton}>
-              Confirmar
-            </Text>
+          <Text style={styles.textoBoton}>
+            Confirmar
+          </Text>
 
-          </Pressable>
+        </Pressable>
 
-        </>
+      </>
 
-      )}
+    )}
 
-    </AuthLayout>
 
-  );
+    {/* ================================== */}
+    {/* MODAL CANCELAR AUTENTICACIÓN */}
+    {/* ================================== */}
+
+    <ConfirmacionModal
+
+      visible={
+        mostrarConfirmacionCancelar
+      }
+
+      titulo={
+        "Estás a punto de\nCancelar el\nProceso de\nAutenticación"
+      }
+
+      mensaje={
+        "¿Estás seguro/a de\nquerer Cancelar el\nProceso?"
+      }
+
+      textoConfirmar={
+        "Sí, quiero Cancelar"
+      }
+
+      textoCancelar={
+        "No, no quiero Cancelar"
+      }
+
+      onConfirmar={
+        confirmarCancelar
+      }
+
+      onCancelar={
+        noCancelar
+      }
+
+    />
+
+
+    {/* ================================== */}
+    {/* MODAL SESIÓN FINALIZADA */}
+    {/* ================================== */}
+
+    <AlertaModal
+
+      visible={
+        mostrarSesionFinalizada
+      }
+
+      titulo="Sesión Finalizada"
+
+      mensaje={
+        "¡Se ha Finalizado la\nSesión con Éxito!"
+      }
+
+      tipo="exito"
+
+      mostrarBoton={false}
+
+      onAceptar={() =>
+        setMostrarSesionFinalizada(
+          false
+        )
+      }
+
+    />
+
+
+    {/* ================================== */}
+    {/* MODAL ENVÍO OTP EXITOSO */}
+    {/* ================================== */}
+
+    <AlertaModal
+
+      visible={
+        mostrarEnvioExitoso
+      }
+
+      titulo={
+        "Se ha Enviado con\nÉxito"
+      }
+
+      mensaje={
+        "¡Se ha Enviado el Correo\na tu Casilla de E-Mail con\nÉxito!"
+      }
+
+      tipo="exito"
+
+      mostrarBoton={false}
+
+      onAceptar={() =>
+        setMostrarEnvioExitoso(
+          false
+        )
+      }
+
+    />
+
+
+    {/* ================================== */}
+    {/* MODAL CONFIRMACIÓN OTP EXITOSA */}
+    {/* ================================== */}
+
+    <AlertaModal
+
+      visible={
+        mostrarConfirmacionExitosa
+      }
+
+      titulo={
+        "Se ha Confirmado\ncon Éxito"
+      }
+
+      mensaje={
+        "¡Se ha Confirmado el\nCódigo que se te\nproporcionó a tu Casilla\nde E-Mail con Éxito!"
+      }
+
+      tipo="exito"
+
+      mostrarBoton={false}
+
+      onAceptar={() =>
+        setMostrarConfirmacionExitosa(
+          false
+        )
+      }
+
+    />
+
+
+    {/* ================================== */}
+    {/* MODAL ERROR DE CONEXIÓN */}
+    {/* ================================== */}
+
+    <AlertaModal
+
+      visible={
+        mostrarErrorConexion
+      }
+
+      titulo="Error"
+
+      mensaje={
+        "No se pudo validar su identidad, vuelva intentarlo más tarde"
+      }
+
+      tipo="error"
+
+      mostrarBoton={true}
+
+      onAceptar={
+        aceptarErrorConexion
+      }
+
+    />
+
+
+    {/* ================================== */}
+    {/* MODAL ERROR / INTENTOS OTP */}
+    {/* ================================== */}
+
+    <AlertaModal
+
+      visible={
+        mostrarAlerta
+      }
+
+      titulo={
+        tituloAlerta
+      }
+
+      mensaje={
+        mensajeAlerta
+      }
+
+      tipo={
+        tipoAlerta
+      }
+
+      mostrarBoton={true}
+
+      onAceptar={() =>
+        setMostrarAlerta(false)
+      }
+
+    />
+
+  </AuthLayout>
+
+);
 
 }
 
@@ -369,105 +832,139 @@ const styles = StyleSheet.create({
 
   paso: {
 
-    fontSize: TYPOGRAPHY.small,
+    fontSize:
+      TYPOGRAPHY.small,
 
-    color: COLORS.textSecondary,
+    color:
+      COLORS.textSecondary,
 
-    marginBottom: SPACING.xs,
+    marginBottom:
+      SPACING.xs,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
   },
 
 
   titulo: {
 
-    fontSize: TYPOGRAPHY.h1,
+    fontSize:
+      TYPOGRAPHY.h1,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
-    color: COLORS.primary,
+    color:
+      COLORS.primary,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
-    marginBottom: SPACING.sm,
+    marginBottom:
+      SPACING.sm,
 
   },
 
 
   descripcion: {
 
-    fontSize: TYPOGRAPHY.body,
+    fontSize:
+      TYPOGRAPHY.body,
 
-    color: COLORS.text,
+    color:
+      COLORS.text,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
-    marginBottom: SPACING.lg,
+    marginBottom:
+      SPACING.lg,
 
   },
 
 
   correo: {
 
-    fontSize: TYPOGRAPHY.body,
+    fontSize:
+      TYPOGRAPHY.body,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
-    color: COLORS.primary,
+    color:
+      COLORS.primary,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
-    backgroundColor: COLORS.surface,
+    backgroundColor:
+      COLORS.surface,
 
     borderWidth: 1,
 
-    borderColor: COLORS.border,
+    borderColor:
+      COLORS.border,
 
-    borderRadius: RADIUS.md,
+    borderRadius:
+      RADIUS.md,
 
-    padding: SPACING.md,
+    padding:
+      SPACING.md,
 
-    marginBottom: SPACING.xl,
+    marginBottom:
+      SPACING.xl,
 
   },
 
 
   boton: {
 
-    backgroundColor: COLORS.primary,
+    backgroundColor:
+      COLORS.primary,
 
-    borderRadius: RADIUS.md,
+    borderRadius:
+      RADIUS.md,
 
-    padding: SPACING.lg,
+    padding:
+      SPACING.lg,
 
-    alignItems: "center",
+    alignItems:
+      "center",
 
   },
 
 
   textoBoton: {
 
-    color: COLORS.white,
+    color:
+      COLORS.white,
 
-    fontWeight: "bold",
+    fontWeight:
+      "bold",
 
-    fontSize: TYPOGRAPHY.body,
+    fontSize:
+      TYPOGRAPHY.body,
 
   },
 
 
   codigoContainer: {
 
-    flexDirection: "row",
+    flexDirection:
+      "row",
 
-    justifyContent: "center",
+    justifyContent:
+      "center",
 
-    alignItems: "center",
+    alignItems:
+      "center",
 
-    gap: SPACING.sm,
+    gap:
+      SPACING.sm,
 
-    marginBottom: SPACING.xl,
+    marginBottom:
+      SPACING.xl,
 
   },
 
@@ -480,19 +977,26 @@ const styles = StyleSheet.create({
 
     borderWidth: 1,
 
-    borderColor: COLORS.border,
+    borderColor:
+      COLORS.border,
 
-    borderRadius: RADIUS.md,
+    borderRadius:
+      RADIUS.md,
 
-    backgroundColor: COLORS.white,
+    backgroundColor:
+      COLORS.white,
 
-    fontSize: TYPOGRAPHY.h2,
+    fontSize:
+      TYPOGRAPHY.h2,
 
-    color: COLORS.text,
+    color:
+      COLORS.text,
 
-    textAlign: "center",
+    textAlign:
+      "center",
 
-    textAlignVertical: "center",
+    textAlignVertical:
+      "center",
 
     padding: 0,
 

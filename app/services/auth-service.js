@@ -1,44 +1,172 @@
+import {
+  informarErrorConexion,
+} from "./connection-error";
+
 // ✅ Fetch usando .then() — sin async/await
 export function login(correo, contrasena) {
-  if (!correo.trim() || !contrasena.trim()) {
+
+  // ==========================================
+  // VALIDAR CAMPOS
+  // ==========================================
+
+  if (
+    !correo.trim() ||
+    !contrasena.trim()
+  ) {
+
     return Promise.resolve({
+
       ok: false,
-      mensaje: "Por favor, completa todos los campos",
+
+      tipo: "camposObligatorios",
+
+      mensaje:
+        "Todos los campos del formulario son obligatorios.",
+
     });
+
   }
-  // Reemplaza esta URL por la de tu API real
-  const URL = "http://localhost:3000/login";
+
+
+  // ==========================================
+  // URL DEL BACK-END
+  // ==========================================
+
+  const URL =
+    "http://localhost:3000/login";
+
+
+  // ==========================================
+  // FETCH
+  // ==========================================
 
   return fetch(URL, {
+
     method: "POST",
+
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+
+      Accept:
+        "application/json",
+
+      "Content-Type":
+        "application/json",
+
     },
+
     body: JSON.stringify({
-      correo: correo,
-      contrasena: contrasena,
+
+      correo:
+        correo,
+
+      contrasena:
+        contrasena,
+
     }),
+
   })
-    .then((recibir) => recibir.json())
+
+    // ========================================
+    // CONVERTIR RESPUESTA A JSON
+    // ========================================
+
+    .then((recibir) =>
+      recibir.json()
+    )
+
+
+    // ========================================
+    // RESPUESTA DEL BACK-END
+    // ========================================
+
     .then((recibido) => {
-      console.log("✅ Respuesta del Login:", recibido);
-      // Aquí adaptamos lo que devuelve tu API al formato que espera tu pantalla
+
+      console.log(
+        "✅ Respuesta del Login:",
+        recibido
+      );
+
+
       return {
-        ok: !!(recibido.usuarioID && recibido.sessionID),
-        usuarioID: recibido.usuarioID,
-        sessionID: recibido.sessionID,
-        correo: recibido.correo,
-        mensaje: recibido.tipo,
+
+        // Login correcto
+        ok:
+          !!(
+            recibido.usuarioID &&
+            recibido.sessionID
+          ),
+
+
+        usuarioID:
+          recibido.usuarioID,
+
+
+        sessionID:
+          recibido.sessionID,
+
+
+        correo:
+          recibido.correo,
+
+
+        // IMPORTANTE:
+        // guardamos el tipo real
+        // que manda el backend
+
+        tipo:
+          recibido.tipo,
+
+
+        // IMPORTANTE:
+        // guardamos el mensaje real
+        // que manda el backend
+
+        mensaje:
+          recibido.mensaje,
+
+
+        // Intentos restantes
+        // para primer/segundo error
+
+        intentos:
+          recibido.intentos,
+
+
+        conexionError:
+          false,
+
       };
+
     })
+
+
+    // ========================================
+    // ERROR DE CONEXIÓN
+    // ========================================
+
     .catch((error) => {
-      // Si falla la petición, devolvemos ok: false
-      console.log("Error en el fetch:", error);
+
+      console.log(
+        "❌ Error en el fetch Login:",
+        error
+      );
+
+
       return {
+
         ok: false,
+
+        conexionError: true,
+
+        tipo: "conexion",
+
+        mensaje:
+          "No se pudo iniciar la sesión.",
+
       };
+
     });
+
 }
 
 // ===============================
@@ -77,12 +205,23 @@ export function enviarOtp(usuarioID, sessionID) {
       };
     })
     .catch((error) => {
-      console.log("Error en enviar OTP:", error);
+
+      console.log(
+        "❌ Error en enviar OTP:",
+        error
+      );
 
       return {
+
         ok: false,
-        mensaje: "No se pudo enviar el código de verificación",
+
+        conexionError: true,
+
+        mensaje:
+          "No se pudo conectar con el servidor.",
+
       };
+
     });
 }
 
@@ -98,7 +237,6 @@ export function confirmarOtp(usuarioID, sessionID, otp) {
   if (!otp || otp.length !== 6) {
     return Promise.resolve({
       ok: false,
-
       mensaje: "Debe completar el código de 6 dígitos.",
     });
   }
@@ -107,7 +245,8 @@ export function confirmarOtp(usuarioID, sessionID, otp) {
   // URL DEL BACK-END
   // ==========================================
 
-  const URL = "http://localhost:3000/confirmar-otp";
+  const URL =
+    "http://localhost:3000/confirmar-otp";
 
   // ==========================================
   // FETCH
@@ -119,45 +258,59 @@ export function confirmarOtp(usuarioID, sessionID, otp) {
 
       headers: {
         Accept: "application/json",
-
         "Content-Type": "application/json",
       },
 
       body: JSON.stringify({
         id: usuarioID,
-
         session: sessionID,
-
         otp: otp,
       }),
     })
+
       // ========================================
       // CONVERTIR RESPUESTA A JSON
       // ========================================
 
-      .then((recibir) => recibir.json())
+      .then((recibir) =>
+        recibir.json()
+      )
 
       // ========================================
       // RESPUESTA DEL BACK-END
       // ========================================
 
       .then((recibido) => {
-        console.log("✅ Respuesta confirmar OTP:", recibido);
+        console.log(
+          "✅ Respuesta confirmar OTP:",
+          recibido
+        );
 
         return {
           ok: !!recibido.verificacion,
 
-          verificacion: recibido.verificacion,
+          verificacion:
+            recibido.verificacion,
 
-          rol: recibido.rol,
+          rol:
+            recibido.rol,
 
-          nombre: recibido.nombre,
+          nombre:
+            recibido.nombre,
 
-          instructorID: recibido.instructorId,
+          instructorID:
+            recibido.instructorId,
 
-          intentos: recibido.intentos,
+          // Cantidad de intentos restantes
+          intentos:
+            recibido.intentos,
 
-          mensaje: recibido.tipo,
+          // Minutos restantes del bloqueo
+          minutos:
+            recibido.minutos,
+
+          mensaje:
+            recibido.tipo,
 
           conexionError: false,
         };
@@ -168,14 +321,18 @@ export function confirmarOtp(usuarioID, sessionID, otp) {
       // ========================================
 
       .catch((error) => {
-        console.log("❌ Error confirmar OTP:", error);
+        console.log(
+          "❌ Error confirmar OTP:",
+          error
+        );
 
         return {
           ok: false,
 
           conexionError: true,
 
-          mensaje: "No se pudo conectar con el servidor.",
+          mensaje:
+            "No se pudo conectar con el servidor.",
         };
       })
   );
@@ -219,15 +376,22 @@ export function actualizarListaComision(usuarioID, sessionID, rol) {
     })
 
     .catch((error) => {
-      console.log("❌ Error al obtener comisiones:", error);
+
+      console.log(
+        "❌ Error al obtener comisiones:",
+        error
+      );
+
+      informarErrorConexion();
 
       return {
         ok: false,
-
+        conexionError: true,
         comisiones: [],
-
-        mensaje: "No se pudieron obtener las comisiones.",
+        mensaje:
+          "No se pudieron obtener las comisiones.",
       };
+
     });
 }
 
@@ -269,15 +433,22 @@ export function obtenerPortada(usuarioID, sessionID, comisionID) {
     })
 
     .catch((error) => {
-      console.log("❌ Error al obtener portada:", error);
+
+      console.log(
+        "❌ Error al obtener portada:",
+        error
+      );
+
+      informarErrorConexion();
 
       return {
         ok: false,
-
+        conexionError: true,
         portada: [],
-
-        mensaje: "No se pudo obtener la portada.",
+        mensaje:
+          "No se pudo obtener la portada.",
       };
+
     });
 }
 
@@ -352,15 +523,22 @@ export function obtenerPublicaciones(usuarioID, sessionID, comisionID) {
       // ==========================================
 
       .catch((error) => {
-        console.log("❌ Error al obtener publicaciones:", error);
+
+        console.log(
+          "❌ Error al obtener publicaciones:",
+          error
+        );
+
+        informarErrorConexion();
 
         return {
           ok: false,
-
+          conexionError: true,
           publicaciones: [],
-
-          mensaje: "No se pudieron obtener las publicaciones.",
+          mensaje:
+            "No se pudieron obtener las publicaciones.",
         };
+
       })
   );
 }
@@ -423,15 +601,23 @@ export function crearPublicacion(
       };
     })
 
-    .catch((error) => {
-      console.log("❌ Error al crear publicación:", error);
+.catch((error) => {
 
-      return {
-        ok: false,
+  console.log(
+    "❌ Error al crear publicación:",
+    error
+  );
 
-        mensaje: "No se pudo crear la publicación.",
-      };
-    });
+  informarErrorConexion();
+
+  return {
+    ok: false,
+    conexionError: true,
+    mensaje:
+      "No se pudo crear la publicación.",
+  };
+
+});
 }
 
 // ===============================
@@ -494,13 +680,21 @@ export function crearComentario(
 
       // Error de conexión
       .catch((error) => {
-        console.log("❌ Error al crear comentario:", error);
+
+        console.log(
+          "❌ Error al crear comentario:",
+          error
+        );
+
+        informarErrorConexion();
 
         return {
           ok: false,
-
-          mensaje: "No se pudo crear el comentario.",
+          conexionError: true,
+          mensaje:
+            "No se pudo crear el comentario.",
         };
+
       })
   );
 }
@@ -544,15 +738,22 @@ export function obtenerTrabajos(usuarioID, sessionID, comisionID) {
     })
 
     .catch((error) => {
-      console.log("❌ Error al obtener trabajos:", error);
+
+      console.log(
+        "❌ Error al obtener trabajos:",
+        error
+      );
+
+      informarErrorConexion();
 
       return {
         ok: false,
-
+        conexionError: true,
         trabajos: [],
-
-        mensaje: "No se pudieron obtener los trabajos.",
+        mensaje:
+          "No se pudieron obtener los trabajos.",
       };
+
     });
 }
 
@@ -608,19 +809,22 @@ export function obtenerAlumnos(
     })
 
     .catch((error) => {
+
       console.log(
         "❌ Error al obtener alumnos:",
         error
       );
 
+      informarErrorConexion();
+
       return {
         ok: false,
-
+        conexionError: true,
         alumnos: [],
-
         mensaje:
           "No se pudo obtener la lista de alumnos.",
       };
+
     });
 }
 
@@ -669,15 +873,22 @@ export function obtenerTrabajoInstructor(
     })
 
     .catch((error) => {
-      console.log("❌ Error al obtener trabajo:", error);
+
+      console.log(
+        "❌ Error al obtener trabajo:",
+        error
+      );
+
+      informarErrorConexion();
 
       return {
         ok: false,
-
+        conexionError: true,
         trabajo: null,
-
-        mensaje: "No se pudo obtener el trabajo.",
+        mensaje:
+          "No se pudo obtener el trabajo.",
       };
+
     });
 }
 
@@ -703,15 +914,15 @@ export function obtenerTrabajoAlumno(
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-body: JSON.stringify({
-  id: usuarioID,
-  session: sessionID,
-  comisionID: comisionID,
-  trabajo: trabajoID,
-  listaAlumno: listaAlumno,
-  rol: rol,
-  instructorId: instructorID,
-}),
+    body: JSON.stringify({
+      id: usuarioID,
+      session: sessionID,
+      comisionID: comisionID,
+      trabajo: trabajoID,
+      listaAlumno: listaAlumno,
+      rol: rol,
+      instructorId: instructorID,
+    }),
   })
     .then((recibir) => recibir.json())
 
@@ -722,21 +933,28 @@ body: JSON.stringify({
         ok: recibido.ok === true,
 
         trabajo: recibido.archivosEntregas || null,
-        
+
         mensaje: recibido.mensaje,
       };
     })
 
     .catch((error) => {
-      console.log("❌ Error al obtener trabajo alumno:", error);
+
+      console.log(
+        "❌ Error al obtener trabajo alumno:",
+        error
+      );
+
+      informarErrorConexion();
 
       return {
         ok: false,
-
+        conexionError: true,
         trabajo: null,
-
-        mensaje: "No se pudo obtener el trabajo.",
+        mensaje:
+          "No se pudo obtener el trabajo.",
       };
+
     });
 }
 
@@ -787,17 +1005,22 @@ export function obtenerChat(
       };
     })
     .catch((error) => {
+
       console.log(
         "❌ Error al obtener chat:",
         error
       );
 
+      informarErrorConexion();
+
       return {
         ok: false,
+        conexionError: true,
         mensajes: [],
         mensaje:
           "No se pudo obtener el chat.",
       };
+
     });
 }
 
@@ -854,16 +1077,21 @@ export function actualizarChatTrabajo(
       };
     })
     .catch((error) => {
+
       console.log(
         "❌ Error al enviar mensaje:",
         error
       );
 
+      informarErrorConexion();
+
       return {
         ok: false,
+        conexionError: true,
         mensaje:
           "No se pudo enviar el mensaje.",
       };
+
     });
 }
 
@@ -915,13 +1143,21 @@ export function crearTrabajosAlumnos(
     })
 
     .catch((error) => {
-      console.log("❌ Error al enviar entrega:", error);
+
+      console.log(
+        "❌ Error al enviar entrega:",
+        error
+      );
+
+      informarErrorConexion();
 
       return {
         ok: false,
-
-        mensaje: "No se pudo enviar la entrega.",
+        conexionError: true,
+        mensaje:
+          "No se pudo enviar la entrega.",
       };
+
     });
 }
 
@@ -1016,13 +1252,20 @@ export async function actualizarComision(
       mensaje: recibido.mensaje,
     };
   } catch (error) {
-    console.log("❌ Error al actualizar comisión:", error);
+    console.log(
+      "❌ Error al actualizar comisión:",
+      error
+    );
+
+    informarErrorConexion();
 
     return {
       ok: false,
       conexionError: true,
-      mensaje: "No se pudo actualizar la comisión.",
+      mensaje:
+        "No se pudo actualizar la comisión.",
     };
+
   }
 }
 
@@ -1062,11 +1305,20 @@ export function crearTrabajo(
       mensaje: recibido.mensaje || recibido.error,
     }))
     .catch((error) => {
-      console.log("❌ Error al crear trabajo:", error);
+
+      console.log(
+        "❌ Error al crear trabajo:",
+        error
+      );
+
+      informarErrorConexion();
 
       return {
         ok: false,
-        mensaje: "No se pudo crear el trabajo.",
+        conexionError: true,
+        mensaje:
+          "No se pudo crear el trabajo.",
       };
+
     });
 }
