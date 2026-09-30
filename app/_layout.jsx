@@ -2,7 +2,10 @@ import { useRef } from "react";
 
 import { Stack } from "expo-router";
 
-import { useSession, SessionProvider } from "./context/SessionContext";
+import {
+  SessionProvider,
+  useSession,
+} from "./context/SessionContext";
 
 import AlertaModal from "./components/AlertaModal";
 
@@ -27,7 +30,42 @@ function AlertasGlobales() {
 
   } = useSession();
 
-  const temporizador = useRef(null);
+
+  const temporizador =
+    useRef(null);
+
+
+  // ==========================================
+  // MOSTRAR SESIÓN FINALIZADA
+  // ==========================================
+
+  function mostrarSesionFinalizadaTemporal() {
+
+    setMostrarSesionFinalizada(true);
+
+
+    if (temporizador.current) {
+
+      clearTimeout(
+        temporizador.current
+      );
+
+    }
+
+
+    temporizador.current =
+      setTimeout(() => {
+
+        setMostrarSesionFinalizada(
+          false
+        );
+
+        temporizador.current =
+          null;
+
+      }, 2000);
+
+  }
 
 
   // ==========================================
@@ -36,36 +74,26 @@ function AlertasGlobales() {
 
   function aceptarErrorConexion() {
 
-    // Cerramos la alerta roja.
+    // Cerramos alerta roja.
 
-    setMostrarErrorConexion(false);
+    setMostrarErrorConexion(
+      false
+    );
 
-    // Eliminamos los datos de sesión.
+
+    // Eliminamos sesión.
 
     limpiarSesion();
 
-    // Navegamos al Login.
+
+    // Vamos al Login.
 
     irLogin();
 
-    // Mostramos la alerta verde.
 
-    setMostrarSesionFinalizada(true);
+    // Mostramos sesión finalizada.
 
-    // Después de 2 segundos
-    // cerramos la alerta verde.
-
-    if (temporizador.current) {
-      clearTimeout(temporizador.current);
-    }
-
-    temporizador.current = setTimeout(() => {
-
-      setMostrarSesionFinalizada(false);
-
-      temporizador.current = null;
-
-    }, 2000);
+    mostrarSesionFinalizadaTemporal();
 
   }
 
@@ -80,7 +108,9 @@ function AlertasGlobales() {
 
       <AlertaModal
 
-        visible={mostrarErrorConexion}
+        visible={
+          mostrarErrorConexion
+        }
 
         titulo="Error"
 
@@ -92,7 +122,9 @@ function AlertasGlobales() {
 
         mostrarBoton={true}
 
-        onAceptar={aceptarErrorConexion}
+        onAceptar={
+          aceptarErrorConexion
+        }
 
       />
 
@@ -103,7 +135,9 @@ function AlertasGlobales() {
 
       <AlertaModal
 
-        visible={mostrarSesionFinalizada}
+        visible={
+          mostrarSesionFinalizada
+        }
 
         titulo="Sesión Finalizada"
 
@@ -116,7 +150,9 @@ function AlertasGlobales() {
         mostrarBoton={false}
 
         onAceptar={() =>
-          setMostrarSesionFinalizada(false)
+          setMostrarSesionFinalizada(
+            false
+          )
         }
 
       />

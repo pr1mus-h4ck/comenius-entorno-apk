@@ -1,8 +1,8 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
+  useEffect,
 } from "react";
 
 import { SESSION_INICIAL } from "../constants/session";
@@ -16,12 +16,16 @@ const SessionContext = createContext();
 
 export function SessionProvider({ children }) {
 
-  const [session, setSessionState] = useState(
+  const [
+    session,
+    setSessionState,
+  ] = useState(
     SESSION_INICIAL
   );
 
+
   // ==========================================
-  // ERROR GLOBAL DE CONEXIÓN
+  // ALERTA ERROR DE CONEXIÓN
   // ==========================================
 
   const [
@@ -29,8 +33,25 @@ export function SessionProvider({ children }) {
     setMostrarErrorConexion,
   ] = useState(false);
 
+  useEffect(() => {
+
+  registrarErrorConexion(() => {
+
+    setMostrarErrorConexion(true);
+
+  });
+
+  return () => {
+
+    quitarErrorConexion();
+
+  };
+
+}, []);
+
+
   // ==========================================
-  // SESIÓN FINALIZADA
+  // ALERTA SESIÓN FINALIZADA
   // ==========================================
 
   const [
@@ -38,44 +59,31 @@ export function SessionProvider({ children }) {
     setMostrarSesionFinalizada,
   ] = useState(false);
 
-  // ==========================================
-  // ESCUCHAR ERROR DE CONEXIÓN
-  // ==========================================
-
-  useEffect(() => {
-
-    registrarErrorConexion(() => {
-
-      setMostrarErrorConexion(true);
-
-    });
-
-    return () => {
-
-      quitarErrorConexion();
-
-    };
-
-  }, []);
 
   // ==========================================
-  // ACTUALIZAR SESIÓN
+  // SESIÓN
   // ==========================================
 
-  function setSession(actualizacion) {
+  function setSession(
+    actualizacion
+  ) {
 
-    setSessionState((anterior) => {
+    setSessionState(
+      (anterior) => {
 
-      const nuevaSesion =
-        typeof actualizacion === "function"
-          ? actualizacion(anterior)
-          : actualizacion;
+        const nuevaSesion =
+          typeof actualizacion ===
+          "function"
+            ? actualizacion(anterior)
+            : actualizacion;
 
-      return nuevaSesion;
+        return nuevaSesion;
 
-    });
+      }
+    );
 
   }
+
 
   // ==========================================
   // LIMPIAR SESIÓN
@@ -83,9 +91,12 @@ export function SessionProvider({ children }) {
 
   function limpiarSesion() {
 
-    setSessionState(SESSION_INICIAL);
+    setSessionState(
+      SESSION_INICIAL
+    );
 
   }
+
 
   return (
 
@@ -97,6 +108,9 @@ export function SessionProvider({ children }) {
         setSession,
 
         limpiarSesion,
+
+
+        // ALERTAS GLOBALES
 
         mostrarErrorConexion,
 
@@ -117,8 +131,11 @@ export function SessionProvider({ children }) {
 
 }
 
+
 export function useSession() {
 
-  return useContext(SessionContext);
+  return useContext(
+    SessionContext
+  );
 
 }

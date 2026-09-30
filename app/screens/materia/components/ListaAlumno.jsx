@@ -36,199 +36,422 @@ import {
   TYPOGRAPHY,
 } from "../../../constants/typography";
 
+
 export default function ListaAlumno() {
+
   const {
     session,
     actualizarCampo,
   } = useSessionService();
 
-  const [alumnos, setAlumnos] =
-    useState([]);
 
-  const [cargando, setCargando] =
-    useState(true);
+  const [
+    alumnos,
+    setAlumnos,
+  ] = useState([]);
+
+
+  const [
+    cargando,
+    setCargando,
+  ] = useState(true);
+
 
   const cargarAlumnos =
-    useCallback(async () => {
-      if (
-        !session.usuarioID ||
-        !session.sessionID ||
-        !session.comisionID ||
-        !session.instructorID
-      ) {
-        return;
-      }
+    useCallback(
+      async () => {
 
-      setCargando(true);
-
-      try {
-        const respuesta =
-          await obtenerAlumnos(
-            session.usuarioID,
-            session.sessionID,
-            session.comisionID,
-            session.instructorID
-          );
-
-        console.log(
-          "✅ Alumnos:",
-          respuesta.alumnos
-        );
-
-        if (!respuesta.ok) {
-          setAlumnos([]);
-
-          Alert.alert(
-            "Información",
-            respuesta.mensaje ||
-              "No se encontraron alumnos."
-          );
+        if (
+          !session.usuarioID ||
+          !session.sessionID ||
+          !session.comisionID ||
+          !session.instructorID
+        ) {
 
           return;
+
         }
 
-        setAlumnos(
-          respuesta.alumnos || []
-        );
-      } catch (error) {
-        console.log(
-          "❌ Error cargando alumnos:",
-          error
-        );
 
-        Alert.alert(
-          "Error",
-          "No se pudo cargar la lista de alumnos."
-        );
-      } finally {
-        setCargando(false);
-      }
-    }, [
-      session.usuarioID,
-      session.sessionID,
-      session.comisionID,
-      session.instructorID,
-    ]);
+        setCargando(true);
+
+
+        try {
+
+          const respuesta =
+            await obtenerAlumnos(
+
+              session.usuarioID,
+
+              session.sessionID,
+
+              session.comisionID,
+
+              session.instructorID
+
+            );
+
+
+          console.log(
+            "✅ Alumnos:",
+            respuesta.alumnos
+          );
+
+
+          // ====================================
+          // ERROR DE CONEXIÓN
+          // ====================================
+
+          if (
+            respuesta.conexionError
+          ) {
+
+            return;
+
+          }
+
+
+          // ====================================
+          // OTRO ERROR
+          // ====================================
+
+          if (!respuesta.ok) {
+
+            setAlumnos([]);
+
+            Alert.alert(
+
+              "Información",
+
+              respuesta.mensaje ||
+                "No se encontraron alumnos."
+
+            );
+
+            return;
+
+          }
+
+
+          setAlumnos(
+            respuesta.alumnos || []
+          );
+
+
+        } catch (error) {
+
+          console.log(
+            "❌ Error cargando alumnos:",
+            error
+          );
+
+
+          Alert.alert(
+
+            "Error",
+
+            "No se pudo cargar la lista de alumnos."
+
+          );
+
+
+        } finally {
+
+          setCargando(false);
+
+        }
+
+      },
+
+      [
+
+        session.usuarioID,
+
+        session.sessionID,
+
+        session.comisionID,
+
+        session.instructorID,
+
+      ]
+
+    );
+
 
   useEffect(() => {
-    cargarAlumnos();
-  }, [cargarAlumnos]);
 
-  function seleccionarAlumno(alumno) {
+    cargarAlumnos();
+
+  }, [
+    cargarAlumnos,
+  ]);
+
+
+  // ==========================================
+  // SELECCIONAR ALUMNO
+  // ==========================================
+
+  function seleccionarAlumno(
+    alumno
+  ) {
+
     actualizarCampo(
       "listaAlumno",
       alumno.id
     );
 
+
     actualizarCampo(
       "alumno",
       alumno
     );
+
   }
 
+
+  // ==========================================
+  // VOLVER A TRABAJOS
+  // ==========================================
+
   function volverAListaTrabajos() {
+
     actualizarCampo(
       "trabajo",
       null
     );
 
+
     actualizarCampo(
       "alumno",
       null
     );
 
+
     actualizarCampo(
       "listaAlumno",
       null
     );
+
   }
 
+
   return (
-    <View style={styles.container}>
+
+    <View
+      style={
+        styles.container
+      }
+    >
+
       <Pressable
-        style={styles.botonVolver}
-        onPress={volverAListaTrabajos}
+
+        style={
+          styles.botonVolver
+        }
+
+        onPress={
+          volverAListaTrabajos
+        }
+
       >
-        <Text style={styles.textoVolver}>
+
+        <Text
+          style={
+            styles.textoVolver
+          }
+        >
+
           ← Volver a trabajos
+
         </Text>
+
       </Pressable>
 
-      <Text style={styles.titulo}>
+
+      <Text
+        style={
+          styles.titulo
+        }
+      >
+
         Lista de Usuarios Asignados
+
       </Text>
 
+
       {cargando ? (
-        <Text style={styles.texto}>
+
+        <Text
+          style={
+            styles.texto
+          }
+        >
+
           Cargando alumnos...
+
         </Text>
+
       ) : alumnos.length === 0 ? (
-        <Text style={styles.texto}>
+
+        <Text
+          style={
+            styles.texto
+          }
+        >
+
           No hay alumnos asignados a esta comisión.
+
         </Text>
+
       ) : (
-        alumnos.map((alumno) => (
-          <Pressable
-            key={alumno.id}
-            style={styles.alumno}
-            onPress={() =>
-              seleccionarAlumno(
-                alumno
-              )
-            }
-          >
-            <Text style={styles.nombre}>
-              {alumno.Nombre}
-            </Text>
-          </Pressable>
-        ))
+
+        alumnos.map(
+          (alumno) => (
+
+            <Pressable
+
+              key={
+                alumno.id
+              }
+
+              style={
+                styles.alumno
+              }
+
+              onPress={() =>
+                seleccionarAlumno(
+                  alumno
+                )
+              }
+
+            >
+
+              <Text
+                style={
+                  styles.nombre
+                }
+              >
+
+                {alumno.Nombre}
+
+              </Text>
+
+            </Pressable>
+
+          )
+        )
+
       )}
+
     </View>
+
   );
+
 }
 
+
 const styles = StyleSheet.create({
+
   container: {
-    padding: SPACING.md,
+
+    padding:
+      SPACING.md,
+
   },
+
 
   botonVolver: {
-    alignSelf: "flex-start",
-    marginBottom: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.md,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface,
+
+    alignSelf:
+      "flex-start",
+
+    marginBottom:
+      SPACING.lg,
+
+    paddingVertical:
+      SPACING.sm,
+
+    paddingHorizontal:
+      SPACING.md,
+
+    borderRadius:
+      RADIUS.md,
+
+    backgroundColor:
+      COLORS.surface,
+
   },
+
 
   textoVolver: {
-    color: COLORS.primary,
-    fontWeight: "bold",
+
+    color:
+      COLORS.primary,
+
+    fontWeight:
+      "bold",
+
   },
+
 
   titulo: {
-    fontSize: TYPOGRAPHY.h2,
-    fontWeight: "bold",
-    color: COLORS.text,
-    marginBottom: SPACING.lg,
+
+    fontSize:
+      TYPOGRAPHY.h2,
+
+    fontWeight:
+      "bold",
+
+    color:
+      COLORS.text,
+
+    marginBottom:
+      SPACING.lg,
+
   },
+
 
   alumno: {
-    padding: SPACING.md,
-    marginBottom: SPACING.sm,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.white,
+
+    padding:
+      SPACING.md,
+
+    marginBottom:
+      SPACING.sm,
+
+    borderRadius:
+      RADIUS.md,
+
+    backgroundColor:
+      COLORS.white,
+
     borderWidth: 1,
-    borderColor: COLORS.border,
+
+    borderColor:
+      COLORS.border,
+
   },
+
 
   nombre: {
-    fontSize: TYPOGRAPHY.body,
-    color: COLORS.text,
+
+    fontSize:
+      TYPOGRAPHY.body,
+
+    color:
+      COLORS.text,
+
   },
 
+
   texto: {
-    fontSize: TYPOGRAPHY.body,
-    color: COLORS.textSecondary,
+
+    fontSize:
+      TYPOGRAPHY.body,
+
+    color:
+      COLORS.textSecondary,
+
   },
+
 });

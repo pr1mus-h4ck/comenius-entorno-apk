@@ -2,11 +2,12 @@ import { useSession } from "../context/SessionContext";
 import { SESSION_INICIAL } from "../constants/session";
 
 export function useSessionService() {
-  const {
-    session,
-    setSession,
-    limpiarSesion: limpiarSesionContext,
-  } = useSession();
+const {
+  session,
+  setSession,
+  limpiarSesion: limpiarSesionContext,
+  setMostrarSesionFinalizada,
+} = useSession();
 
   function obtenerSesion() {
     return session;
@@ -36,5 +37,6 @@ export function useSessionService() {
     actualizarSesion,
     actualizarCampo,
     limpiarSesion,
+    setMostrarSesionFinalizada,
   };
 }

@@ -33,8 +33,55 @@ import { RADIUS } from "../../constants/radius";
 import { SPACING } from "../../constants/spacing";
 import { TYPOGRAPHY } from "../../constants/typography";
 
+function formatearMensajeBloqueo(
+  mensaje
+) {
+
+  if (!mensaje) {
+    return "Ha ocurrido un error.";
+  }
+
+
+  const coincidencia =
+    mensaje.match(
+      /(\d+)\s*minuto\(s\)/
+    );
+
+
+  if (!coincidencia) {
+    return mensaje;
+  }
+
+
+  const minutos =
+    Number(
+      coincidencia[1]
+    );
+
+
+  const palabraMinuto =
+    minutos === 1
+      ? "minuto"
+      : "minutos";
+
+
+  return mensaje.replace(
+
+    /(\d+)\s*minuto\(s\)/,
+
+    `${minutos} ${palabraMinuto}`
+
+  );
+
+}
+
 
 export default function OtpScreen() {
+
+  const [
+  cerrarSesionPorBloqueo,
+  setCerrarSesionPorBloqueo,
+] = useState(false);
 
   const {
     session,
@@ -56,6 +103,21 @@ export default function OtpScreen() {
     "",
   ]);
 
+function aceptarAlertaOtp() {
+
+  setMostrarAlerta(false);
+
+  if (cerrarSesionPorBloqueo) {
+
+    setCerrarSesionPorBloqueo(false);
+
+    limpiarSesion();
+
+    irLogin();
+
+  }
+
+}
   
 // ==========================================
 // ALERTA OTP
@@ -174,15 +236,23 @@ const [
 
   }
 
-  function aceptarErrorConexion() {
+function aceptarErrorConexion() {
 
-    setMostrarErrorConexion(false);
+  setMostrarErrorConexion(false);
 
-    limpiarSesion();
+  limpiarSesion();
 
-    irLogin();
+  irLogin();
 
-  }
+  setMostrarSesionFinalizada(true);
+
+  setTimeout(() => {
+
+    setMostrarSesionFinalizada(false);
+
+  }, 2000);
+
+}
 
 
   // ==========================================
@@ -274,6 +344,23 @@ const [
 
   }
 
+  //
+  //
+  //
+
+  function limpiarCodigo() {
+
+  setCodigo([
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
+
+}
+
 
   // ==========================================
   // CONFIRMAR OTP
@@ -289,16 +376,25 @@ const [
     // VALIDACIÓN ANTES DEL FETCH
     // ========================================
 
-    if (!codigoCompleto) {
+if (!codigoCompleto) {
 
-      Alert.alert(
-        "Error",
-        "Debe ingresar el código de verificación."
-      );
+  setTipoAlerta(
+    "camposObligatorios"
+  );
 
-      return;
+  setTituloAlerta(
+    "Campos Obligatorios"
+  );
 
-    }
+  setMensajeAlerta(
+    "Todos los campos del formulario son obligatorios"
+  );
+
+  setMostrarAlerta(true);
+
+  return;
+
+}
 
 
     if (
@@ -343,8 +439,7 @@ const [
 
     }
 
-
-// ========================================
+    // ========================================
 // OTP INCORRECTO / BLOQUEO
 // ========================================
 
@@ -355,34 +450,32 @@ if (!respuesta.ok) {
   // ======================================
 
   if (
-    respuesta.minutos !== undefined &&
-    respuesta.minutos !== null
+    respuesta.tipo === "errorConfirmar" ||
+    (
+      respuesta.mensaje &&
+      respuesta.mensaje.includes(
+        "Ha excedido el límite de intentos"
+      )
+    )
   ) {
 
-    const minutos =
-      Number(respuesta.minutos);
+    limpiarCodigo();
 
-
-    const palabraMinuto =
-      minutos === 1
-        ? "minuto"
-        : "minutos";
-
+    setCerrarSesionPorBloqueo(true);
 
     setTipoAlerta("error");
 
     setTituloAlerta("Error");
 
     setMensajeAlerta(
-
-      `Ha excedido el límite de intentos. Intente de nuevo en ${minutos} ${palabraMinuto}.`
-
+      formatearMensajeBloqueo(
+        respuesta.mensaje
+      )
     );
 
     setMostrarAlerta(true);
 
     return;
-
   }
 
 
@@ -398,27 +491,24 @@ if (!respuesta.ok) {
     const intentos =
       Number(respuesta.intentos);
 
-
     const palabraIntento =
       intentos === 1
         ? "intento"
         : "intentos";
 
+    limpiarCodigo();
 
     setTipoAlerta("aviso");
 
     setTituloAlerta("Error");
 
     setMensajeAlerta(
-
       `El Código ingresado es incorrecto. Te quedan ${intentos} ${palabraIntento}.`
-
     );
 
     setMostrarAlerta(true);
 
     return;
-
   }
 
 
@@ -431,18 +521,14 @@ if (!respuesta.ok) {
   setTituloAlerta("Error");
 
   setMensajeAlerta(
-
     respuesta.mensaje ||
-    "No se pudo validar el código."
-
+      "No se pudo validar el código."
   );
 
   setMostrarAlerta(true);
 
   return;
-
 }
-
 
     // ========================================
     // LOGIN COMPLETADO
@@ -795,31 +881,29 @@ return (
     {/* MODAL ERROR / INTENTOS OTP */}
     {/* ================================== */}
 
-    <AlertaModal
+<AlertaModal
+  visible={
+    mostrarAlerta
+  }
 
-      visible={
-        mostrarAlerta
-      }
+  titulo={
+    tituloAlerta
+  }
 
-      titulo={
-        tituloAlerta
-      }
+  mensaje={
+    mensajeAlerta
+  }
 
-      mensaje={
-        mensajeAlerta
-      }
+  tipo={
+    tipoAlerta
+  }
 
-      tipo={
-        tipoAlerta
-      }
+  mostrarBoton={true}
 
-      mostrarBoton={true}
-
-      onAceptar={() =>
-        setMostrarAlerta(false)
-      }
-
-    />
+  onAceptar={
+    aceptarAlertaOtp
+  }
+/>
 
   </AuthLayout>
 

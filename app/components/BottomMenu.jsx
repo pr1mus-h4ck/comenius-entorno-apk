@@ -1,16 +1,19 @@
+import { useState } from "react";
+
 import { Image } from "expo-image";
 
 import {
-  Alert,
-  Platform,
   Pressable,
   StyleSheet,
   View,
 } from "react-native";
 
 import Icon from "./Icon";
+import ConfirmacionModal from "./ConfirmacionModal";
 
-import { ICONS } from "../constants/icons";
+import {
+  ICONS,
+} from "../constants/icons";
 
 import {
   cerrarSesion as cerrarSesionApi,
@@ -32,8 +35,19 @@ export default function BottomMenu() {
     session,
     limpiarSesion,
     actualizarSesion,
+    setMostrarSesionFinalizada,
   } = useSessionService();
 
+
+  const [
+    mostrarConfirmacionCerrar,
+    setMostrarConfirmacionCerrar,
+  ] = useState(false);
+
+
+  // ==========================================
+  // IR A INICIO
+  // ==========================================
 
   function irInicioLimpio() {
 
@@ -49,51 +63,48 @@ export default function BottomMenu() {
 
     });
 
+
     irInicio();
 
   }
 
+
+  // ==========================================
+  // MOSTRAR CONFIRMACIÓN
+  // ==========================================
+
   function confirmarCerrarSesion() {
 
-    if (Platform.OS === "web") {
-
-      const confirmar =
-        window.confirm(
-          "¿Estás seguro de que querés cerrar sesión?"
-        );
-
-      if (confirmar) {
-        ejecutarCerrarSesion();
-      }
-
-      return;
-    }
-
-
-    Alert.alert(
-      "Cerrar sesión",
-      "¿Estás seguro de que querés cerrar sesión?",
-      [
-
-        {
-          text: "No",
-          style: "cancel",
-        },
-
-        {
-          text: "Sí",
-          style: "destructive",
-          onPress:
-            ejecutarCerrarSesion,
-        },
-
-      ]
+    setMostrarConfirmacionCerrar(
+      true
     );
 
   }
 
 
+  // ==========================================
+  // CANCELAR
+  // ==========================================
+
+  function cancelarCerrarSesion() {
+
+    setMostrarConfirmacionCerrar(
+      false
+    );
+
+  }
+
+
+  // ==========================================
+  // CERRAR SESIÓN
+  // ==========================================
+
   async function ejecutarCerrarSesion() {
+
+    setMostrarConfirmacionCerrar(
+      false
+    );
+
 
     try {
 
@@ -103,10 +114,12 @@ export default function BottomMenu() {
           session.sessionID
         );
 
+
       console.log(
         "✅ Cerrar sesión:",
         respuesta
       );
+
 
     } catch (error) {
 
@@ -117,9 +130,40 @@ export default function BottomMenu() {
 
     } finally {
 
-      await limpiarSesion();
+      // ======================================
+      // LIMPIAR SESIÓN
+      // ======================================
+
+      limpiarSesion();
+
+
+      // ======================================
+      // VOLVER AL LOGIN
+      // ======================================
 
       irLogin();
+
+
+      // ======================================
+      // MOSTRAR SESIÓN FINALIZADA
+      // ======================================
+
+      setMostrarSesionFinalizada(
+        true
+      );
+
+
+      // ======================================
+      // OCULTAR DESPUÉS DE 2 SEGUNDOS
+      // ======================================
+
+      setTimeout(() => {
+
+        setMostrarSesionFinalizada(
+          false
+        );
+
+      }, 2000);
 
     }
 
@@ -128,98 +172,161 @@ export default function BottomMenu() {
 
   return (
 
-    <View style={styles.menu}>
+    <>
+
+      <View style={styles.menu}>
+
+        {/* ============================= */}
+        {/* INICIO */}
+        {/* ============================= */}
+
+        <Pressable
+
+          style={({ pressed }) => [
+
+            styles.boton,
+
+            pressed &&
+              styles.botonPresionado,
+
+          ]}
+
+          onPress={
+            irInicioLimpio
+          }
+
+        >
+
+          <Icon
+
+            icon={
+              ICONS.inicio
+            }
+
+            size={24}
+
+          />
+
+        </Pressable>
 
 
-      {/* ============================= */}
-      {/* INICIO */}
-      {/* ============================= */}
+        {/* ============================= */}
+        {/* LOGO */}
+        {/* ============================= */}
 
-      <Pressable
+        <Pressable
 
-        style={styles.boton}
+          style={({ pressed }) => [
 
-        onPress={irInicioLimpio}
+            styles.boton,
 
-      >
+            pressed &&
+              styles.botonPresionado,
 
-        <Icon
+          ]}
 
-          icon={ICONS.inicio}
+          onPress={
+            irInicioLimpio
+          }
 
-          size={24}
+        >
 
-        />
+          <Image
 
-      </Pressable>
+            source={
+              require(
+                "../../assets/mini-logo.svg"
+              )
+            }
 
+            style={
+              styles.logo
+            }
 
-      {/* ============================= */}
-      {/* LOGO */}
-      {/* ============================= */}
+            contentFit="contain"
 
-      <Pressable
+          />
 
-        style={styles.boton}
-
-        onPress={irInicioLimpio}
-
-      >
-
-        <Image
-
-          source={require(
-            "../../assets/mini-logo.svg"
-          )}
-
-          style={styles.logo}
-
-          contentFit="contain"
-
-        />
-
-      </Pressable>
+        </Pressable>
 
 
-      {/* ============================= */}
-      {/* CERRAR SESIÓN */}
-      {/* ============================= */}
+        {/* ============================= */}
+        {/* CERRAR SESIÓN */}
+        {/* ============================= */}
 
-      <Pressable
+        <Pressable
 
-        style={({ pressed }) => [
-          styles.boton,
+          style={({ pressed }) => [
 
-          pressed &&
-          styles.botonPresionado,
-        ]}
+            styles.boton,
 
-        android_ripple={{
-          color: "#DDDDDD",
-        }}
+            pressed &&
+              styles.botonPresionado,
 
-        onPress={() => {
+          ]}
 
-          setTimeout(() => {
-            confirmarCerrarSesion();
-          }, 80);
+          android_ripple={{
+            color: "#DDDDDD",
+          }}
 
-        }}
+          onPress={
+            confirmarCerrarSesion
+          }
 
-      >
+        >
 
-        <Icon
+          <Icon
 
-          icon={ICONS.logout}
+            icon={
+              ICONS.logout
+            }
 
-          size={24}
+            size={24}
 
-        />
+          />
 
-      </Pressable>
+        </Pressable>
+
+      </View>
 
 
-    </View>
+      {/* ================================= */}
+      {/* CONFIRMACIÓN */}
+      {/* ================================= */}
+
+      <ConfirmacionModal
+
+        visible={
+          mostrarConfirmacionCerrar
+        }
+
+        titulo={
+          "Estás a punto de\nCerrar la Sesión"
+        }
+
+        mensaje={
+          "¿Estás seguro/a de\nquerer Cerrar la Sesión?"
+        }
+
+        textoConfirmar={
+          "Sí, quiero Cerrar la Sesión"
+        }
+
+        textoCancelar={
+          "No, no quiero Cerrar la Sesión"
+        }
+
+        onConfirmar={
+          ejecutarCerrarSesion
+        }
+
+        onCancelar={
+          cancelarCerrarSesion
+        }
+
+      />
+
+    </>
 
   );
 
@@ -240,15 +347,19 @@ const styles = StyleSheet.create({
 
     height: 65,
 
-    backgroundColor: "#FFFFFF",
+    backgroundColor:
+      "#FFFFFF",
 
     borderTopWidth: 1,
 
-    borderTopColor: "#DDDDDD",
+    borderTopColor:
+      "#DDDDDD",
 
-    flexDirection: "row",
+    flexDirection:
+      "row",
 
-    alignItems: "center",
+    alignItems:
+      "center",
 
     justifyContent:
       "space-around",
@@ -264,11 +375,14 @@ const styles = StyleSheet.create({
 
     height: 65,
 
-    alignItems: "center",
+    alignItems:
+      "center",
 
-    justifyContent: "center",
+    justifyContent:
+      "center",
 
   },
+
 
   botonPresionado: {
 

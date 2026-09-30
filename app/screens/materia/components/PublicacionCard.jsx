@@ -60,10 +60,10 @@ export default function PublicacionCard({
 
       ))}
 
-      <FormularioComentario
-        publicacionId={publicacion.id}
-        onComentado={onComentado}
-      />
+<FormularioComentario
+  publicacion={publicacion}
+  onComentado={onComentado}
+/>
 
     </Card>
 

@@ -1,16 +1,24 @@
+import { useState } from "react";
+
 import { Image } from "expo-image";
+
 import { Tabs } from "expo-router";
+
 import {
-  Alert,
-  Platform,
   Pressable,
   View,
 } from "react-native";
 
 import Icon from "../components/Icon";
+import ConfirmacionModal from "../components/ConfirmacionModal";
 
-import { COLORS } from "../constants/colors";
-import { ICONS } from "../constants/icons";
+import {
+  COLORS,
+} from "../constants/colors";
+
+import {
+  ICONS,
+} from "../constants/icons";
 
 import {
   cerrarSesion as cerrarSesionApi,
@@ -24,51 +32,52 @@ import {
   useSessionService,
 } from "../services/session-service";
 
+
 export default function TabsLayout() {
 
   const {
     session,
     limpiarSesion,
+    setMostrarSesionFinalizada,
   } = useSessionService();
 
 
+  const [
+    mostrarConfirmacionCerrar,
+    setMostrarConfirmacionCerrar,
+  ] = useState(false);
+
+
+  // ==========================================
+  // MOSTRAR CONFIRMACIÓN
+  // ==========================================
+
   function cerrarSesion() {
 
-    if (Platform.OS === "web") {
+    setMostrarConfirmacionCerrar(true);
 
-      const confirmar =
-        window.confirm(
-          "¿Estás seguro de que querés cerrar sesión?"
-        );
-
-      if (confirmar) {
-        ejecutarCerrarSesion();
-      }
-
-      return;
-    }
-
-
-    Alert.alert(
-      "Cerrar sesión",
-      "¿Estás seguro de que querés cerrar sesión?",
-      [
-        {
-          text: "No",
-          style: "cancel",
-        },
-
-        {
-          text: "Sí",
-          style: "destructive",
-          onPress: ejecutarCerrarSesion,
-        },
-      ]
-    );
   }
 
 
+  // ==========================================
+  // CANCELAR
+  // ==========================================
+
+  function cancelarCerrarSesion() {
+
+    setMostrarConfirmacionCerrar(false);
+
+  }
+
+
+  // ==========================================
+  // CONFIRMAR CIERRE
+  // ==========================================
+
   async function ejecutarCerrarSesion() {
+
+    setMostrarConfirmacionCerrar(false);
+
 
     try {
 
@@ -78,10 +87,12 @@ export default function TabsLayout() {
           session.sessionID
         );
 
+
       console.log(
         "✅ Cerrar sesión:",
         respuesta
       );
+
 
     } catch (error) {
 
@@ -92,9 +103,36 @@ export default function TabsLayout() {
 
     } finally {
 
-      await limpiarSesion();
+      // ======================================
+      // LIMPIAR SESIÓN
+      // ======================================
+
+      limpiarSesion();
+
+
+      // ======================================
+      // VOLVER AL LOGIN
+      // ======================================
 
       irLogin();
+
+
+      // ======================================
+      // MOSTRAR SESIÓN FINALIZADA
+      // ======================================
+
+      setMostrarSesionFinalizada(true);
+
+
+      // ======================================
+      // OCULTAR DESPUÉS DE 2 SEGUNDOS
+      // ======================================
+
+      setTimeout(() => {
+
+        setMostrarSesionFinalizada(false);
+
+      }, 2000);
 
     }
 
@@ -103,184 +141,239 @@ export default function TabsLayout() {
 
   return (
 
-    <Tabs
+    <>
 
-      initialRouteName="inicio"
+      <Tabs
 
-      screenOptions={{
+        initialRouteName="inicio"
 
-        headerShown: false,
+        screenOptions={{
 
-        tabBarActiveTintColor:
-          COLORS.white,
+          headerShown: false,
 
-        tabBarInactiveTintColor:
-          COLORS.textSecondary,
+          tabBarActiveTintColor:
+            COLORS.white,
 
-        tabBarActiveBackgroundColor:
-          COLORS.primary,
+          tabBarInactiveTintColor:
+            COLORS.textSecondary,
 
-        tabBarStyle: {
+          tabBarActiveBackgroundColor:
+            COLORS.primary,
 
-          height: 65,
+          tabBarStyle: {
 
-          paddingBottom: 8,
+            height: 65,
 
-          paddingTop: 8,
+            paddingBottom: 8,
 
-        },
+            paddingTop: 8,
 
-      }}
-
-    >
-
-      {/* ============================= */}
-      {/* INICIO */}
-      {/* ============================= */}
-
-      <Tabs.Screen
-        name="inicio"
-        options={{
-          title: "",
-
-          tabBarIcon: ({ focused }) => (
-            <Icon
-              icon={ICONS.inicio}
-              active={focused}
-              size={24}
-            />
-          ),
-        }}
-      />
-
-      {/* ============================= */}
-      {/* LOGO */}
-      {/* ============================= */}
-
-      <Tabs.Screen
-
-        name="logo"
-
-        options={{
-
-          title: "",
-
-          tabBarButton: () => (
-
-            <View
-
-              style={{
-
-                flex: 1,
-
-                justifyContent:
-                  "center",
-
-                alignItems:
-                  "center",
-
-              }}
-
-            >
-
-              <Image
-
-                source={require(
-                  "../../assets/mini-logo.svg"
-                )}
-
-                style={{
-
-                  width: 30,
-
-                  height: 30,
-
-                }}
-
-                contentFit="contain"
-
-              />
-
-            </View>
-
-          ),
+          },
 
         }}
 
-      />
+      >
 
+        {/* ================================= */}
+        {/* INICIO */}
+        {/* ================================= */}
 
-      {/* ============================= */}
-      {/* CERRAR SESIÓN */}
-      {/* ============================= */}
+        <Tabs.Screen
 
-      <Tabs.Screen
+          name="inicio"
 
-        name="logout"
+          options={{
 
-        options={{
+            title: "",
 
-          title: "Cerrar sesión",
-
-          tabBarButton: () => (
-
-            <Pressable
-
-              style={({ pressed }) => [
-
-                {
-                  flex: 1,
-
-                  justifyContent:
-                    "center",
-
-                  alignItems:
-                    "center",
-                },
-
-                pressed && {
-                  opacity: 0.6,
-
-                  transform: [
-                    {
-                      scale: 0.94,
-                    },
-                  ],
-                },
-
-              ]}
-
-              android_ripple={{
-                color: "#DDDDDD",
-              }}
-
-              onPress={() => {
-
-                setTimeout(() => {
-                  cerrarSesion();
-                }, 80);
-
-              }}
-
-            >
+            tabBarIcon: ({
+              focused,
+            }) => (
 
               <Icon
 
-                icon={ICONS.logout}
+                icon={
+                  ICONS.inicio
+                }
+
+                active={
+                  focused
+                }
 
                 size={24}
 
               />
 
-            </Pressable>
+            ),
 
-          ),
+          }}
 
-        }}
+        />
+
+
+        {/* ================================= */}
+        {/* LOGO */}
+        {/* ================================= */}
+
+        <Tabs.Screen
+
+          name="logo"
+
+          options={{
+
+            title: "",
+
+            tabBarButton: () => (
+
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent:
+                    "center",
+                  alignItems:
+                    "center",
+                }}
+              >
+
+                <Image
+
+                  source={
+                    require(
+                      "../../assets/mini-logo.svg"
+                    )
+                  }
+
+                  style={{
+                    width: 30,
+                    height: 30,
+                  }}
+
+                  contentFit="contain"
+
+                />
+
+              </View>
+
+            ),
+
+          }}
+
+        />
+
+
+        {/* ================================= */}
+        {/* CERRAR SESIÓN */}
+        {/* ================================= */}
+
+        <Tabs.Screen
+
+          name="logout"
+
+          options={{
+
+            title: "Cerrar sesión",
+
+            tabBarButton: () => (
+
+              <Pressable
+
+                style={({
+                  pressed,
+                }) => [
+
+                  {
+                    flex: 1,
+
+                    justifyContent:
+                      "center",
+
+                    alignItems:
+                      "center",
+                  },
+
+                  pressed && {
+
+                    opacity: 0.6,
+
+                    transform: [
+                      {
+                        scale: 0.94,
+                      },
+                    ],
+
+                  },
+
+                ]}
+
+                android_ripple={{
+                  color:
+                    "#DDDDDD",
+                }}
+
+                onPress={
+                  cerrarSesion
+                }
+
+              >
+
+                <Icon
+
+                  icon={
+                    ICONS.logout
+                  }
+
+                  size={24}
+
+                />
+
+              </Pressable>
+
+            ),
+
+          }}
+
+        />
+
+      </Tabs>
+
+
+      {/* ================================= */}
+      {/* CONFIRMACIÓN CERRAR SESIÓN */}
+      {/* ================================= */}
+
+      <ConfirmacionModal
+
+        visible={
+          mostrarConfirmacionCerrar
+        }
+
+        titulo={
+          "Estás a punto de\nCerrar la Sesión"
+        }
+
+        mensaje={
+          "¿Estás seguro/a de\nquerer Cerrar la Sesión?"
+        }
+
+        textoConfirmar={
+          "Sí, quiero Cerrar la Sesión"
+        }
+
+        textoCancelar={
+          "No, no quiero Cerrar la Sesión"
+        }
+
+        onConfirmar={
+          ejecutarCerrarSesion
+        }
+
+        onCancelar={
+          cancelarCerrarSesion
+        }
 
       />
 
-    </Tabs>
+    </>
 
   );
 
