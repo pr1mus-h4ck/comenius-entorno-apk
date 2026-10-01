@@ -18,6 +18,14 @@ import {
   useSessionService,
 } from "../../../services/session-service";
 
+import {
+  COLORS,
+} from "../../../constants/colors";
+
+import {
+  SPACING,
+} from "../../../constants/spacing";
+
 export default function FormularioComentario({
   publicacion,
   onComentado,
@@ -26,11 +34,13 @@ export default function FormularioComentario({
   const { session } =
     useSessionService();
 
-  const [comentario, setComentario] =
-    useState("");
+  const [
+    comentario,
+    setComentario,
+  ] = useState("");
 
   // ==========================================
-  // COMENTANDO
+  // ESTADO COMENTANDO
   // ==========================================
 
   const [
@@ -90,12 +100,8 @@ export default function FormularioComentario({
       // ERROR DE CONEXIÓN
       // ======================================
 
-      if (
-        respuesta.conexionError
-      ) {
-
+      if (respuesta.conexionError) {
         return;
-
       }
 
       // ======================================
@@ -103,9 +109,7 @@ export default function FormularioComentario({
       // ======================================
 
       if (!respuesta.ok) {
-
         return;
-
       }
 
       // ======================================
@@ -114,25 +118,20 @@ export default function FormularioComentario({
 
       setComentario("");
 
-      setMostrarComentarioExitoso(
-        true
-      );
+      setMostrarComentarioExitoso(true);
 
-      // Actualizar comentarios
-
+      // Actualizar publicaciones/comentarios
       if (onComentado) {
         onComentado();
       }
 
       // ======================================
-      // OCULTAR MENSAJE
+      // OCULTAR MODAL
       // ======================================
 
       setTimeout(() => {
 
-        setMostrarComentarioExitoso(
-          false
-        );
+        setMostrarComentarioExitoso(false);
 
       }, 2000);
 
@@ -155,28 +154,30 @@ export default function FormularioComentario({
 
     <View style={styles.container}>
 
+      {/* ================================== */}
+      {/* CAMPO DE COMENTARIO */}
+      {/* ================================== */}
+
       <Input
-
         placeholder="Escribir comentario..."
-
         value={comentario}
-
         onChangeText={setComentario}
-
+        style={styles.input}
       />
 
-      <Button
+      {/* ================================== */}
+      {/* BOTÓN ENVIAR */}
+      {/* ================================== */}
 
+      <Button
         title={
           comentando
             ? "Comentando..."
             : "Enviar"
         }
-
         onPress={comentar}
-
         disabled={comentando}
-
+        style={styles.boton}
       />
 
       {/* ================================== */}
@@ -184,7 +185,6 @@ export default function FormularioComentario({
       {/* ================================== */}
 
       <AlertaModal
-
         visible={
           mostrarComentarioExitoso
         }
@@ -200,11 +200,8 @@ export default function FormularioComentario({
         mostrarBoton={false}
 
         onAceptar={() =>
-          setMostrarComentarioExitoso(
-            false
-          )
+          setMostrarComentarioExitoso(false)
         }
-
       />
 
     </View>
@@ -221,9 +218,31 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
 
-    gap: 10,
+    width: "100%",
 
-    marginTop: 10,
+    gap: SPACING.sm,
+
+    marginTop: SPACING.md,
+
+  },
+
+  input: {
+
+    flex: 1,
+
+    width: undefined,
+
+    marginBottom: 0,
+
+  },
+
+  boton: {
+
+    flex: 0,
+
+    width: 110,
+
+    marginBottom: 0,
 
   },
 
