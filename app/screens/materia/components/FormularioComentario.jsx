@@ -168,13 +168,8 @@ export default function FormularioComentario({
       {/* ================================== */}
       {/* BOTÓN ENVIAR */}
       {/* ================================== */}
-
       <Button
-        title={
-          comentando
-            ? "Comentando..."
-            : "Enviar"
-        }
+        title={comentando ? "Comentando..." : "Enviar"}
         onPress={comentar}
         disabled={comentando}
         style={styles.boton}
@@ -210,40 +205,35 @@ export default function FormularioComentario({
 
 }
 
+
 const styles = StyleSheet.create({
-
   container: {
-
     flexDirection: "row",
-
-    alignItems: "center",
-
+    alignItems: "stretch",
     width: "100%",
-
     gap: SPACING.sm,
-
     marginTop: SPACING.md,
-
   },
 
   input: {
-
     flex: 1,
-
-    width: undefined,
-
+    width: 0,
+    minWidth: 0,
     marginBottom: 0,
-
+    alignSelf: "stretch",
   },
 
   boton: {
-
-    flex: 0,
-
-    width: 110,
-
+    flexGrow: 0,
+    flexShrink: 0,
+    width: 100,
+    minHeight: 44,
     marginBottom: 0,
-
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.sm,
   },
-
 });
