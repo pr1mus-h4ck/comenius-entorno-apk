@@ -74,24 +74,16 @@ function AlertasGlobales() {
 
   function aceptarErrorConexion() {
 
-    // Cerramos alerta roja.
-
     setMostrarErrorConexion(
       false
     );
 
 
-    // Eliminamos sesión.
-
     limpiarSesion();
 
 
-    // Vamos al Login.
-
     irLogin();
 
-
-    // Mostramos sesión finalizada.
 
     mostrarSesionFinalizadaTemporal();
 

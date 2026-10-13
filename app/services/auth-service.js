@@ -2,7 +2,6 @@ import {
   informarErrorConexion,
 } from "./connection-error";
 
-// ✅ Fetch usando .then() — sin async/await
 export function login(correo, contrasena) {
 
   // ==========================================
@@ -89,7 +88,6 @@ export function login(correo, contrasena) {
 
       return {
 
-        // Login correcto
         ok:
           !!(
             recibido.usuarioID &&
@@ -109,24 +107,13 @@ export function login(correo, contrasena) {
           recibido.correo,
 
 
-        // IMPORTANTE:
-        // guardamos el tipo real
-        // que manda el backend
-
         tipo:
           recibido.tipo,
 
 
-        // IMPORTANTE:
-        // guardamos el mensaje real
-        // que manda el backend
-
         mensaje:
           recibido.mensaje,
 
-
-        // Intentos restantes
-        // para primer/segundo error
 
         intentos:
           recibido.intentos,
@@ -687,7 +674,6 @@ export function crearComentario(
   publicacionId,
   comentario,
 ) {
-  // Validar comentario antes de hacer el fetch
   if (!comentario.trim()) {
     return Promise.resolve({
       ok: false,
@@ -696,7 +682,6 @@ export function crearComentario(
     });
   }
 
-  // URL del Back-End
   const URL = "http://localhost:3000/crearComentario";
 
   return (
@@ -721,10 +706,8 @@ export function crearComentario(
         fechaHora: Date.now(),
       }),
     })
-      // Convertir respuesta a JSON
       .then((recibir) => recibir.json())
 
-      // Adaptar respuesta del Back-End
       .then((recibido) => {
         console.log("✅ Respuesta crear comentario:", recibido);
 
@@ -735,7 +718,6 @@ export function crearComentario(
         };
       })
 
-      // Error de conexión
       .catch((error) => {
 
         console.log(
@@ -761,7 +743,7 @@ export function crearComentario(
 // ===============================
 
 export function obtenerTrabajos(usuarioID, sessionID, comisionID) {
-  // URL del Back-End
+
   const URL = "http://localhost:3000/actualizarTrabajos";
 
   return fetch(URL, {

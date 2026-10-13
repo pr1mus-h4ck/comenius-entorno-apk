@@ -37,14 +37,7 @@ export default function MateriaMenu() {
 
       enlace: opcion.label,
 
-      // Cada vez que cambiamos
-      // de sección, reiniciamos
-      // el trabajo seleccionado.
-
       trabajo: null,
-
-      // También reiniciamos
-      // el alumno seleccionado.
 
       alumno: null,
 

@@ -1,6 +1,3 @@
-// ❌ SIN import de librerías nuevas
-// ✅ SOLO tu código original, con los console.log para probar
-
 import {
   SESSION_INICIAL,
 } from "../constants/session";
